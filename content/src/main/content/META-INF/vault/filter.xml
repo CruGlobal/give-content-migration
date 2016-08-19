@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/apps/cru-content-importer" mode="replace"/>
+    <filter root="/etc/clientlibs/cru-content-importer" mode="replace"/>
+    <filter root="/etc/importers/cru/givedataimport" mode="replace"/>
+</workspaceFilter>

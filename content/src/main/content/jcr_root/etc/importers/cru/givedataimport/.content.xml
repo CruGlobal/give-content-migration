@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    jcr:primaryType="sling:Folder"
+    jcr:title="Give Data Import"
+    sling:resourceType="cq/ui/components/widget"
+    jsLibs="[cq.widgets]"
+    xtype="cruGiveDataImporter"
+    options='[
+    {"name":"staff"\,
+     "title":"Staff"\,
+     "defaultPath":"/content/give/us/en/designations"\,
+     "pageTemplate":"/apps/Give/templates/designation"\,
+     "intermediateTemplate":"/apps/Give/templates/redirect"\,
+     "transformation":"/apps/cru-content-importer/transformations/default.xsl"\,
+     "rowColumnNames":"2"\,
+     "columnFileName":"primaryFile"\,
+     "columnDesignation":"Designation"},
+    {"name":"ministry"\,
+     "title":"Ministry"\,
+     "defaultPath":"/content/give/us/en/designations"\,
+     "pageTemplate":"/apps/Give/templates/designation"\,
+     "intermediateTemplate":"/apps/Give/templates/redirect"\,
+     "transformation":"/apps/cru-content-importer/transformations/default.xsl"\,
+     "rowColumnNames":"2"\,
+     "columnFileName":"primaryFile"\,
+     "columnDesignation":"Designation"},
+    {"name":"fund"\,
+     "title":"Fund"\,
+     "defaultPath":"/content/give/us/en/campaigns"\,
+     "pageTemplate":"/apps/Give/templates/campaign"\,
+     "intermediateTemplate":"/apps/Give/templates/redirect"\,
+     "transformation":"/apps/cru-content-importer/transformations/default.xsl"\,
+     "rowColumnNames":"2"\,
+     "columnFileName":"primaryFile"\,
+     "columnDesignation":"Designation"}
+    ]'
+    tempStorePath="/var/cru-content-importer"
+    />
