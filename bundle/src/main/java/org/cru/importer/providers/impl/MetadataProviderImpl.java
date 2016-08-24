@@ -12,7 +12,7 @@ import javax.jcr.Binary;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -32,11 +32,13 @@ public class MetadataProviderImpl implements MetadataProvider {
 	List<String> colnames;
 	int columnFileNames;
 	int rowColumnNames;
+	DataFormatter excelFormatter;
 	
 	public MetadataProviderImpl(ParametersCollector parametersCollector) throws Exception {
 		workbook = getWorkbook(parametersCollector.getContentFile());
 		columnFileNames = -1;
 		rowColumnNames = parametersCollector.getRowColumnNames();
+		excelFormatter = new DataFormatter();
 		if (workbook != null && workbook.getNumberOfSheets()>0) {
 			XSSFSheet sheet = workbook.getSheetAt(0);
 			XSSFRow row = sheet.getRow(rowColumnNames);
@@ -142,7 +144,8 @@ public class MetadataProviderImpl implements MetadataProvider {
 	 */
 	private String getStringValue(Row row, int column) {
 		Cell cell = row.getCell(column);
-		if (cell != null) {
+		return excelFormatter.formatCellValue(cell);
+		/*if (cell != null) {
 			int cellType = cell.getCellType();
 			if (cellType == Cell.CELL_TYPE_FORMULA) {
 				cellType = cell.getCachedFormulaResultType();
@@ -163,7 +166,7 @@ public class MetadataProviderImpl implements MetadataProvider {
 			}
 		} else {
 			return "";
-		}
+		}*/
 	}
 
 }
