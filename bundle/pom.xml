@@ -107,11 +107,11 @@
 		    <version>9.7.0-7</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/net.sf.saxon/saxon-dom -->
-		<dependency>
+		<!-- <dependency>
 		    <groupId>net.sf.saxon</groupId>
 		    <artifactId>saxon-dom</artifactId>
 		    <version>8.7</version>
-		</dependency>
+		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/xml-resolver/xml-resolver -->
 		<dependency>
 		    <groupId>xml-resolver</groupId>
