@@ -33,12 +33,16 @@
 			<xsl:attribute name="websiteURL"><xsl:value-of select="wcm:root/wcm:element[@name='website']" /></xsl:attribute>
 			<xsl:attribute name="paragraphText"><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></xsl:attribute>
 
-			<xsl:attribute name="largeImage">
-				<xsl:value-of select="fn:doc(concat('give://largeImage?image=', wcm:root/wcm:element[@name='wide_image']))" />
-			</xsl:attribute>
-			<xsl:attribute name="smallImage">
-				<xsl:value-of select="fn:doc(concat('give://smallImage?image=', wcm:root/wcm:element[@name='image']))" />
-			</xsl:attribute>
+			<xsl:if test="not(empty(wcm:root/wcm:element[@name='wide_image']))">
+				<xsl:attribute name="largeImage">
+					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', wcm:root/wcm:element[@name='wide_image']))" />
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:if test="not(empty(wcm:root/wcm:element[@name='image']))">
+				<xsl:attribute name="smallImage">
+					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', wcm:root/wcm:element[@name='image']))" />
+				</xsl:attribute>
+			</xsl:if>
 			<xsl:attribute name="parentDesignationNumber">TBD</xsl:attribute>
 			<xsl:attribute name="organizationID">TBD</xsl:attribute>
 		</jcr:content>

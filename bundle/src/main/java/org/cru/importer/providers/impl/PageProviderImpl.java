@@ -23,6 +23,8 @@ public class PageProviderImpl implements PageProvider {
 	private String pageTemplate;
 	private String intermediateTemplate;
 	private String columnDesignation;
+	private String pageAcceptRuleKey;
+	private String pageAcceptRuleValue;
 	
 	public PageProviderImpl(ParametersCollector parametersCollector) {
 		this.pageManager = parametersCollector.getRequest().getResourceResolver().adaptTo(PageManager.class);
@@ -30,9 +32,23 @@ public class PageProviderImpl implements PageProvider {
 		this.pageTemplate = parametersCollector.getPageTemplate();
 		this.intermediateTemplate = parametersCollector.getIntermediateTemplate();
 		this.columnDesignation = parametersCollector.getColumnDesignation();
+		if (parametersCollector.getPageAcceptRule().equals("")) {
+			this.pageAcceptRuleKey = null;
+			this.pageAcceptRuleValue = null;
+		} else {
+			String[] pageAcceptRule = parametersCollector.getPageAcceptRule().split("=");
+			this.pageAcceptRuleKey = pageAcceptRule[0];
+			this.pageAcceptRuleValue = pageAcceptRule[1];
+		}
 	}
 
 	public PageInfo getPage(Map<String, String> metadata) throws Exception {
+		if (this.pageAcceptRuleKey != null && metadata.containsKey(this.pageAcceptRuleKey)) {
+			String val = metadata.get(this.pageAcceptRuleKey);
+			if (!val.equals(this.pageAcceptRuleValue)) {
+				return null;
+			}
+		}
 		String relativePath = getRelativePath(metadata);
 		Page page = pageManager.getPage(this.baselocation + relativePath);
 		if (page != null) {

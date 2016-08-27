@@ -210,6 +210,9 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
     		if (obj.notModifiedPages.length > 0) {
     			results.add(this.showResultSection("Not Modified Pages",obj.notModifiedPages));
     		}
+    		if (obj.ignoredPages.length > 0) {
+    			results.add(this.showResultSection("Ignored Pages",obj.ignoredPages));
+    		}
     	} catch(e) {
         	results.add(new CQ.Ext.form.Label({html: responseText}));
     	}

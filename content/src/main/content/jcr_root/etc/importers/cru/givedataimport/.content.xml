@@ -14,7 +14,8 @@
      "transformation":"/apps/cru-content-importer/transformations/default.xsl"\,
      "rowColumnNames":"2"\,
      "columnFileName":"primaryFile"\,
-     "columnDesignation":"Designation"},
+     "columnDesignation":"Designation"\,
+     "pageAcceptRule":"Active or Inactive=Active"},
     {"name":"ministry"\,
      "title":"Ministry"\,
      "defaultPath":"/content/give/us/en/designations"\,
@@ -23,7 +24,8 @@
      "transformation":"/apps/cru-content-importer/transformations/default.xsl"\,
      "rowColumnNames":"2"\,
      "columnFileName":"primaryFile"\,
-     "columnDesignation":"Designation"},
+     "columnDesignation":"Designation"\,
+     "pageAcceptRule":"Active or Inactive=Active"},
     {"name":"fund"\,
      "title":"Fund"\,
      "defaultPath":"/content/give/us/en/campaigns"\,
@@ -32,7 +34,9 @@
      "transformation":"/apps/cru-content-importer/transformations/default.xsl"\,
      "rowColumnNames":"2"\,
      "columnFileName":"primaryFile"\,
-     "columnDesignation":"Designation"}
+     "columnDesignation":"Designation"\,
+     "pageAcceptRule":""}
     ]'
     tempStorePath="/var/cru-content-importer"
+    ignoreFilesPattern="__MACOSX(.*)"
     />

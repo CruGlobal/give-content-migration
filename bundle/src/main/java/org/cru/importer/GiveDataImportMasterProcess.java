@@ -3,7 +3,10 @@ package org.cru.importer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -11,6 +14,7 @@ import javax.inject.Inject;
 import javax.jcr.Session;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.models.annotations.Model;
 import org.cru.importer.bean.PageInfo;
@@ -51,35 +55,44 @@ public class GiveDataImportMasterProcess {
 			in = parametersCollector.getContentFile().getStream();
 			ZipInputStream zis = new ZipInputStream(in);
 			ZipEntry entry = null;
+			Pattern ignoreFilesPattern = null;
+			if (!parametersCollector.getIgnoreFilesPattern().equals("")) {
+				ignoreFilesPattern = Pattern.compile(parametersCollector.getIgnoreFilesPattern());
+			}
 			while ((entry = zis.getNextEntry()) != null) {
 				if (entry.isDirectory()) {
 					continue;
 				}
-				if (entry.getName().toLowerCase().endsWith(".xml")) {
+				String filename = entry.getName();
+				if (acceptsFile(ignoreFilesPattern, filename)) {
 					try {
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						IOUtils.copy(zis, baos);
-						Map<String,String> metadata = metadataProvider.getMetadata(entry.getName());
-
+						Map<String,String> metadata = metadataProvider.getMetadata(filename);
 						PageInfo pageInfo = pageProvider.getPage(metadata);
-						contentMapperProvider.mapFields(pageInfo.getPage(), metadata, new ByteArrayInputStream(baos.toByteArray()));
-
-						String pageReference = pageInfo.getPage().getPath();
-						if (session.hasPendingChanges()) {
-							session.save();
-							if (pageInfo.isNewPage()) {
-								resultsCollector.addCreatedPage(pageReference);
+						if (pageInfo != null) {
+							String sbaos = new String(baos.toByteArray());
+							byte[] arrbaos = sbaos.getBytes(StandardCharsets.UTF_8); // Ensure the stream is encoded in UTF-8
+							contentMapperProvider.mapFields(pageInfo.getPage(), metadata, new ByteArrayInputStream(arrbaos));
+							String pageReference = pageInfo.getPage().getPath();
+							if (session.hasPendingChanges()) {
+								session.save();
+								if (pageInfo.isNewPage()) {
+									resultsCollector.addCreatedPage(pageReference);
+								} else {
+									resultsCollector.addModifiedPage(pageReference);
+								}
 							} else {
-								resultsCollector.addModifiedPage(pageReference);
+								resultsCollector.addNotModifiedPage(pageReference);
 							}
 						} else {
-							resultsCollector.addNotModifiedPage(pageReference);
+							resultsCollector.addIgnoredPages(filename);
 						}
 					} catch (Exception e) {
 						if (session.hasPendingChanges()) {
 							session.refresh(false);
 						}
-						resultsCollector.addError(entry.getName() + ": " + e.getMessage());
+						resultsCollector.addError(filename + ": " + StringEscapeUtils.escapeHtml4(e.getMessage()));
 					}
 				}
 			}
@@ -88,6 +101,17 @@ public class GiveDataImportMasterProcess {
 		} finally {
 			IOUtils.closeQuietly(in);
 		}
+	}
+
+	private boolean acceptsFile(Pattern ignoreFilesPattern, String filename) {
+		if (!filename.toLowerCase().endsWith(".xml")) {
+			return false;
+		}
+		if (ignoreFilesPattern != null) {
+			Matcher matcher = ignoreFilesPattern.matcher(filename);
+			return !matcher.matches();
+		}
+		return true;
 	}
 
 }

@@ -8,6 +8,7 @@ public class ResultsCollector {
 	private List<String> createdPages;
 	private List<String> modifiedPages;
 	private List<String> notModifiedPages;
+	private List<String> ignoredPages;
 	private List<String> errors;
 
 	public ResultsCollector() {
@@ -15,22 +16,27 @@ public class ResultsCollector {
 		modifiedPages = new LinkedList<String>();
 		notModifiedPages = new LinkedList<String>();
 		errors = new LinkedList<String>();
+		ignoredPages =  new LinkedList<String>();
 	}
 	
-	public void addCreatedPage(String  page) {
+	public void addCreatedPage(String page) {
 		createdPages.add(page);
 	}
 	
-	public void addModifiedPage(String  page) {
+	public void addModifiedPage(String page) {
 		modifiedPages.add(page);
 	}
 
-	public void addNotModifiedPage(String  page) {
+	public void addNotModifiedPage(String page) {
 		notModifiedPages.add(page);
 	}
 	
-	public void addError(String  page) {
+	public void addError(String page) {
 		errors.add(page);
+	}
+
+	public void addIgnoredPages(String page) {
+		ignoredPages.add(page);
 	}
 
 	public List<String> getCreatedPages() {
@@ -47,6 +53,10 @@ public class ResultsCollector {
 
 	public List<String> getErrors() {
 		return errors;
+	}
+
+	public List<String> getIgnoredPages() {
+		return ignoredPages;
 	}
 
 }

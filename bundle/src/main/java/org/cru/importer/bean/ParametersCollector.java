@@ -16,6 +16,8 @@ public class ParametersCollector {
 	private String xsltPath;
 	private String pageTemplate;
 	private String intermediateTemplate;
+	private String ignoreFilesPattern;
+	private String pageAcceptRule;
 	
 	public String getBaselocation() {
 		return baselocation;
@@ -95,6 +97,22 @@ public class ParametersCollector {
 
 	public void setColumnDesignation(String columnDesignation) {
 		this.columnDesignation = columnDesignation;
+	}
+
+	public void setIgnoreFilesPattern(String ignoreFilesPattern) {
+		this.ignoreFilesPattern = ignoreFilesPattern;
+	}
+
+	public String getIgnoreFilesPattern() {
+		return ignoreFilesPattern;
+	}
+
+	public String getPageAcceptRule() {
+		return pageAcceptRule;
+	}
+
+	public void setPageAcceptRule(String pageAcceptRule) {
+		this.pageAcceptRule = pageAcceptRule;
 	}
 
 }

@@ -13,10 +13,12 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XsltCompiler;
 import net.sf.saxon.s9api.XsltExecutable;
 import net.sf.saxon.s9api.XsltTransformer;
+import net.sf.saxon.trans.XPathException;
 
 import org.apache.jackrabbit.commons.JcrUtils;
 import org.cru.importer.bean.ParametersCollector;
@@ -45,7 +47,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 		Node xsltNode = this.session.getNode(parametersCollector.getXsltPath());
 		processor = new Processor(false);
         XsltCompiler comp = processor.newXsltCompiler();
-        GiveURIResolver resolver = new GiveURIResolver();
+        GiveURIResolver resolver = new GiveURIResolver(parametersCollector.getRequest().getResourceResolver());
         comp.setURIResolver(resolver);
         XsltExecutable exp = comp.compile(new StreamSource(JcrUtils.readFile(xsltNode)));
         transformer = exp.load();
@@ -53,27 +55,40 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	}
 
 	public void mapFields(Page page, Map<String, String> metadata, InputStream xmlInputStream) throws Exception {
-		initTransformedKeys(metadata);
-		transformer.setParameter(new QName("path"), new XdmAtomicValue(page.getPath()));
-		for (String key : metadata.keySet()) {
-			transformer.setParameter(new QName(this.transformedKeys.get(key)), new XdmAtomicValue(metadata.get(key)));
+		try {
+			initTransformedKeys(metadata);
+			transformer.setParameter(new QName("path"), new XdmAtomicValue(page.getPath()));
+			for (String key : metadata.keySet()) {
+				transformer.setParameter(new QName(this.transformedKeys.get(key)), new XdmAtomicValue(metadata.get(key)));
+			}
+			
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			transformer.setSource(new StreamSource(xmlInputStream));
+			transformer.setDestination(processor.newSerializer(output));
+			transformer.transform();
+
+			InputStream result = new ByteArrayInputStream(output.toByteArray());
+
+			importResult(page, result);
+		} catch (SaxonApiException e) {
+			if (e.getCause()!=null && e.getCause() instanceof XPathException) {
+				XPathException ex = (XPathException)e.getCause();
+				if (ex.getException()!=null && ex.getException() instanceof XPathException) {
+					throw (XPathException)ex.getException();
+				} else {
+					throw ex;
+				}
+			}
+			throw e;
 		}
-		
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		transformer.setSource(new StreamSource(xmlInputStream));
-		transformer.setDestination(processor.newSerializer(output));
-		transformer.transform();
-
-        InputStream result = new ByteArrayInputStream(output.toByteArray());
-
-        importResult(page, result);
 	}
 
 	private void initTransformedKeys(Map<String, String> metadata) {
 		if (this.transformedKeys == null) {
 			this.transformedKeys = new HashMap<String, String>();
 			for (String key : metadata.keySet()) {
-				this.transformedKeys.put(key, key.replaceAll(" ", "_").replaceAll(":", "_"));
+				//this.transformedKeys.put(key, key.replaceAll(" ", "_").replaceAll(":", "_"));
+				this.transformedKeys.put(key, key.replaceAll("[^a-zA-Z0-9]", "_"));
 			}
 		}
 	}

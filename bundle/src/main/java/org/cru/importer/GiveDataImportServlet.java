@@ -108,12 +108,12 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 				resultsCollector.addError("configpath parameter not found or node not exists at JCR.");
 				isValid = false;
 			} else {
+				ValueMap properties = config.adaptTo(ValueMap.class);
 				String option = request.getParameter("option");
 				if (option == null || option.trim().equals("")) {
 					resultsCollector.addError("Option parameter not found.");
 					isValid = false;
 				} else {
-					ValueMap properties = config.adaptTo(ValueMap.class);
 					String[] options = properties.get("options", String[].class);
 					if (options == null || options.length==0) {
 						resultsCollector.addError("Options property not found at configuration node.");
@@ -143,12 +143,20 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 								parametersCollector.setXsltPath(jsonOption.getString("transformation"));
 								parametersCollector.setPageTemplate(jsonOption.getString("pageTemplate"));
 								parametersCollector.setIntermediateTemplate(jsonOption.getString("intermediateTemplate"));
+								parametersCollector.setPageAcceptRule(jsonOption.getString("pageAcceptRule"));
 							} catch (JSONException e) {
 								resultsCollector.addError("Selected option " + option + " error. " + e.getMessage());
 								isValid = false;
 							}
 						}
 					}
+				}
+				String ignoreFilesPattern = properties.get("ignoreFilesPattern", String.class);
+				if (ignoreFilesPattern == null) {
+					resultsCollector.addError("Ignore files pattern property not found at configuration node.");
+					isValid = false;
+				} else {
+					parametersCollector.setIgnoreFilesPattern(ignoreFilesPattern);
 				}
 			}
 		} catch (Exception e) {
@@ -215,6 +223,7 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 			writeList(writer, "createdPages", collector.getCreatedPages());
 			writeList(writer, "modifiedPages", collector.getModifiedPages());
 			writeList(writer, "notModifiedPages", collector.getNotModifiedPages());
+			writeList(writer, "ignoredPages", collector.getIgnoredPages());
 			writeList(writer, "errors", collector.getErrors());
 			writer.endObject();
 		} catch (Exception e) {

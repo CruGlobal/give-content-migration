@@ -1,44 +1,72 @@
 package org.cru.importer.xml;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
 import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 
 import net.sf.saxon.lib.StandardURIResolver;
 import net.sf.saxon.trans.XPathException;
 
+import org.apache.sling.api.resource.ResourceResolver;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+
 /**
  * Resolve specific URLs of give project.
  * 
- * NOTE: It will be used to get the dam path for large image and small image
- * 
  * usage example:
  * 
- *  <xsl:value-of select="fn:doc(concat('give://test?path=', $path))" />
+ *  <xsl:value-of select="fn:doc(concat('give://searchImage?image=', wcm:root/wcm:element[@name='image']))" />
  *  
  * @author Nestor de Dios
  *
  */
 public class GiveURIResolver extends StandardURIResolver {
 
+	private ResourceResolver resourceResolver;
+	private BundleContext bundleContext;
+	
+	public GiveURIResolver(ResourceResolver resourceResolver) {
+		this.resourceResolver = resourceResolver;
+		bundleContext = FrameworkUtil.getBundle(GiveURIResolver.class).getBundleContext();
+	}
+
 	@Override
 	public Source resolve(String href, String base) throws XPathException {
 		if (href.startsWith("give")) {
-			// TODO: Change this and handle the URL
-			// For example, search in the DAM for an image.
-			String image = "";
-			if (href.startsWith("give://largeImage")) {
-				image = "<image>/content/dam/geometrixx/banners/shapecon.jpg</image>";
-			} else {
-				image = "<image>/content/dam/geometrixx/shapes/01.jpg</image>";
-			}
-			InputStream stream = new ByteArrayInputStream(image.getBytes(StandardCharsets.UTF_8));
-			return new StreamSource(stream);
+			return resolveFromFactory(href, base);
 		} else {
 			return super.resolve(href, base);
+		}
+	}
+
+	/**
+	 * Search for registered factories to handle the request
+	 * 
+	 * @param href
+	 * @param base
+	 * @return
+	 * @throws XPathException
+	 */
+	private Source resolveFromFactory(String href, String base) throws XPathException {
+		try {
+			String[] path = href.replace("give://", "").split("\\?");
+			String factory = path[0];
+			String parameters = "";
+			if (path.length > 1) {
+				parameters = path[1];
+			}
+			String typeFilter = String.format("(%s=%s)", GiveSourceFactory.OSGI_PROPERTY_TYPE, factory);
+			ServiceReference[] serviceReference;
+			serviceReference = bundleContext.getServiceReferences(GiveSourceFactory.class.getName(), typeFilter);
+			if (serviceReference != null && serviceReference.length > 0) {
+				GiveSourceFactory sourceFactory = (GiveSourceFactory) bundleContext.getService(serviceReference[0]);
+				return sourceFactory.resolve(resourceResolver, parameters);
+			} else {
+				throw new XPathException("There are not source factory defined for " + factory);
+			}
+		} catch (InvalidSyntaxException e) {
+			throw new XPathException("Unable to load source factory for " + href);
 		}
 	}
 
