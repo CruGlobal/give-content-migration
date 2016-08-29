@@ -1,2 +1,44 @@
+# SnapBuild gitignore #
+
+# Compiled source #
+###################
+*.class
+*.dll
+*.exe
+
+# IntelliJ files #
+##################
+*.iml
+*.idea
+*.ipr
+*.iws
+atlassian-ide-plugin.xml
+
+# Vault files #
+###############
+*.vlt
+
+*.git
+
+# Miscellaneous files #
+#######################
+.DS_Store*
+*.log
+nb*.xml
+*.project
+target
 bundle/target/
 content/target/
+Thumbs.db
+*.settings
+*.classpath
+libs
+/libs
+/libs*
+/libs/*
+# Web project files generated in NetBeans for developing the CQ UI.
+nbproject/private/
+src/content/conf
+src/content/nbproject
+src/content/WEB-INF
+src/content/build.xml
