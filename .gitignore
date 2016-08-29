@@ -1,4 +1,4 @@
-# SnapBuild gitignore #
+# gitignore #
 
 # Compiled source #
 ###################
@@ -36,7 +36,7 @@ libs
 /libs
 /libs*
 /libs/*
-# Web project files generated in NetBeans for developing the CQ UI.
+# Web project files generated in NetBeans
 nbproject/private/
 src/content/conf
 src/content/nbproject
