@@ -61,7 +61,7 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 		ParametersCollector parametersCollector = new ParametersCollector();
 		ResultsCollector resultsCollector = new ResultsCollector();
 		if (validateParams(request, parametersCollector, resultsCollector)) {
-			GiveDataImportMasterProcess process = request.adaptTo(GiveDataImportMasterProcess.class);
+			GiveDataImportMasterProcess process = new GiveDataImportMasterProcess(request.getResourceResolver());
 			process.runProcess(parametersCollector, resultsCollector);
 		}
 		writeResult(response, resultsCollector);

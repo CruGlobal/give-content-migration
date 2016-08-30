@@ -63,11 +63,11 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			// Copy the stream to be sure is not closed prematurelly
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			IOUtils.copy(xmlInputStream, baos);
-			String sbaos = new String(baos.toByteArray());
+			/*String sbaos = new String(baos.toByteArray());
 			
 			// Ensure the stream is encoded in UTF-8 before transformation
-			byte[] arrbaos = sbaos.getBytes(StandardCharsets.UTF_8);
-			InputStream isArrBaos = new ByteArrayInputStream(arrbaos);
+			byte[] arrbaos = sbaos.getBytes(StandardCharsets.UTF_8);*/
+			InputStream isArrBaos = new ByteArrayInputStream(baos.toByteArray());
 			
 			transformer.setParameter(new QName("path"), new XdmAtomicValue(page.getPath()));
 			for (String key : metadata.keySet()) {

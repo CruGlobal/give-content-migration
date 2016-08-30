@@ -7,13 +7,11 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.inject.Inject;
 import javax.jcr.Session;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.models.annotations.Model;
+import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.bean.PageInfo;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResultsCollector;
@@ -21,6 +19,7 @@ import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.providers.DataImportFactory;
 import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.PageProvider;
+import org.cru.importer.providers.impl.DataImportFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,16 +29,18 @@ import org.slf4j.LoggerFactory;
  * @author Nestor de Dios
  *
  */
-@Model(adaptables = SlingHttpServletRequest.class)
 public class GiveDataImportMasterProcess {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(GiveDataImportMasterProcess.class);
 	
-	@Inject
 	private Session session;
 	
-	@Inject
 	private DataImportFactory dataImportFactory;
+	
+	public GiveDataImportMasterProcess(ResourceResolver resolver) {
+		this.session = resolver.adaptTo(Session.class);
+		this.dataImportFactory = new DataImportFactoryImpl(); // TODO: Get it from bundle context
+	}
 
 	/**
 	 * Starts the import process. Iterate over all xml files contained in the zip file and process each one.
