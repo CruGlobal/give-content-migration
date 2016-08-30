@@ -1,7 +1,8 @@
 package org.cru.importer.providers;
 
 import java.io.InputStream;
-import java.util.Map;
+
+import org.cru.importer.bean.ResourceMetadata;
 
 import com.day.cq.wcm.api.Page;
 
@@ -21,6 +22,6 @@ public interface ContentMapperProvider {
 	 * @param xmlInputStream
 	 * @throws Exception
 	 */
-	public void mapFields(Page page, Map<String,String> metadata, InputStream xmlInputStream) throws Exception;
+	public void mapFields(Page page, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception;
 	
 }

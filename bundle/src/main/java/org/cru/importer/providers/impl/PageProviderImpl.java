@@ -1,10 +1,9 @@
 package org.cru.importer.providers.impl;
 
-import java.util.Map;
-
 import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.PageInfo;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.PageProvider;
 
 import com.day.cq.wcm.api.Page;
@@ -42,9 +41,9 @@ public class PageProviderImpl implements PageProvider {
 		}
 	}
 
-	public PageInfo getPage(Map<String, String> metadata) throws Exception {
-		if (this.pageAcceptRuleKey != null && metadata.containsKey(this.pageAcceptRuleKey)) {
-			String val = metadata.get(this.pageAcceptRuleKey);
+	public PageInfo getPage(ResourceMetadata metadata) throws Exception {
+		if (this.pageAcceptRuleKey != null && metadata.getPropertyNames().contains(this.pageAcceptRuleKey)) {
+			String val = metadata.getValue(this.pageAcceptRuleKey);
 			if (!val.equals(this.pageAcceptRuleValue)) {
 				return null;
 			}
@@ -65,9 +64,9 @@ public class PageProviderImpl implements PageProvider {
 	 * @return
 	 * @throws Exception 
 	 */
-	private String getRelativePath(Map<String, String> metadata) throws Exception {
-		if (metadata.containsKey(this.columnDesignation)) {
-			String designation = metadata.get(this.columnDesignation);
+	private String getRelativePath(ResourceMetadata metadata) throws Exception {
+		if (metadata.getPropertyNames().contains(this.columnDesignation)) {
+			String designation = metadata.getValue(this.columnDesignation);
 			if (!designation.equals("")) {
 				StringBuilder path = new StringBuilder();
 				for (int i=0;i<5;i++) {

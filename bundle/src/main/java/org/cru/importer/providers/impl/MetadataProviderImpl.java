@@ -1,9 +1,7 @@
 package org.cru.importer.providers.impl;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -18,6 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.MetadataProvider;
 
 /**
@@ -29,13 +28,12 @@ import org.cru.importer.providers.MetadataProvider;
 public class MetadataProviderImpl implements MetadataProvider {
 
 	XSSFWorkbook workbook;
-	List<String> colnames;
+	Map<String, Integer> colnames;
 	int columnFileNames;
 	int rowColumnNames;
 	DataFormatter excelFormatter;
 	Map<String,XSSFRow>[] rowsCache;
-	
-	@SuppressWarnings("unchecked")
+
 	public MetadataProviderImpl(ParametersCollector parametersCollector) throws Exception {
 		workbook = getWorkbook(parametersCollector.getContentFile());
 		columnFileNames = -1;
@@ -46,42 +44,26 @@ public class MetadataProviderImpl implements MetadataProvider {
 			XSSFSheet sheet = workbook.getSheetAt(0);
 			XSSFRow row = sheet.getRow(rowColumnNames);
 			if (row != null) {
-				colnames = new ArrayList<String>(row.getLastCellNum() - row.getFirstCellNum() + 1);
+				colnames = new HashMap<String, Integer>();
 				for (int i = row.getFirstCellNum(); i < row.getLastCellNum(); i++) {
 					String colname = getStringValue(row,i);
-					colnames.add(colname);
+					colnames.put(colname, i);
 					if (columnFileNames==-1 && colname.equals(parametersCollector.getColumnFileName())) {
 						columnFileNames = i;
 					}
 				}
-			}
-			if (row == null) {
-				throw new Exception("Metadata Excel file does not contains a row at index "+ parametersCollector.getRowColumnNames());
-			} else if (columnFileNames == -1) {
-				throw new Exception("Metadata Excel file does not contains a column called "+ parametersCollector.getColumnFileName());
-			} else {
-				// Create the cache
-				rowsCache = (Map<String, XSSFRow>[]) new HashMap<?,?>[workbook.getNumberOfSheets()];
-				for (int i=0;i<workbook.getNumberOfSheets();i++) {
-					XSSFSheet currentsheet = workbook.getSheetAt(i);
-					rowsCache[i] = new HashMap<String, XSSFRow>();
-					for (int j = rowColumnNames + 1; j <= sheet.getLastRowNum(); j++){
-						XSSFRow currentrow = currentsheet.getRow(j);
-						String rowFileName = getStringValue(row, columnFileNames);
-						try {
-							rowFileName = rowFileName.substring(rowFileName.indexOf("@"));
-							rowsCache[i].put(rowFileName, currentrow);
-						} catch (Exception e) {
-						}
-					}
+				if (columnFileNames == -1) {
+					throw new Exception("Metadata Excel file does not contains a column called "+ parametersCollector.getColumnFileName());
 				}
+			} else if (row == null) {
+				throw new Exception("Metadata Excel file does not contains a row at index "+ parametersCollector.getRowColumnNames());
 			}
 		} else {
 			throw new Exception("The content file does not contain a metadata Excel file");
 		}
 	}
 
-	public Map<String, String> getMetadata(String filename) throws Exception {
+	public ResourceMetadata getMetadata(String filename) throws Exception {
 		// Step 1: Find the filename in the Excel file
 		String partialName;
 		try {
@@ -99,9 +81,10 @@ public class MetadataProviderImpl implements MetadataProvider {
 		XSSFRow metadataRow = null;
 		if (sheetIndex == -1) {
 			// first search in cache
-			for (int i=0;i<rowsCache.length && metadataRow==null;i++) {
-				if (rowsCache[i].containsKey(partialName)) {
-					metadataRow = rowsCache[i].get(partialName);
+			for (int i=0;i<workbook.getNumberOfSheets() && metadataRow==null;i++) {
+				Map<String,XSSFRow> cache = getCache(i);
+				if (cache.containsKey(partialName)) {
+					metadataRow = cache.get(partialName);
 				}
 			}
 			// Then iterate over sheets
@@ -110,8 +93,9 @@ public class MetadataProviderImpl implements MetadataProvider {
 			}
 		} else {
 			// First search in cache
-			if (rowsCache[sheetIndex].containsKey(partialName)) {
-				metadataRow = rowsCache[sheetIndex].get(partialName);
+			Map<String,XSSFRow> cache = getCache(sheetIndex);
+			if (cache.containsKey(partialName)) {
+				metadataRow = cache.get(partialName);
 			}
 			// Then search in the page
 			if (metadataRow == null) {
@@ -120,16 +104,33 @@ public class MetadataProviderImpl implements MetadataProvider {
 		}
 		// Step 2: extract the metadata
 		if (metadataRow != null) {
-			Map<String, String> metadata = new HashMap<String, String>();
-			for (int i=0;i<colnames.size();i++) {
-				metadata.put(colnames.get(i), getStringValue(metadataRow,i));
-			}
-			return metadata;
+			return new ResourceMetadata(metadataRow, colnames, excelFormatter);
 		} else {
 			throw new Exception("Can not find metadata for this file in the Excel file sarching for " + partialName);
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	private Map<String, XSSFRow> getCache(int i) {
+		if (rowsCache == null) {
+			rowsCache = (Map<String, XSSFRow>[]) new HashMap<?,?>[workbook.getNumberOfSheets()];
+		}
+		if (rowsCache[i] == null) {
+			XSSFSheet currentsheet = workbook.getSheetAt(i);
+			rowsCache[i] = new HashMap<String, XSSFRow>();
+			for (int j = rowColumnNames + 1; j <= currentsheet.getLastRowNum(); j++){
+				XSSFRow currentrow = currentsheet.getRow(j);
+				String rowFileName = getStringValue(currentrow, columnFileNames);
+				try {
+					rowFileName = rowFileName.substring(rowFileName.indexOf("@"));
+					rowsCache[i].put(rowFileName, currentrow);
+				} catch (Exception e) {
+				}
+			}
+		}
+		return rowsCache[i];
+	}
+
 	/**
 	 * Search a metadata row from a given partial filename and the sheet index
 	 * @param sheetIndex

@@ -1,8 +1,7 @@
 package org.cru.importer.providers;
 
-import java.util.Map;
-
 import org.cru.importer.bean.PageInfo;
+import org.cru.importer.bean.ResourceMetadata;
 
 /**
  * Create or get a page related to a given metadata
@@ -19,6 +18,6 @@ public interface PageProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	public PageInfo getPage(Map<String, String> metadata) throws Exception;
+	public PageInfo getPage(ResourceMetadata metadata) throws Exception;
 	
 }

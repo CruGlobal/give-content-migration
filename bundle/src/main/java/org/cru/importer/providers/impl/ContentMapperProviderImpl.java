@@ -3,9 +3,11 @@ package org.cru.importer.providers.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jcr.ImportUUIDBehavior;
 import javax.jcr.Node;
@@ -24,6 +26,7 @@ import net.sf.saxon.trans.XPathException;
 import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.commons.JcrUtils;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.xml.GiveURIResolver;
 
@@ -41,6 +44,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	private XsltTransformer transformer;
 	private Processor processor;
 	private Map<String,String> transformedKeys;
+	private List<String> transformerParameters;
 	
 	public ContentMapperProviderImpl(ParametersCollector parametersCollector) throws Exception {
 		this.transformedKeys = null;
@@ -52,13 +56,17 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
         GiveURIResolver resolver = new GiveURIResolver(parametersCollector.getRequest().getResourceResolver());
         comp.setURIResolver(resolver);
         XsltExecutable exp = comp.compile(new StreamSource(JcrUtils.readFile(xsltNode)));
+        transformerParameters = new LinkedList<String>();
+        for (QName key : exp.getGlobalParameters().keySet()) {
+        	transformerParameters.add(key.getLocalName());
+        }
         transformer = exp.load();
         transformer.setURIResolver(resolver);
 	}
 
-	public void mapFields(Page page, Map<String, String> metadata, InputStream xmlInputStream) throws Exception {
+	public void mapFields(Page page, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception {
 		try {
-			initTransformedKeys(metadata);
+			initTransformedKeys(metadata.getPropertyNames());
 			
 			// Copy the stream to be sure is not closed prematurelly
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -70,8 +78,11 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			InputStream isArrBaos = new ByteArrayInputStream(baos.toByteArray());
 			
 			transformer.setParameter(new QName("path"), new XdmAtomicValue(page.getPath()));
-			for (String key : metadata.keySet()) {
-				transformer.setParameter(new QName(this.transformedKeys.get(key)), new XdmAtomicValue(metadata.get(key)));
+			for (String key : transformerParameters) {
+				if (transformedKeys.containsKey(key)) {
+					String colname = transformedKeys.get(key);
+					transformer.setParameter(new QName(key), new XdmAtomicValue(metadata.getValue(colname)));
+				}
 			}
 			
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -95,12 +106,12 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 		}
 	}
 
-	private void initTransformedKeys(Map<String, String> metadata) {
+	private void initTransformedKeys(Set<String> colnames) {
 		if (this.transformedKeys == null) {
 			this.transformedKeys = new HashMap<String, String>();
-			for (String key : metadata.keySet()) {
+			for (String colname : colnames) {
 				//this.transformedKeys.put(key, key.replaceAll(" ", "_").replaceAll(":", "_"));
-				this.transformedKeys.put(key, key.replaceAll("[^a-zA-Z0-9]", "_"));
+				this.transformedKeys.put(colname.replaceAll("[^a-zA-Z0-9]", "_"), colname);
 			}
 		}
 	}

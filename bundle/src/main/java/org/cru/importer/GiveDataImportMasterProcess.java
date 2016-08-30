@@ -1,7 +1,6 @@
 package org.cru.importer;
 
 import java.io.InputStream;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -14,6 +13,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.bean.PageInfo;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.providers.DataImportFactory;
@@ -69,7 +69,7 @@ public class GiveDataImportMasterProcess {
 				LOGGER.info("Start processing file: " + filename);
 				if (acceptsFile(ignoreFilesPattern, filename)) {
 					try {
-						Map<String,String> metadata = metadataProvider.getMetadata(filename);
+						ResourceMetadata metadata = metadataProvider.getMetadata(filename);
 						PageInfo pageInfo = pageProvider.getPage(metadata);
 						if (pageInfo != null) {
 							contentMapperProvider.mapFields(pageInfo.getPage(), metadata, zis);
@@ -99,6 +99,8 @@ public class GiveDataImportMasterProcess {
 						resultsCollector.addError(errorMessage);
 						LOGGER.info("Error importing " + errorMessage);
 					}
+				} else {
+					LOGGER.info("File not accepted: " + filename);
 				}
 			}
 		} catch (Exception e) {

@@ -1,6 +1,6 @@
 package org.cru.importer.providers;
 
-import java.util.Map;
+import org.cru.importer.bean.ResourceMetadata;
 
 /**
  * Extract the metadata corresponding to a given file
@@ -17,6 +17,6 @@ public interface MetadataProvider {
 	 * @return
 	 * @throws Exception 
 	 */
-	public Map<String,String> getMetadata(String filename) throws Exception;
+	public ResourceMetadata getMetadata(String filename) throws Exception;
 	
 }
