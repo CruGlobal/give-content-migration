@@ -2,12 +2,11 @@ package org.cru.importer.providers;
 
 import java.io.InputStream;
 
+import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.ResourceMetadata;
 
-import com.day.cq.wcm.api.Page;
-
 /**
- * Fills the page content
+ * Fills the resource content
  * 
  * @author Nestor de Dios
  *
@@ -15,13 +14,13 @@ import com.day.cq.wcm.api.Page;
 public interface ContentMapperProvider {
 
 	/**
-	 * Fills the page content
+	 * Fills the resource content
 	 * 
-	 * @param page
+	 * @param resource
 	 * @param metadata
 	 * @param xmlInputStream
 	 * @throws Exception
 	 */
-	public void mapFields(Page page, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception;
+	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception;
 	
 }

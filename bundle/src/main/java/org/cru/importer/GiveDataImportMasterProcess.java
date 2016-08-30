@@ -8,18 +8,23 @@ import java.util.zip.ZipInputStream;
 
 import javax.jcr.Session;
 
+import net.sf.saxon.trans.XPathException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.sling.api.resource.ResourceResolver;
-import org.cru.importer.bean.PageInfo;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.providers.ContentMapperProvider;
-import org.cru.importer.providers.DataImportFactory;
 import org.cru.importer.providers.MetadataProvider;
-import org.cru.importer.providers.PageProvider;
-import org.cru.importer.providers.impl.DataImportFactoryImpl;
+import org.cru.importer.providers.ResourceProvider;
+import org.cru.importer.providers.factory.DataImportFactory;
+import org.cru.importer.xml.GiveURIResolver;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +40,8 @@ public class GiveDataImportMasterProcess {
 	
 	private Session session;
 	
-	private DataImportFactory dataImportFactory;
-	
 	public GiveDataImportMasterProcess(ResourceResolver resolver) {
 		this.session = resolver.adaptTo(Session.class);
-		this.dataImportFactory = new DataImportFactoryImpl(); // TODO: Get it from bundle context
 	}
 
 	/**
@@ -51,8 +53,9 @@ public class GiveDataImportMasterProcess {
 	public void runProcess(ParametersCollector parametersCollector, ResultsCollector resultsCollector) {
 		InputStream in = null;
 		try {
+			DataImportFactory dataImportFactory = getDataImporFactory(parametersCollector);
 			MetadataProvider metadataProvider = dataImportFactory.createMetadataProvider(parametersCollector);
-			PageProvider pageProvider = dataImportFactory.createPageProvider(parametersCollector);
+			ResourceProvider resourceProvider = dataImportFactory.createResourceProvider(parametersCollector);
 			ContentMapperProvider contentMapperProvider = dataImportFactory.createContentMapperProvider(parametersCollector);
 			in = parametersCollector.getContentFile().getStream();
 			ZipInputStream zis = new ZipInputStream(in);
@@ -70,22 +73,22 @@ public class GiveDataImportMasterProcess {
 				if (acceptsFile(ignoreFilesPattern, filename)) {
 					try {
 						ResourceMetadata metadata = metadataProvider.getMetadata(filename);
-						PageInfo pageInfo = pageProvider.getPage(metadata);
-						if (pageInfo != null) {
-							contentMapperProvider.mapFields(pageInfo.getPage(), metadata, zis);
-							String pageReference = pageInfo.getPage().getPath();
+						ResourceInfo resourceInfo = resourceProvider.getResource(metadata);
+						if (resourceInfo != null) {
+							contentMapperProvider.mapFields(resourceInfo.getResource(), metadata, zis);
+							String pageReference = resourceInfo.getResource().getPath();
 							if (session.hasPendingChanges()) {
 								session.save();
-								if (pageInfo.isNewPage()) {
+								if (resourceInfo.isNewResource()) {
 									resultsCollector.addCreatedPage(pageReference);
-									LOGGER.info("New page created at: " + pageReference);
+									LOGGER.info("New resource created at: " + pageReference);
 								} else {
 									resultsCollector.addModifiedPage(pageReference);
-									LOGGER.info("Existed page modified at: " + pageReference);
+									LOGGER.info("Existed resource modified at: " + pageReference);
 								}
 							} else {
 								resultsCollector.addNotModifiedPage(pageReference);
-								LOGGER.info("Not modified page at: " + pageReference);
+								LOGGER.info("Not modified resource at: " + pageReference);
 							}
 						} else {
 							resultsCollector.addIgnoredPages(filename);
@@ -119,6 +122,17 @@ public class GiveDataImportMasterProcess {
 			return !matcher.matches();
 		}
 		return true;
+	}
+	
+	private DataImportFactory getDataImporFactory(ParametersCollector parametersCollector) throws Exception {
+		BundleContext bundleContext = FrameworkUtil.getBundle(GiveURIResolver.class).getBundleContext();
+		String typeFilter = String.format("(%s=%s)", DataImportFactory.OSGI_PROPERTY_TYPE, parametersCollector.getFactoryType());
+		ServiceReference[] serviceReference = bundleContext.getServiceReferences(DataImportFactory.class.getName(), typeFilter);
+		if (serviceReference != null && serviceReference.length > 0) {
+			return (DataImportFactory) bundleContext.getService(serviceReference[0]);
+		} else {
+			throw new XPathException("There are not import factory defined for " + parametersCollector.getFactoryType());
+		}
 	}
 
 }

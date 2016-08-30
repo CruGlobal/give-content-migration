@@ -25,6 +25,7 @@ import net.sf.saxon.trans.XPathException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.commons.JcrUtils;
+import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ContentMapperProvider;
@@ -64,8 +65,9 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
         transformer.setURIResolver(resolver);
 	}
 
-	public void mapFields(Page page, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception {
+	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception {
 		try {
+			Page page = resource.adaptTo(Page.class);
 			initTransformedKeys(metadata.getPropertyNames());
 			
 			// Copy the stream to be sure is not closed prematurelly

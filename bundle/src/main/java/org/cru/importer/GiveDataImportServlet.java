@@ -144,6 +144,7 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 								parametersCollector.setPageTemplate(jsonOption.getString("pageTemplate"));
 								parametersCollector.setIntermediateTemplate(jsonOption.getString("intermediateTemplate"));
 								parametersCollector.setPageAcceptRule(jsonOption.getString("pageAcceptRule"));
+								parametersCollector.setFactoryType(jsonOption.getString("factoryType"));
 							} catch (JSONException e) {
 								resultsCollector.addError("Selected option " + option + " error. " + e.getMessage());
 								isValid = false;

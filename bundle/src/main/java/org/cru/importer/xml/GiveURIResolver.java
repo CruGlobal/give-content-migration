@@ -1,5 +1,8 @@
 package org.cru.importer.xml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.transform.Source;
 
 import net.sf.saxon.lib.StandardURIResolver;
@@ -28,10 +31,12 @@ public class GiveURIResolver extends StandardURIResolver {
 	
 	private ResourceResolver resourceResolver;
 	private BundleContext bundleContext;
+	private Map<String, GiveSourceFactory> cache;
 	
 	public GiveURIResolver(ResourceResolver resourceResolver) {
 		this.resourceResolver = resourceResolver;
-		bundleContext = FrameworkUtil.getBundle(GiveURIResolver.class).getBundleContext();
+		this.bundleContext = FrameworkUtil.getBundle(GiveURIResolver.class).getBundleContext();
+		this.cache = new HashMap<String, GiveSourceFactory>();
 	}
 
 	@Override
@@ -59,15 +64,20 @@ public class GiveURIResolver extends StandardURIResolver {
 			if (path.length > 1) {
 				parameters = path[1];
 			}
-			String typeFilter = String.format("(%s=%s)", GiveSourceFactory.OSGI_PROPERTY_TYPE, factory);
-			ServiceReference[] serviceReference;
-			serviceReference = bundleContext.getServiceReferences(GiveSourceFactory.class.getName(), typeFilter);
-			if (serviceReference != null && serviceReference.length > 0) {
-				GiveSourceFactory sourceFactory = (GiveSourceFactory) bundleContext.getService(serviceReference[0]);
-				return sourceFactory.resolve(resourceResolver, parameters);
+			GiveSourceFactory sourceFactory = null;
+			if (this.cache.containsKey(factory)) {
+				sourceFactory = this.cache.get(factory);
 			} else {
-				throw new XPathException("There are not source factory defined for " + factory);
+				String typeFilter = String.format("(%s=%s)", GiveSourceFactory.OSGI_PROPERTY_TYPE, factory);
+				ServiceReference[] serviceReference = bundleContext.getServiceReferences(GiveSourceFactory.class.getName(), typeFilter);
+				if (serviceReference != null && serviceReference.length > 0) {
+					sourceFactory = (GiveSourceFactory) bundleContext.getService(serviceReference[0]);
+					this.cache.put(factory, sourceFactory);
+				} else {
+					throw new XPathException("There are not source factory defined for " + factory);
+				}
 			}
+			return sourceFactory.resolve(resourceResolver, parameters);
 		} catch (Exception e) {
 			LOGGER.error("Unable to load source factory for " + href, e);
 			throw new XPathException("Unable to load source factory for " + href);

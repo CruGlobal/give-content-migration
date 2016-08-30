@@ -18,6 +18,7 @@ public class ParametersCollector {
 	private String intermediateTemplate;
 	private String ignoreFilesPattern;
 	private String pageAcceptRule;
+	private String factoryType;
 	
 	public String getBaselocation() {
 		return baselocation;
@@ -113,6 +114,14 @@ public class ParametersCollector {
 
 	public void setPageAcceptRule(String pageAcceptRule) {
 		this.pageAcceptRule = pageAcceptRule;
+	}
+
+	public String getFactoryType() {
+		return factoryType;
+	}
+
+	public void setFactoryType(String factoryType) {
+		this.factoryType = factoryType;
 	}
 
 }

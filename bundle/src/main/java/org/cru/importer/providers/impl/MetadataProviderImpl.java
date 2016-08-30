@@ -97,7 +97,7 @@ public class MetadataProviderImpl implements MetadataProvider {
 			if (cache.containsKey(partialName)) {
 				metadataRow = cache.get(partialName);
 			}
-			// Then search in the page
+			// Then search in the sheet
 			if (metadataRow == null) {
 				metadataRow = getMetadataRow(sheetIndex, partialName);
 			}

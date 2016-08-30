@@ -1,10 +1,10 @@
 package org.cru.importer.providers.impl;
 
 import org.apache.sling.api.resource.Resource;
-import org.cru.importer.bean.PageInfo;
+import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
-import org.cru.importer.providers.PageProvider;
+import org.cru.importer.providers.ResourceProvider;
 
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.PageManager;
@@ -15,7 +15,7 @@ import com.day.cq.wcm.api.PageManager;
  * @author Nestor de Dios
  *
  */
-public class PageProviderImpl implements PageProvider {
+public class PageProviderImpl implements ResourceProvider {
 
 	private PageManager pageManager;
 	private String baselocation;
@@ -41,7 +41,7 @@ public class PageProviderImpl implements PageProvider {
 		}
 	}
 
-	public PageInfo getPage(ResourceMetadata metadata) throws Exception {
+	public ResourceInfo getResource(ResourceMetadata metadata) throws Exception {
 		if (this.pageAcceptRuleKey != null && metadata.getPropertyNames().contains(this.pageAcceptRuleKey)) {
 			String val = metadata.getValue(this.pageAcceptRuleKey);
 			if (!val.equals(this.pageAcceptRuleValue)) {
@@ -51,10 +51,10 @@ public class PageProviderImpl implements PageProvider {
 		String relativePath = getRelativePath(metadata);
 		Page page = pageManager.getPage(this.baselocation + relativePath);
 		if (page != null) {
-			return new PageInfo(page,false);
+			return new ResourceInfo(page.adaptTo(Resource.class),false);
 		} else {
 			page = buildPage(relativePath);
-			return new PageInfo(page,true);
+			return new ResourceInfo(page.adaptTo(Resource.class),true);
 		}
 	}
 
