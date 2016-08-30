@@ -8,8 +8,9 @@ import net.sf.saxon.trans.XPathException;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolve specific URLs of give project.
@@ -23,6 +24,8 @@ import org.osgi.framework.ServiceReference;
  */
 public class GiveURIResolver extends StandardURIResolver {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(GiveURIResolver.class);
+	
 	private ResourceResolver resourceResolver;
 	private BundleContext bundleContext;
 	
@@ -65,7 +68,8 @@ public class GiveURIResolver extends StandardURIResolver {
 			} else {
 				throw new XPathException("There are not source factory defined for " + factory);
 			}
-		} catch (InvalidSyntaxException e) {
+		} catch (Exception e) {
+			LOGGER.error("Unable to load source factory for " + href, e);
 			throw new XPathException("Unable to load source factory for " + href);
 		}
 	}

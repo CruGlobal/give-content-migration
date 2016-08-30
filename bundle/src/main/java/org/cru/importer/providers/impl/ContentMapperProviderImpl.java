@@ -3,6 +3,7 @@ package org.cru.importer.providers.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import net.sf.saxon.s9api.XsltExecutable;
 import net.sf.saxon.s9api.XsltTransformer;
 import net.sf.saxon.trans.XPathException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.commons.JcrUtils;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.providers.ContentMapperProvider;
@@ -57,13 +59,23 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	public void mapFields(Page page, Map<String, String> metadata, InputStream xmlInputStream) throws Exception {
 		try {
 			initTransformedKeys(metadata);
+			
+			// Copy the stream to be sure is not closed prematurelly
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			IOUtils.copy(xmlInputStream, baos);
+			String sbaos = new String(baos.toByteArray());
+			
+			// Ensure the stream is encoded in UTF-8 before transformation
+			byte[] arrbaos = sbaos.getBytes(StandardCharsets.UTF_8);
+			InputStream isArrBaos = new ByteArrayInputStream(arrbaos);
+			
 			transformer.setParameter(new QName("path"), new XdmAtomicValue(page.getPath()));
 			for (String key : metadata.keySet()) {
 				transformer.setParameter(new QName(this.transformedKeys.get(key)), new XdmAtomicValue(metadata.get(key)));
 			}
 			
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			transformer.setSource(new StreamSource(xmlInputStream));
+			transformer.setSource(new StreamSource(isArrBaos));
 			transformer.setDestination(processor.newSerializer(output));
 			transformer.transform();
 

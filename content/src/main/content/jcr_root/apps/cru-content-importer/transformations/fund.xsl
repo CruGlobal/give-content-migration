@@ -24,7 +24,7 @@
 			<xsl:attribute name="jcr:primaryType">cq:PageContent</xsl:attribute>
 			<xsl:attribute name="sling:resourceType">Give/components/page/designation</xsl:attribute>
 			<xsl:attribute name="cq:template">/apps/Give/templates/designation</xsl:attribute>
-			<xsl:attribute name="jcr:title"><xsl:value-of select="$Designation" /></xsl:attribute>
+			<xsl:attribute name="jcr:title"><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></xsl:attribute>
 
 			<xsl:attribute name="designationType">People</xsl:attribute>
 			<xsl:attribute name="designationNumber"><xsl:value-of select="$Designation" /></xsl:attribute>
@@ -34,17 +34,17 @@
 			<xsl:attribute name="paragraphText"><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></xsl:attribute>
 
 			<xsl:if test="not(empty(wcm:root/wcm:element[@name='wide_image']))">
-				<xsl:attribute name="largeImage">
-					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', wcm:root/wcm:element[@name='wide_image']))" />
+				<xsl:attribute name="coverPhoto">
+					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='wide_image'])))" />
 				</xsl:attribute>
 			</xsl:if>
 			<xsl:if test="not(empty(wcm:root/wcm:element[@name='image']))">
-				<xsl:attribute name="smallImage">
-					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', wcm:root/wcm:element[@name='image']))" />
+				<xsl:attribute name="secondaryPhoto">
+					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='image'])))" />
 				</xsl:attribute>
 			</xsl:if>
-			<xsl:attribute name="parentDesignationNumber">TBD</xsl:attribute>
-			<xsl:attribute name="organizationID">TBD</xsl:attribute>
+			<xsl:attribute name="parentDesignationNumber"></xsl:attribute>
+			<xsl:attribute name="organizationID"></xsl:attribute>
 		</jcr:content>
 	</xsl:template>
 

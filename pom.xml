@@ -21,7 +21,7 @@
     <!-- P R O P E R T I E S -->
     <!-- ====================================================================== -->
     <properties>
-        <crx.host>localhost</crx.host>
+        <crx.host>192.168.133.129</crx.host>
         <crx.port>4502</crx.port>
         <crx.username>admin</crx.username>
         <crx.password>admin</crx.password>

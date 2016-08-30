@@ -2,6 +2,7 @@ package org.cru.importer.xml.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,8 @@ import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.util.UrlUtil;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.osgi.framework.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.day.cq.search.PredicateGroup;
 import com.day.cq.search.Query;
@@ -43,17 +46,27 @@ import com.day.cq.search.result.SearchResult;
 })
 public class ImageSourceFactory implements GiveSourceFactory {
 	
+	private final static Logger LOGGER = LoggerFactory.getLogger(ImageSourceFactory.class);
+	
 	private static final String PARAM_IMAGE = "image";
 	private static final String IMAGES_CONTENT_PATH = "/content/dam"; // TODO: Move to service property
 	private static final String IMAGE_ID_EXRACTOR_REGEX = "wcmUrl\\(\\s*?'.*?'\\s*?,\\s*?'(.*?)'"; // TODO: Move to service property
 	private static Pattern pattern = Pattern.compile(IMAGE_ID_EXRACTOR_REGEX);
 
 	public Source resolve(ResourceResolver resourceResolver, String parameters) throws XPathException {
-		Map<String, String> params = UrlUtil.splitQuery(parameters);
+		Map<String, String> params;
+		try {
+			params = UrlUtil.splitQuery(parameters);
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.warn("Error parsing parmeters: " + parameters + "  - Error: " + e.getMessage());
+			params = new HashMap<String, String>();
+		}
 		String image = "";
 		if (params.containsKey(PARAM_IMAGE) && !params.get(PARAM_IMAGE).equals("")) {
 			String imageCode = captureImageCode(params.get(PARAM_IMAGE));
-			image = searchInDam(resourceResolver, imageCode);
+			if (imageCode != null) {
+				image = searchInDam(resourceResolver, imageCode);
+			}
 		}
 		image = "<image>" + image + "</image>";
 		InputStream stream = new ByteArrayInputStream(image.getBytes(StandardCharsets.UTF_8));
@@ -72,7 +85,9 @@ public class ImageSourceFactory implements GiveSourceFactory {
 		if (matcher.find()) {
 		    return matcher.group(1);
 		} else {
-			throw new XPathException("Impossible to extract image ID from " + imageStr);
+			LOGGER.warn("Impossible to extract image ID from " + imageStr);
+			return null;
+			//throw new XPathException("Impossible to extract image ID from " + imageStr);
 		}
 	}
 
@@ -97,7 +112,9 @@ public class ImageSourceFactory implements GiveSourceFactory {
 			if (hits.size() > 0) {
 				return hits.get(0).getPath();
 			} else {
-				throw new XPathException("Image " + imageCode + " cannot be found");
+				LOGGER.warn("Image " + imageCode + " cannot be found");
+				return "";
+				//throw new XPathException("Image " + imageCode + " cannot be found");
 			}
 		} catch (RepositoryException e) {
 			throw new XPathException("Cannot get the image path for " + imageCode);

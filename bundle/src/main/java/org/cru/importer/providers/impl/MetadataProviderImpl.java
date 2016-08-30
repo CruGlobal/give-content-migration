@@ -33,13 +33,16 @@ public class MetadataProviderImpl implements MetadataProvider {
 	int columnFileNames;
 	int rowColumnNames;
 	DataFormatter excelFormatter;
+	Map<String,XSSFRow>[] rowsCache;
 	
+	@SuppressWarnings("unchecked")
 	public MetadataProviderImpl(ParametersCollector parametersCollector) throws Exception {
 		workbook = getWorkbook(parametersCollector.getContentFile());
 		columnFileNames = -1;
 		rowColumnNames = parametersCollector.getRowColumnNames();
 		excelFormatter = new DataFormatter();
 		if (workbook != null && workbook.getNumberOfSheets()>0) {
+			// Find key column
 			XSSFSheet sheet = workbook.getSheetAt(0);
 			XSSFRow row = sheet.getRow(rowColumnNames);
 			if (row != null) {
@@ -49,6 +52,27 @@ public class MetadataProviderImpl implements MetadataProvider {
 					colnames.add(colname);
 					if (columnFileNames==-1 && colname.equals(parametersCollector.getColumnFileName())) {
 						columnFileNames = i;
+					}
+				}
+			}
+			if (row == null) {
+				throw new Exception("Metadata Excel file does not contains a row at index "+ parametersCollector.getRowColumnNames());
+			} else if (columnFileNames == -1) {
+				throw new Exception("Metadata Excel file does not contains a column called "+ parametersCollector.getColumnFileName());
+			} else {
+				// Create the cache
+				rowsCache = (Map<String, XSSFRow>[]) new HashMap<?,?>[workbook.getNumberOfSheets()];
+				for (int i=0;i<workbook.getNumberOfSheets();i++) {
+					XSSFSheet currentsheet = workbook.getSheetAt(i);
+					rowsCache[i] = new HashMap<String, XSSFRow>();
+					for (int j = rowColumnNames + 1; j <= sheet.getLastRowNum(); j++){
+						XSSFRow currentrow = currentsheet.getRow(j);
+						String rowFileName = getStringValue(row, columnFileNames);
+						try {
+							rowFileName = rowFileName.substring(rowFileName.indexOf("@"));
+							rowsCache[i].put(rowFileName, currentrow);
+						} catch (Exception e) {
+						}
 					}
 				}
 			}
@@ -74,11 +98,25 @@ public class MetadataProviderImpl implements MetadataProvider {
 		}
 		XSSFRow metadataRow = null;
 		if (sheetIndex == -1) {
+			// first search in cache
+			for (int i=0;i<rowsCache.length && metadataRow==null;i++) {
+				if (rowsCache[i].containsKey(partialName)) {
+					metadataRow = rowsCache[i].get(partialName);
+				}
+			}
+			// Then iterate over sheets
 			for (int i=0;i<workbook.getNumberOfSheets() && metadataRow==null;i++) {
 				metadataRow = getMetadataRow(i, partialName);
 			}
 		} else {
-			metadataRow = getMetadataRow(sheetIndex, partialName);
+			// First search in cache
+			if (rowsCache[sheetIndex].containsKey(partialName)) {
+				metadataRow = rowsCache[sheetIndex].get(partialName);
+			}
+			// Then search in the page
+			if (metadataRow == null) {
+				metadataRow = getMetadataRow(sheetIndex, partialName);
+			}
 		}
 		// Step 2: extract the metadata
 		if (metadataRow != null) {

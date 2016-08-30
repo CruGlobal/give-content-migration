@@ -1,9 +1,6 @@
 package org.cru.importer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +21,8 @@ import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.providers.DataImportFactory;
 import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.PageProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Master process: Process the content file and create the content
@@ -34,6 +33,8 @@ import org.cru.importer.providers.PageProvider;
 @Model(adaptables = SlingHttpServletRequest.class)
 public class GiveDataImportMasterProcess {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(GiveDataImportMasterProcess.class);
+	
 	@Inject
 	private Session session;
 	
@@ -64,35 +65,38 @@ public class GiveDataImportMasterProcess {
 					continue;
 				}
 				String filename = entry.getName();
+				LOGGER.info("Start processing file: " + filename);
 				if (acceptsFile(ignoreFilesPattern, filename)) {
 					try {
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						IOUtils.copy(zis, baos);
 						Map<String,String> metadata = metadataProvider.getMetadata(filename);
 						PageInfo pageInfo = pageProvider.getPage(metadata);
 						if (pageInfo != null) {
-							String sbaos = new String(baos.toByteArray());
-							byte[] arrbaos = sbaos.getBytes(StandardCharsets.UTF_8); // Ensure the stream is encoded in UTF-8
-							contentMapperProvider.mapFields(pageInfo.getPage(), metadata, new ByteArrayInputStream(arrbaos));
+							contentMapperProvider.mapFields(pageInfo.getPage(), metadata, zis);
 							String pageReference = pageInfo.getPage().getPath();
 							if (session.hasPendingChanges()) {
 								session.save();
 								if (pageInfo.isNewPage()) {
 									resultsCollector.addCreatedPage(pageReference);
+									LOGGER.info("New page created at: " + pageReference);
 								} else {
 									resultsCollector.addModifiedPage(pageReference);
+									LOGGER.info("Existed page modified at: " + pageReference);
 								}
 							} else {
 								resultsCollector.addNotModifiedPage(pageReference);
+								LOGGER.info("Not modified page at: " + pageReference);
 							}
 						} else {
 							resultsCollector.addIgnoredPages(filename);
+							LOGGER.info("Ignored file: " + filename);
 						}
 					} catch (Exception e) {
 						if (session.hasPendingChanges()) {
 							session.refresh(false);
 						}
-						resultsCollector.addError(filename + ": " + StringEscapeUtils.escapeHtml4(e.getMessage()));
+						String errorMessage = filename + ": " + StringEscapeUtils.escapeHtml4(e.getMessage());
+						resultsCollector.addError(errorMessage);
+						LOGGER.info("Error importing " + errorMessage);
 					}
 				}
 			}
