@@ -30,8 +30,12 @@ import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.xml.GiveURIResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.day.cq.wcm.api.Page;
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
 
 /**
  * Fills page content for Give import process using xslt
@@ -41,6 +45,8 @@ import com.day.cq.wcm.api.Page;
  */
 public class ContentMapperProviderImpl implements ContentMapperProvider {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(ContentMapperProviderImpl.class);
+	
 	private Session session;
 	private XsltTransformer transformer;
 	private Processor processor;
@@ -73,12 +79,16 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			// Copy the stream to be sure is not closed prematurelly
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			IOUtils.copy(xmlInputStream, baos);
-			/*String sbaos = new String(baos.toByteArray());
-			
-			// Ensure the stream is encoded in UTF-8 before transformation
-			byte[] arrbaos = sbaos.getBytes(StandardCharsets.UTF_8);*/
 			InputStream isArrBaos = new ByteArrayInputStream(baos.toByteArray());
 			
+			CharsetDetector detector = new CharsetDetector();
+	        detector.setText(isArrBaos);
+	        CharsetMatch match = detector.detect();
+	        if (!match.getName().equals("UTF-8")) {
+	        	byte[] utf8 = new String(baos.toByteArray(), match.getName()).getBytes("UTF-8");
+	        	isArrBaos = new ByteArrayInputStream(utf8);
+	        }
+	        
 			transformer.setParameter(new QName("path"), new XdmAtomicValue(page.getPath()));
 			for (String key : transformerParameters) {
 				if (transformedKeys.containsKey(key)) {
@@ -92,7 +102,8 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			transformer.setDestination(processor.newSerializer(output));
 			transformer.transform();
 
-			InputStream result = new ByteArrayInputStream(output.toByteArray());
+			byte[] bresult = output.toByteArray();
+			InputStream result = new ByteArrayInputStream(bresult);
 
 			importResult(page, result);
 		} catch (SaxonApiException e) {

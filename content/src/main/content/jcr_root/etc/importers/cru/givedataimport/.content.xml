@@ -16,7 +16,7 @@
      "columnFileName":"primaryFile"\,
      "columnDesignation":"Designation"\,
      "pageAcceptRule":"Active or Inactive=Active"\,
-     "factoryType"="page"},
+     "factoryType":"page"},
     {"name":"ministry"\,
      "title":"Ministry"\,
      "defaultPath":"/content/give/us/en/designations"\,
@@ -27,7 +27,7 @@
      "columnFileName":"primaryFile"\,
      "columnDesignation":"Designation"\,
      "pageAcceptRule":"Active or Inactive=Active"\,
-     "factoryType"="page"},
+     "factoryType":"page"},
     {"name":"fund"\,
      "title":"Fund"\,
      "defaultPath":"/content/give/us/en/campaigns"\,
@@ -38,7 +38,7 @@
      "columnFileName":"primaryFile"\,
      "columnDesignation":"Designation"\,
      "pageAcceptRule":""\,
-     "factoryType"="page"}
+     "factoryType":"page"}
     ]'
     tempStorePath="/var/cru-content-importer"
     ignoreFilesPattern="__MACOSX(.*)"
