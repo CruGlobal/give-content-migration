@@ -36,7 +36,7 @@
      "transformation":"/apps/cru-content-importer/transformations/fund.xsl"\,
      "rowColumnNames":"2"\,
      "columnFileName":"primaryFile"\,
-     "columnDesignation":"Designation"\,
+     "columnDesignation":"xSiebelDesignation"\,
      "pageAcceptRule":""\,
      "factoryType":"page"}
     ]'

@@ -6,7 +6,7 @@
 	xmlns:jcr="http://www.jcp.org/jcr/1.0"
 	xmlns:cq="http://www.day.com/jcr/cq/1.0"
 	xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
-	xmlns:wcm="http://www.stellant.com/wcm-data/ns/8.0.0"
+	xmlns:wcm="http://www.stellent.com/wcm-data/ns/8.0.0"
 	version="2.0">
 
 	<xsl:output method="xml" version="1.0" indent="yes" encoding="UTF-8" />
