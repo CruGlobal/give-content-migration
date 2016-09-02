@@ -21,8 +21,12 @@
 	<xsl:param name="xFriendlyFilename" />
 	<xsl:param name="xSiebelParentDesignation" />
 	<xsl:param name="xSiebelOrganizationId"/>
+	<xsl:param name="xSiebelWebTreatment"/>
 
 	<xsl:template match="/">
+	
+		<xsl:variable name="additionalMapping" select="fn:doc(concat('give://csvAdditionalMapping?keyColumn=TREATMENT_NUMBER&amp;keyValue=', fn:encode-for-uri($xSiebelWebTreatment)))"/>
+	
 		<jcr:content>
 			<xsl:attribute name="jcr:primaryType">cq:PageContent</xsl:attribute>
 			<xsl:attribute name="sling:resourceType">Give/components/page/campaign</xsl:attribute>
@@ -37,10 +41,14 @@
 			<xsl:attribute name="paragraphText"><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></xsl:attribute>
 			<xsl:attribute name="letterDate"><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))" /></xsl:attribute>
 			<xsl:attribute name="psText"><xsl:value-of select="wcm:root/wcm:element[@name='postscript']" /></xsl:attribute>
-			<xsl:attribute name="signatureImage"><xsl:value-of select="wcm:root/wcm:element[@name='signature']" /></xsl:attribute>
+			<xsl:if test="not(empty(wcm:root/wcm:element[@name='signature']))">
+				<xsl:attribute name="signatureImage">
+					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='signature'])))" />
+				</xsl:attribute>
+			</xsl:if>
 			
-			<xsl:attribute name="startDate">GET FROM EXTERNAL SOURCE</xsl:attribute>
-			<xsl:attribute name="defaultCampaign">GET FROM EXTERNAL SOURCE</xsl:attribute>
+			<xsl:attribute name="startDate"><xsl:value-of select="$additionalMapping/data/FUND_APPEAL_START_DATE" /></xsl:attribute>
+			<xsl:attribute name="defaultCampaign"><xsl:value-of select="$additionalMapping/data/CAMPAIGN_NUMBER" /></xsl:attribute>
 
 			<xsl:if test="not(empty(wcm:root/wcm:element[@name='wide_image']))">
 				<xsl:attribute name="coverPhoto">

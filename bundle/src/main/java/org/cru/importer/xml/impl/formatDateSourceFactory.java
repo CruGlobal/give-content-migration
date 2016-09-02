@@ -21,7 +21,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.sling.api.resource.ResourceResolver;
+import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.util.UrlUtil;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.osgi.framework.Constants;
@@ -47,7 +47,7 @@ public class formatDateSourceFactory implements GiveSourceFactory {
 	private DateFormat alternativeIncomingDateFormatter = null;
 	private DateFormat aemDateFormatter = null;
 	
-	public Source resolve(ResourceResolver resourceResolver, String parameters) throws XPathException {
+	public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException {
 		Map<String, String> params;
 		try {
 			params = UrlUtil.splitQuery(parameters);

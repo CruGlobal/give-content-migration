@@ -4,7 +4,7 @@ import javax.xml.transform.Source;
 
 import net.sf.saxon.trans.XPathException;
 
-import org.apache.sling.api.resource.ResourceResolver;
+import org.cru.importer.bean.ParametersCollector;
 
 /**
  * Defines an interface to build source factories for give project
@@ -23,11 +23,11 @@ public interface GiveSourceFactory {
 	/**
 	 * Resolve a URI
 	 * 
-	 * @param resourceResolver
+	 * @param parametersCollector
 	 * @param parameters
 	 * @return
 	 * @throws XPathException
 	 */
-	public Source resolve(ResourceResolver resourceResolver, String parameters) throws XPathException;
+	public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException;
 	
 }

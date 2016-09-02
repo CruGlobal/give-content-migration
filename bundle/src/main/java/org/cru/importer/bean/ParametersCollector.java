@@ -1,5 +1,7 @@
 package org.cru.importer.bean;
 
+import java.io.InputStream;
+
 import javax.jcr.Binary;
 
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -19,6 +21,8 @@ public class ParametersCollector {
 	private String ignoreFilesPattern;
 	private String pageAcceptRule;
 	private String factoryType;
+	private InputStream additionalMappingFile;
+	private Object additionalMappingCache = null;
 	
 	public String getBaselocation() {
 		return baselocation;
@@ -122,6 +126,22 @@ public class ParametersCollector {
 
 	public void setFactoryType(String factoryType) {
 		this.factoryType = factoryType;
+	}
+
+	public InputStream getAdditionalMappingFile() {
+		return additionalMappingFile;
+	}
+
+	public void setAdditionalMappingFile(InputStream additionalMappingFile) {
+		this.additionalMappingFile = additionalMappingFile;
+	}
+
+	public Object getAdditionalMappingCache() {
+		return additionalMappingCache;
+	}
+
+	public void setAdditionalMappingCache(Object additionalMappingCache) {
+		this.additionalMappingCache = additionalMappingCache;
 	}
 
 }

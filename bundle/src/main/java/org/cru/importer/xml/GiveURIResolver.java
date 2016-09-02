@@ -8,7 +8,7 @@ import javax.xml.transform.Source;
 import net.sf.saxon.lib.StandardURIResolver;
 import net.sf.saxon.trans.XPathException;
 
-import org.apache.sling.api.resource.ResourceResolver;
+import org.cru.importer.bean.ParametersCollector;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -29,12 +29,12 @@ public class GiveURIResolver extends StandardURIResolver {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(GiveURIResolver.class);
 	
-	private ResourceResolver resourceResolver;
+	private ParametersCollector parametersCollector;
 	private BundleContext bundleContext;
 	private Map<String, GiveSourceFactory> cache;
 	
-	public GiveURIResolver(ResourceResolver resourceResolver) {
-		this.resourceResolver = resourceResolver;
+	public GiveURIResolver(ParametersCollector parametersCollector) {
+		this.parametersCollector = parametersCollector;
 		this.bundleContext = FrameworkUtil.getBundle(GiveURIResolver.class).getBundleContext();
 		this.cache = new HashMap<String, GiveSourceFactory>();
 	}
@@ -77,7 +77,7 @@ public class GiveURIResolver extends StandardURIResolver {
 					throw new XPathException("There are not source factory defined for " + factory);
 				}
 			}
-			return sourceFactory.resolve(resourceResolver, parameters);
+			return sourceFactory.resolve(parametersCollector, parameters);
 		} catch (Exception e) {
 			LOGGER.error("Unable to load source factory for " + href, e);
 			throw new XPathException("Unable to load source factory for " + href);

@@ -61,15 +61,20 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
         
         var processOptions = [];
         var defaultPaths = {};
+        var requireAdditionalMappingFile = [];
         config.options.forEach(function(item,index){
         	var option = JSON.parse(item);
         	processOptions.push({text:option.title,value:option.name});
         	defaultPaths[option.name] = option.defaultPath;
+        	if (option.additionalMappingFile) {
+        		requireAdditionalMappingFile.push(option.name);
+        	}
         });
-        
+
         var formParameters = new CQ.Ext.FormPanel({
             url: "/services/givedataimport",
             title:"",
+            fileUpload:true,
             border:false,
             labelWidth:100,
             buttonAlign:"left",
@@ -90,6 +95,13 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                 	"listeners":{
                 		"selectionchanged": function(selection,value,checked) {
                 			CQ.Ext.getCmp("importer-baselocation").setRawValue(defaultPaths[value]);
+                			if ($.inArray(value,requireAdditionalMappingFile) > -1) {
+                				CQ.Ext.getCmp("additional-mapping-file").show();
+                				CQ.Ext.getCmp("additional-mapping-file").allowBlank = false;
+                			} else {
+                				CQ.Ext.getCmp("additional-mapping-file").hide();
+                				CQ.Ext.getCmp("additional-mapping-file").allowBlank = true;
+                			}
                 		}
                 	}
                 },
@@ -103,6 +115,17 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                     "fieldLabel":"Base Path",
                     "fieldDescription":"Select a base location where the pages will be imported."
                 },
+                {
+	                "xtype": "fileuploadfield",
+	                "id": "additional-mapping-file",
+	                "fieldLabel": "Additional Mapping File",
+	                "fieldDescription": "Enter a CSV file containing the aditional mapping information (required for fund).",
+	                "name": "additionalMappingFile",
+	                "allowBlank":true,
+	                "anchor": "99%",
+	                "hideMode": "display",
+	                "hidden":true
+        		},
                 {
                     "xtype": "hidden",
                     "name":"configpath",
@@ -237,7 +260,11 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
     	zipFile = CQ.Ext.getCmp("zip-file").isValid(false);
     	baselocation = CQ.Ext.getCmp("importer-baselocation").isValid(false);
     	option = CQ.Ext.getCmp("importer-option").isValid(false);
-    	return zipFile && baselocation && option;
+    	additional = true;
+    	if (CQ.Ext.getCmp("additional-mapping-file").isVisible()) {
+    		additional = CQ.Ext.getCmp("additional-mapping-file").isValid(false);
+    	}
+    	return zipFile && baselocation && option && additional;
     }
     
 });

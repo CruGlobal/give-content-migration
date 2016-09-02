@@ -30,8 +30,6 @@ import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.xml.GiveURIResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.day.cq.wcm.api.Page;
 import com.ibm.icu.text.CharsetDetector;
@@ -45,8 +43,6 @@ import com.ibm.icu.text.CharsetMatch;
  */
 public class ContentMapperProviderImpl implements ContentMapperProvider {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(ContentMapperProviderImpl.class);
-	
 	private Session session;
 	private XsltTransformer transformer;
 	private Processor processor;
@@ -60,7 +56,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 		Node xsltNode = this.session.getNode(parametersCollector.getXsltPath());
 		processor = new Processor(false);
         XsltCompiler comp = processor.newXsltCompiler();
-        GiveURIResolver resolver = new GiveURIResolver(parametersCollector.getRequest().getResourceResolver());
+        GiveURIResolver resolver = new GiveURIResolver(parametersCollector);
         comp.setURIResolver(resolver);
         XsltExecutable exp = comp.compile(new StreamSource(JcrUtils.readFile(xsltNode)));
         transformerParameters = new LinkedList<String>();

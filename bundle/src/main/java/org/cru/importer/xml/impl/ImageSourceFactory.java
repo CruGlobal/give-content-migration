@@ -22,6 +22,7 @@ import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.resource.ResourceResolver;
+import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.util.UrlUtil;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.osgi.framework.Constants;
@@ -53,7 +54,7 @@ public class ImageSourceFactory implements GiveSourceFactory {
 	private static final String IMAGE_ID_EXRACTOR_REGEX = "wcmUrl\\(\\s*?'.*?'\\s*?,\\s*?'(.*?)'"; // TODO: Move to service property
 	private static Pattern pattern = Pattern.compile(IMAGE_ID_EXRACTOR_REGEX);
 
-	public Source resolve(ResourceResolver resourceResolver, String parameters) throws XPathException {
+	public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException {
 		Map<String, String> params;
 		try {
 			params = UrlUtil.splitQuery(parameters);
@@ -65,7 +66,7 @@ public class ImageSourceFactory implements GiveSourceFactory {
 		if (params.containsKey(PARAM_IMAGE) && !params.get(PARAM_IMAGE).equals("")) {
 			String imageCode = captureImageCode(params.get(PARAM_IMAGE));
 			if (imageCode != null) {
-				image = searchInDam(resourceResolver, imageCode);
+				image = searchInDam(parametersCollector.getRequest().getResourceResolver(), imageCode);
 			}
 		}
 		image = "<image>" + image + "</image>";
