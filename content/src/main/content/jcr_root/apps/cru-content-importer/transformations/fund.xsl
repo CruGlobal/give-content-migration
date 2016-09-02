@@ -35,7 +35,7 @@
 			<xsl:attribute name="vanityURL"><xsl:value-of select="$xFriendlyFilename" /></xsl:attribute>
 			<xsl:attribute name="websiteURL"><xsl:value-of select="wcm:root/wcm:element[@name='website']" /></xsl:attribute>
 			<xsl:attribute name="paragraphText"><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></xsl:attribute>
-			<xsl:attribute name="letterDate"><xsl:value-of select="wcm:root/wcm:element[@name='by_line_date']" /></xsl:attribute>
+			<xsl:attribute name="letterDate"><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))" /></xsl:attribute>
 			<xsl:attribute name="psText"><xsl:value-of select="wcm:root/wcm:element[@name='postscript']" /></xsl:attribute>
 			<xsl:attribute name="signatureImage"><xsl:value-of select="wcm:root/wcm:element[@name='signature']" /></xsl:attribute>
 			

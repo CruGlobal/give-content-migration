@@ -123,7 +123,6 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 		if (this.transformedKeys == null) {
 			this.transformedKeys = new HashMap<String, String>();
 			for (String colname : colnames) {
-				//this.transformedKeys.put(key, key.replaceAll(" ", "_").replaceAll(":", "_"));
 				this.transformedKeys.put(colname.replaceAll("[^a-zA-Z0-9]", "_"), colname);
 			}
 		}
