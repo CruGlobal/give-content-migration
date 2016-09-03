@@ -10,10 +10,9 @@ public class ParametersCollector {
 
 	private SlingHttpServletRequest request;
 	private String baselocation;
-	private String configpath;
 	private Binary contentFile;
 	private String columnFileName;
-	private String columnDesignation;
+	private String[] pathCreationStrategy;
 	private int rowColumnNames;
 	private String xsltPath;
 	private String pageTemplate;
@@ -30,14 +29,6 @@ public class ParametersCollector {
 	
 	public void setBaselocation(String baselocation) {
 		this.baselocation = baselocation;
-	}
-	
-	public String getConfigpath() {
-		return configpath;
-	}
-	
-	public void setConfigpath(String configpath) {
-		this.configpath = configpath;
 	}
 
 	public Binary getContentFile() throws Exception {
@@ -96,14 +87,6 @@ public class ParametersCollector {
 		this.intermediateTemplate = intermediateTemplate;
 	}
 
-	public String getColumnDesignation() {
-		return columnDesignation;
-	}
-
-	public void setColumnDesignation(String columnDesignation) {
-		this.columnDesignation = columnDesignation;
-	}
-
 	public void setIgnoreFilesPattern(String ignoreFilesPattern) {
 		this.ignoreFilesPattern = ignoreFilesPattern;
 	}
@@ -142,6 +125,14 @@ public class ParametersCollector {
 
 	public void setAdditionalMappingCache(Object additionalMappingCache) {
 		this.additionalMappingCache = additionalMappingCache;
+	}
+
+	public String[] getPathCreationStrategy() {
+		return pathCreationStrategy;
+	}
+
+	public void setPathCreationStrategy(String[] pathCreationStrategy) {
+		this.pathCreationStrategy = pathCreationStrategy;
 	}
 
 }

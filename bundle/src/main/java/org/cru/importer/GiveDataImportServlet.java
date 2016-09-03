@@ -21,8 +21,6 @@ import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
-import org.apache.sling.commons.json.JSONException;
-import org.apache.sling.commons.json.JSONObject;
 import org.apache.sling.commons.json.io.JSONWriter;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResultsCollector;
@@ -109,52 +107,17 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 				isValid = false;
 			} else {
 				ValueMap properties = config.adaptTo(ValueMap.class);
-				String option = request.getParameter("option");
-				if (option == null || option.trim().equals("")) {
-					resultsCollector.addError("Option parameter not found.");
-					isValid = false;
-				} else {
-					String[] options = properties.get("options", String[].class);
-					if (options == null || options.length==0) {
-						resultsCollector.addError("Options property not found at configuration node.");
-						isValid = false;
-					} else {
-						JSONObject jsonOption = null;
-						for (String joption : options) {
-							try {
-								JSONObject json = new JSONObject(joption);
-								if (option.equals(json.getString("name"))) {
-									jsonOption = json;
-									break;
-								}
-							} catch (JSONException e) {
-								resultsCollector.addError("Option " + joption + " at configuration node can not be parsed as JSON.");
-								isValid = false;
-							}
-						}
-						if (jsonOption == null) {
-							resultsCollector.addError("Selected option " + option + " not found at configuration node.");
-							isValid = false;
-						} else {
-							try {
-								parametersCollector.setRowColumnNames(jsonOption.getInt("rowColumnNames"));
-								parametersCollector.setColumnFileName(jsonOption.getString("columnFileName"));
-								parametersCollector.setColumnDesignation(jsonOption.getString("columnDesignation"));
-								parametersCollector.setXsltPath(jsonOption.getString("transformation"));
-								parametersCollector.setPageTemplate(jsonOption.getString("pageTemplate"));
-								parametersCollector.setIntermediateTemplate(jsonOption.getString("intermediateTemplate"));
-								parametersCollector.setPageAcceptRule(jsonOption.getString("pageAcceptRule"));
-								parametersCollector.setFactoryType(jsonOption.getString("factoryType"));
-								if (jsonOption.getBoolean("additionalMappingFile")) {
-									InputStream additionalMappingFile = request.getRequestParameter("additionalMappingFile").getInputStream();
-									parametersCollector.setAdditionalMappingFile(additionalMappingFile);
-								}
-							} catch (JSONException e) {
-								resultsCollector.addError("Selected option " + option + " error. " + e.getMessage());
-								isValid = false;
-							}
-						}
-					}
+				parametersCollector.setRowColumnNames(properties.get("rowColumnNames",Integer.class));
+				parametersCollector.setColumnFileName(properties.get("columnFileName",String.class));
+				parametersCollector.setPathCreationStrategy(properties.get("pathCreationStrategy",String[].class));
+				parametersCollector.setXsltPath(properties.get("transformation",String.class));
+				parametersCollector.setPageTemplate(properties.get("pageTemplate",String.class));
+				parametersCollector.setIntermediateTemplate(properties.get("intermediateTemplate",String.class));
+				parametersCollector.setPageAcceptRule(properties.get("pageAcceptRule",String.class));
+				parametersCollector.setFactoryType(properties.get("factoryType",String.class));
+				if (properties.get("additionalMappingFile",Boolean.class)) {
+					InputStream additionalMappingFile = request.getRequestParameter("additionalMappingFile").getInputStream();
+					parametersCollector.setAdditionalMappingFile(additionalMappingFile);
 				}
 				String ignoreFilesPattern = properties.get("ignoreFilesPattern", String.class);
 				if (ignoreFilesPattern == null) {

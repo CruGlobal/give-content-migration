@@ -98,7 +98,7 @@ public class GiveDataImportMasterProcess {
 						if (session.hasPendingChanges()) {
 							session.refresh(false);
 						}
-						String errorMessage = filename + ": " + StringEscapeUtils.escapeHtml4(e.getMessage());
+						String errorMessage = filename + ": " + StringEscapeUtils.escapeJson(e.getMessage());
 						resultsCollector.addError(errorMessage);
 						LOGGER.info("Error importing " + errorMessage);
 					}

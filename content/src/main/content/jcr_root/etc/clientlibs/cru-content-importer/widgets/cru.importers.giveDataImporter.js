@@ -63,11 +63,13 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
         var defaultPaths = {};
         var requireAdditionalMappingFile = [];
         config.options.forEach(function(item,index){
-        	var option = JSON.parse(item);
-        	processOptions.push({text:option.title,value:option.name});
-        	defaultPaths[option.name] = option.defaultPath;
+        	var path = item.trim();
+            var request = CQ.HTTP.get(path + ".json");
+            var option = CQ.Util.eval(request);
+        	processOptions.push({text:option.title,value:path});
+        	defaultPaths[path] = option.defaultPath;
         	if (option.additionalMappingFile) {
-        		requireAdditionalMappingFile.push(option.name);
+        		requireAdditionalMappingFile.push(path);
         	}
         });
 
@@ -88,7 +90,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                 	"xtype":"selection",
                 	"type":"select",
                 	"allowBlank":false,
-                	"name":"option",
+                	"name":"configpath",
                     "fieldLabel":"Process",
                     "fieldDescription":"Select the type of archive to process.",
                 	"options":processOptions,
@@ -126,11 +128,6 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
 	                "hideMode": "display",
 	                "hidden":true
         		},
-                {
-                    "xtype": "hidden",
-                    "name":"configpath",
-                    "value": CQ.HTTP.getPath(window.location.pathname)
-                },
                 {
                     "xtype": "hidden",
                     "name":"filename",

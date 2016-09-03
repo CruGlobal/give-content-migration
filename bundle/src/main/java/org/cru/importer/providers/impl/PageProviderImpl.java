@@ -1,8 +1,11 @@
 package org.cru.importer.providers.impl;
 
+import java.util.List;
+
 import org.apache.sling.api.resource.Resource;
-import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.RelativePathSection;
+import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ResourceProvider;
 
@@ -21,7 +24,7 @@ public class PageProviderImpl implements ResourceProvider {
 	private String baselocation;
 	private String pageTemplate;
 	private String intermediateTemplate;
-	private String columnDesignation;
+	private List<RelativePathSection> pathSections;
 	private String pageAcceptRuleKey;
 	private String pageAcceptRuleValue;
 	
@@ -30,7 +33,7 @@ public class PageProviderImpl implements ResourceProvider {
 		this.baselocation = parametersCollector.getBaselocation();
 		this.pageTemplate = parametersCollector.getPageTemplate();
 		this.intermediateTemplate = parametersCollector.getIntermediateTemplate();
-		this.columnDesignation = parametersCollector.getColumnDesignation();
+		this.pathSections = RelativePathSection.buildFromStrategy(parametersCollector.getPathCreationStrategy());
 		if (parametersCollector.getPageAcceptRule().equals("")) {
 			this.pageAcceptRuleKey = null;
 			this.pageAcceptRuleValue = null;
@@ -59,29 +62,13 @@ public class PageProviderImpl implements ResourceProvider {
 	}
 
 	/**
-	 * Builds the relative page path from the designation number
+	 * Builds the relative page path from the path creation strategy
 	 * @param metadata
 	 * @return
 	 * @throws Exception 
 	 */
 	private String getRelativePath(ResourceMetadata metadata) throws Exception {
-		if (metadata.getPropertyNames().contains(this.columnDesignation)) {
-			String designation = metadata.getValue(this.columnDesignation);
-			if (!designation.equals("")) {
-				StringBuilder path = new StringBuilder();
-				for (int i=0;i<5;i++) {
-					if (i<designation.length()) {
-						path.append("/" + designation.substring(i, i+1));
-					}
-				}
-				path.append("/" + designation);
-				return path.toString();
-			} else {
-				throw new Exception("The excel file contains an empty value for the column \"Designation\"");
-			}
-		} else {
-			throw new Exception("The excel file does not contains the column labeled as \"Designation\" at row 3.");
-		}
+		return RelativePathSection.buildPath(pathSections, metadata);
 	}
 	
 	private Page buildPage(String relativePath) throws Exception {

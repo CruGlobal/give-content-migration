@@ -47,7 +47,7 @@
 				</xsl:attribute>
 			</xsl:if>
 			
-			<xsl:attribute name="startDate"><xsl:value-of select="$additionalMapping/data/FUND_APPEAL_START_DATE" /></xsl:attribute>
+			<xsl:attribute name="startDate"><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri($additionalMapping/data/FUND_APPEAL_START_DATE)))" /></xsl:attribute>
 			<xsl:attribute name="defaultCampaign"><xsl:value-of select="$additionalMapping/data/CAMPAIGN_NUMBER" /></xsl:attribute>
 
 			<xsl:if test="not(empty(wcm:root/wcm:element[@name='wide_image']))">

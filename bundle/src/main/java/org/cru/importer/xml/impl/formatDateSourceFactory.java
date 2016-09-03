@@ -9,6 +9,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -42,9 +44,11 @@ public class formatDateSourceFactory implements GiveSourceFactory {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(formatDateSourceFactory.class);
 	
+	private static final String[] AVAILABLE_INCOMING_FORMATS = {"MMMM dd, yyyy","MMMM yyyy","dd-MMMM-yy"};
+	private static final String AEM_FORMAT = "yyyy-MM-dd";
+	
 	private static final String PARAM_DATE = "date";
-	private DateFormat incomingDateFormatter = null;
-	private DateFormat alternativeIncomingDateFormatter = null;
+	private List<DateFormat> incomingDateFormatters = null;
 	private DateFormat aemDateFormatter = null;
 	
 	public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException {
@@ -59,13 +63,11 @@ public class formatDateSourceFactory implements GiveSourceFactory {
 		if (params.containsKey(PARAM_DATE) && !params.get(PARAM_DATE).equals("")) {
 			String origDate = params.get(PARAM_DATE);
 			Date extractedDate = null;
-			try {
-				extractedDate = getIncomingDateFormatter().parse(origDate);
-			} catch (ParseException e) {
+			for (DateFormat formatter : getIncomingDateFormatters()) {
 				try {
-					extractedDate = getAlternativeIncomingDateFormatter().parse(origDate);
-				} catch (ParseException e1) {
-					LOGGER.warn("Error parsing date: " + origDate);
+					extractedDate = formatter.parse(origDate);
+					break;
+				} catch (ParseException e) {
 				}
 			}
 			if (extractedDate != null) {
@@ -77,25 +79,21 @@ public class formatDateSourceFactory implements GiveSourceFactory {
 		return new StreamSource(stream);
 	}
 
-	public DateFormat getIncomingDateFormatter() {
-		if (incomingDateFormatter == null) {
-			incomingDateFormatter = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
+	public List<DateFormat> getIncomingDateFormatters() {
+		if (incomingDateFormatters == null) {
+			incomingDateFormatters = new LinkedList<DateFormat>();
+			for (String format : AVAILABLE_INCOMING_FORMATS) {
+				incomingDateFormatters.add(new SimpleDateFormat(format, Locale.US));
+			}
 		}
-		return incomingDateFormatter;
+		return incomingDateFormatters;
 	}
 
 	public DateFormat getAemDateFormatter() {
 		if (aemDateFormatter == null) {
-			aemDateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+			aemDateFormatter = new SimpleDateFormat(AEM_FORMAT, Locale.US);
 		}
 		return aemDateFormatter;
-	}
-
-	public DateFormat getAlternativeIncomingDateFormatter() {
-		if (alternativeIncomingDateFormatter == null) {
-			alternativeIncomingDateFormatter = new SimpleDateFormat("MMMM yyyy", Locale.US);
-		}
-		return alternativeIncomingDateFormatter;
 	}
 
 }
