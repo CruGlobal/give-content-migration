@@ -2,5 +2,5 @@
 <workspaceFilter version="1.0">
     <filter root="/apps/cru-content-importer" mode="replace"/>
     <filter root="/etc/clientlibs/cru-content-importer" mode="replace"/>
-    <filter root="/etc/importers/cru/givedataimport" mode="replace"/>
+    <filter root="/etc/importers/cru" mode="replace"/>
 </workspaceFilter>

@@ -115,7 +115,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                     "allowBlank":false,
                     "name":"baselocation",
                     "fieldLabel":"Base Path",
-                    "fieldDescription":"Select a base location where the pages will be imported."
+                    "fieldDescription":"Select a base location where the resources will be imported."
                 },
                 {
 	                "xtype": "fileuploadfield",
@@ -177,7 +177,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
             "items": [{
 				"id":"importer-wrapper",
 				"xtype":"panel",
-				"title": "Give Import Process",
+				"title": config["jcr:title"],
 				"layout":"border",
 				"region":"center",
 				"border":false,
@@ -222,16 +222,16 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
     			results.add(this.showResultSection("Errors",obj.errors));
     		}
     		if (obj.createdPages.length > 0) {
-    			results.add(this.showResultSection("Created Pages",obj.createdPages));
+    			results.add(this.showResultSection("Created Resources",obj.createdPages));
     		}
     		if (obj.modifiedPages.length > 0) {
-    			results.add(this.showResultSection("Modified Pages",obj.modifiedPages));
+    			results.add(this.showResultSection("Modified Resources",obj.modifiedPages));
     		}
     		if (obj.notModifiedPages.length > 0) {
-    			results.add(this.showResultSection("Not Modified Pages",obj.notModifiedPages));
+    			results.add(this.showResultSection("Not Modified Resources",obj.notModifiedPages));
     		}
     		if (obj.ignoredPages.length > 0) {
-    			results.add(this.showResultSection("Ignored Pages",obj.ignoredPages));
+    			results.add(this.showResultSection("Ignored Resources",obj.ignoredPages));
     		}
     	} catch(e) {
         	results.add(new CQ.Ext.form.Label({html: responseText}));
