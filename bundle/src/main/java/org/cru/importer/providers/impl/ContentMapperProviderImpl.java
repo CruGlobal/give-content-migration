@@ -31,7 +31,6 @@ import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.xml.GiveURIResolver;
 
-import com.day.cq.wcm.api.Page;
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 
@@ -69,7 +68,6 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 
 	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception {
 		try {
-			Page page = resource.adaptTo(Page.class);
 			initTransformedKeys(metadata.getPropertyNames());
 			
 			// Copy the stream to be sure is not closed prematurelly
@@ -85,7 +83,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	        	isArrBaos = new ByteArrayInputStream(utf8);
 	        }
 	        
-			transformer.setParameter(new QName("path"), new XdmAtomicValue(page.getPath()));
+			transformer.setParameter(new QName("path"), new XdmAtomicValue(resource.getPath()));
 			for (String key : transformerParameters) {
 				if (transformedKeys.containsKey(key)) {
 					String colname = transformedKeys.get(key);
@@ -101,7 +99,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			byte[] bresult = output.toByteArray();
 			InputStream result = new ByteArrayInputStream(bresult);
 
-			importResult(page, result);
+			importResult(getResourceToOverride(resource), result);
 		} catch (SaxonApiException e) {
 			if (e.getCause()!=null && e.getCause() instanceof XPathException) {
 				XPathException ex = (XPathException)e.getCause();
@@ -131,11 +129,24 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	 * @param result
 	 * @throws Exception
 	 */
-	private void importResult(Page page, InputStream result) throws Exception {
+	private void importResult(Resource resource, InputStream result) throws Exception {
 		// Remove the previous content to avoid xml import error
-		session.removeItem(page.getContentResource().getPath());
+		session.removeItem(resource.getPath());
 		// Import the content
-		session.importXML(page.getPath(), result, ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
+		session.importXML(resource.getParent().getPath(), result, ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
+	}
+	
+	/**
+	 * Returns the resource to be overrided by the impor process
+	 * @param resource
+	 * @return
+	 */
+	protected Resource getResourceToOverride(Resource resource) {
+		return resource.getChild("jcr:content");
 	}
 
+	protected Session getSession() {
+		return session;
+	}
+	
 }

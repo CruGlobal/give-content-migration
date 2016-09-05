@@ -9,8 +9,8 @@ import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.ResourceProvider;
 import org.cru.importer.providers.factory.DataImportFactory;
+import org.cru.importer.providers.impl.AssetContentMapperProviderImpl;
 import org.cru.importer.providers.impl.AssetProviderImpl;
-import org.cru.importer.providers.impl.ContentMapperProviderImpl;
 import org.cru.importer.providers.impl.MetadataProviderImpl;
 import org.osgi.framework.Constants;
 
@@ -34,7 +34,7 @@ public class AssetImportFactoryImpl implements DataImportFactory {
 	}
 
 	public ContentMapperProvider createContentMapperProvider(ParametersCollector parametersCollector) throws Exception {
-		return new ContentMapperProviderImpl(parametersCollector);
+		return new AssetContentMapperProviderImpl(parametersCollector);
 	}
 
 }

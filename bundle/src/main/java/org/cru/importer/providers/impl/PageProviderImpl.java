@@ -1,5 +1,6 @@
 package org.cru.importer.providers.impl;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.sling.api.resource.Resource;
@@ -44,7 +45,7 @@ public class PageProviderImpl implements ResourceProvider {
 		}
 	}
 
-	public ResourceInfo getResource(ResourceMetadata metadata) throws Exception {
+	public ResourceInfo getResource(ResourceMetadata metadata, InputStream inputStream) throws Exception {
 		if (this.pageAcceptRuleKey != null && metadata.getPropertyNames().contains(this.pageAcceptRuleKey)) {
 			String val = metadata.getValue(this.pageAcceptRuleKey);
 			if (!val.equals(this.pageAcceptRuleValue)) {

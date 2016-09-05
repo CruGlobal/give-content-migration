@@ -18,9 +18,9 @@ public interface ContentMapperProvider {
 	 * 
 	 * @param resource
 	 * @param metadata
-	 * @param xmlInputStream
+	 * @param inputStream
 	 * @throws Exception
 	 */
-	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception;
+	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream inputStream) throws Exception;
 	
 }

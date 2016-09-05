@@ -4,4 +4,30 @@
     <jcr:content
         jcr:primaryType="nt:unstructured"
         jcr:title="CRU"/>
+	<givepageimport
+	    jcr:primaryType="sling:Folder"
+	    jcr:title="Give Pages Importer"
+	    sling:resourceType="cq/ui/components/widget"
+	    jsLibs="[cq.widgets]"
+	    xtype="cruGiveDataImporter"
+	    options="[
+	    	/apps/cru-content-importer/configurations/staff,
+	    	/apps/cru-content-importer/configurations/ministry,
+	    	/apps/cru-content-importer/configurations/fund
+	    ]"
+	    tempStorePath="/var/cru-content-importer"
+	    />
+	<giveimagesimport
+	    jcr:primaryType="sling:Folder"
+	    jcr:title="Give Images Importer"
+	    sling:resourceType="cq/ui/components/widget"
+	    jsLibs="[cq.widgets]"
+	    xtype="cruGiveDataImporter"
+	    options="[
+	    	/apps/cru-content-importer/configurations/staffImage,
+	    	/apps/cru-content-importer/configurations/ministryImage,
+	    	/apps/cru-content-importer/configurations/fundImage
+	    ]"
+	    tempStorePath="/var/cru-content-importer"
+	    />
 </jcr:root>

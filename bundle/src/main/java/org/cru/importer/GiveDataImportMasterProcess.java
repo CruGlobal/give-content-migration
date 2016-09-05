@@ -1,6 +1,8 @@
 package org.cru.importer;
 
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -60,20 +62,22 @@ public class GiveDataImportMasterProcess {
 			in = parametersCollector.getContentFile().getStream();
 			ZipInputStream zis = new ZipInputStream(in);
 			ZipEntry entry = null;
-			Pattern ignoreFilesPattern = null;
-			if (!parametersCollector.getIgnoreFilesPattern().equals("")) {
-				ignoreFilesPattern = Pattern.compile(parametersCollector.getIgnoreFilesPattern());
+			Pattern acceptFilesPattern = null;
+			if (!parametersCollector.getAcceptFilesPattern().equals("")) {
+				acceptFilesPattern = Pattern.compile(parametersCollector.getAcceptFilesPattern());
 			}
+			Set<String> proccesed = new HashSet<String>();
 			while ((entry = zis.getNextEntry()) != null) {
 				if (entry.isDirectory()) {
 					continue;
 				}
 				String filename = entry.getName();
 				LOGGER.info("Start processing file: " + filename);
-				if (acceptsFile(ignoreFilesPattern, filename)) {
+				if (!proccesed.contains(filename) && acceptsFile(acceptFilesPattern, filename)) {
+					proccesed.add(filename);
 					try {
 						ResourceMetadata metadata = metadataProvider.getMetadata(filename);
-						ResourceInfo resourceInfo = resourceProvider.getResource(metadata);
+						ResourceInfo resourceInfo = resourceProvider.getResource(metadata, zis);
 						if (resourceInfo != null) {
 							contentMapperProvider.mapFields(resourceInfo.getResource(), metadata, zis);
 							String pageReference = resourceInfo.getResource().getPath();
@@ -113,13 +117,10 @@ public class GiveDataImportMasterProcess {
 		}
 	}
 
-	private boolean acceptsFile(Pattern ignoreFilesPattern, String filename) {
-		if (!filename.toLowerCase().endsWith(".xml")) {
-			return false;
-		}
-		if (ignoreFilesPattern != null) {
-			Matcher matcher = ignoreFilesPattern.matcher(filename);
-			return !matcher.matches();
+	private boolean acceptsFile(Pattern acceptFilesPattern, String filename) {
+		if (acceptFilesPattern != null) {
+			Matcher matcher = acceptFilesPattern.matcher(filename);
+			return matcher.matches();
 		}
 		return true;
 	}

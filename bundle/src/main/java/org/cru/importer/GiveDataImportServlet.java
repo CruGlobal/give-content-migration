@@ -74,13 +74,12 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 				resultsCollector.addError("baselocation parameter not found.");
 				isValid = false;
 			} else {
-				PageManager pageManager = request.getResourceResolver().adaptTo(PageManager.class);
-				Page basePage = pageManager.getPage(baselocation);
-				if (basePage == null) {
-					resultsCollector.addError("baselocation parameter is not a valid page.");
+				Resource resource = request.getResourceResolver().getResource(baselocation);
+				if (resource == null) {
+					resultsCollector.addError("baselocation parameter is not a valid resource.");
 					isValid = false;
 				} else {
-					parametersCollector.setBaselocation(baselocation);
+					parametersCollector.setBaselocation(resource.getPath());
 				}
 			}
 			String filename = request.getParameter("filename");
@@ -109,6 +108,7 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 				ValueMap properties = config.adaptTo(ValueMap.class);
 				parametersCollector.setRowColumnNames(properties.get("rowColumnNames",Integer.class));
 				parametersCollector.setColumnFileName(properties.get("columnFileName",String.class));
+				parametersCollector.setColumnMimeType(properties.get("columnMimeType",String.class));
 				parametersCollector.setPathCreationStrategy(properties.get("pathCreationStrategy",String[].class));
 				parametersCollector.setXsltPath(properties.get("transformation",String.class));
 				parametersCollector.setPageTemplate(properties.get("pageTemplate",String.class));
@@ -119,12 +119,12 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 					InputStream additionalMappingFile = request.getRequestParameter("additionalMappingFile").getInputStream();
 					parametersCollector.setAdditionalMappingFile(additionalMappingFile);
 				}
-				String ignoreFilesPattern = properties.get("ignoreFilesPattern", String.class);
-				if (ignoreFilesPattern == null) {
-					resultsCollector.addError("Ignore files pattern property not found at configuration node.");
+				String acceptFilesPattern = properties.get("acceptFilesPattern", String.class);
+				if (acceptFilesPattern == null) {
+					resultsCollector.addError("Accept files pattern property not found at configuration node.");
 					isValid = false;
 				} else {
-					parametersCollector.setIgnoreFilesPattern(ignoreFilesPattern);
+					parametersCollector.setAcceptFilesPattern(acceptFilesPattern);
 				}
 			}
 		} catch (Exception e) {

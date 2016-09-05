@@ -11,11 +11,12 @@
 		transformation="/apps/cru-content-importer/transformations/staff.xsl"
 		rowColumnNames="{Long}2"
 		columnFileName="primaryFile"
+		columnMimeType=""
 		pathCreationStrategy="[Designation:(\\d)(\\d)(\\d)(\\d)(\\d)\\d*:/$1/$2/$3/$4/$5/$0]"
 		pageAcceptRule="Active or Inactive=Active"
 		factoryType="page"
 		additionalMappingFile="{Boolean}false"
-		ignoreFilesPattern="__MACOSX(.*)"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"/>
 
 	<ministry
 		jcr:primaryType="nt:unstructured"
@@ -26,11 +27,12 @@
 		transformation="/apps/cru-content-importer/transformations/ministry.xsl"
 		rowColumnNames="{Long}2"
 		columnFileName="primaryFile"
+		columnMimeType=""
 		pathCreationStrategy="[Designation:(\\d)(\\d)(\\d)(\\d)(\\d)\\d*:/$1/$2/$3/$4/$5/$0]"
 		pageAcceptRule="Active or Inactive=Active"
 		factoryType="page"
 		additionalMappingFile="{Boolean}false"
-		ignoreFilesPattern="__MACOSX(.*)"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"/>
 		
 	<fund
 		jcr:primaryType="nt:unstructured"
@@ -41,10 +43,59 @@
 		transformation="/apps/cru-content-importer/transformations/fund.xsl"
 		rowColumnNames="{Long}2"
 		columnFileName="primaryFile"
+		columnMimeType=""
 		pathCreationStrategy="[xSiebelDesignation:(\\d)(\\d)(\\d)(\\d)(\\d)\\d*:/$1/$2/$3/$4/$5/$0,xSiebelWebTreatment:.*:/$0]"
 		pageAcceptRule=""
 		factoryType="page"
 		additionalMappingFile="{Boolean}true"
-		ignoreFilesPattern="__MACOSX(.*)"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"/>
+
+	<staffImage
+		jcr:primaryType="nt:unstructured"
+		title="Staff Image File"
+		defaultPath="/content/dam/give/designations"
+		pageTemplate=""
+		intermediateTemplate=""
+		transformation="/apps/cru-content-importer/transformations/staffImage.xsl"
+		rowColumnNames="{Long}2"
+		columnFileName="primaryFile"
+		columnMimeType="primaryFile:format"
+		pathCreationStrategy="[Designation:(\\d)(\\d)(\\d)(\\d)(\\d)\\d*:/$1/$2/$3/$4/$5/$0,dDocName:.*:/$0,dWebExtension 6 255:.*:\\.$0]"
+		pageAcceptRule="Active or Inactive=Active"
+		factoryType="asset"
+		additionalMappingFile="{Boolean}false"
+		acceptFilesPattern="^(?!__MACOSX)(.*)(?&lt;!xlsx)$"/>
+
+	<ministryImage
+		jcr:primaryType="nt:unstructured"
+		title="Ministry Image File"
+		defaultPath="/content/dam/give/designations"
+		pageTemplate=""
+		intermediateTemplate=""
+		transformation="/apps/cru-content-importer/transformations/ministryImage.xsl"
+		rowColumnNames="{Long}2"
+		columnFileName="primaryFile"
+		columnMimeType="primaryFile:format"
+		pathCreationStrategy="[xSiebelDesignation:(\\d)(\\d)(\\d)(\\d)(\\d)\\d*:/$1/$2/$3/$4/$5/$0,dDocName:.*:/$0,dWebExtension 6 255:.*:\\.$0]"
+		pageAcceptRule=""
+		factoryType="asset"
+		additionalMappingFile="{Boolean}false"
+		acceptFilesPattern="^(?!__MACOSX)(.*)(?&lt;!xlsx)$"/>
+
+	<fundImage
+		jcr:primaryType="nt:unstructured"
+		title="Fund Image File"
+		defaultPath="/content/dam/give/campaigns"
+		pageTemplate=""
+		intermediateTemplate=""
+		transformation="/apps/cru-content-importer/transformations/fundImage.xsl"
+		rowColumnNames="{Long}2"
+		columnFileName="primaryFile"
+		columnMimeType="primaryFile:format"
+		pathCreationStrategy="[xSiebelDesignation 6 200:(\\d)(\\d)(\\d)(\\d)(\\d)\\d*:/$1/$2/$3/$4/$5/$0,dDocName 6 30:.*:/$0,dWebExtension 6 255:.*:\\.$0]"
+		pageAcceptRule=""
+		factoryType="asset"
+		additionalMappingFile="{Boolean}false"
+		acceptFilesPattern="^(?!__MACOSX)(.*)(?&lt;!xlsx)$"/>
 
 </jcr:root>

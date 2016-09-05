@@ -12,12 +12,13 @@ public class ParametersCollector {
 	private String baselocation;
 	private Binary contentFile;
 	private String columnFileName;
+	private String columnMimeType;
 	private String[] pathCreationStrategy;
 	private int rowColumnNames;
 	private String xsltPath;
 	private String pageTemplate;
 	private String intermediateTemplate;
-	private String ignoreFilesPattern;
+	private String acceptFilesPattern;
 	private String pageAcceptRule;
 	private String factoryType;
 	private InputStream additionalMappingFile;
@@ -87,14 +88,6 @@ public class ParametersCollector {
 		this.intermediateTemplate = intermediateTemplate;
 	}
 
-	public void setIgnoreFilesPattern(String ignoreFilesPattern) {
-		this.ignoreFilesPattern = ignoreFilesPattern;
-	}
-
-	public String getIgnoreFilesPattern() {
-		return ignoreFilesPattern;
-	}
-
 	public String getPageAcceptRule() {
 		return pageAcceptRule;
 	}
@@ -133,6 +126,22 @@ public class ParametersCollector {
 
 	public void setPathCreationStrategy(String[] pathCreationStrategy) {
 		this.pathCreationStrategy = pathCreationStrategy;
+	}
+
+	public String getColumnMimeType() {
+		return columnMimeType;
+	}
+
+	public void setColumnMimeType(String columnMimeType) {
+		this.columnMimeType = columnMimeType;
+	}
+
+	public String getAcceptFilesPattern() {
+		return acceptFilesPattern;
+	}
+
+	public void setAcceptFilesPattern(String acceptFilesPattern) {
+		this.acceptFilesPattern = acceptFilesPattern;
 	}
 
 }

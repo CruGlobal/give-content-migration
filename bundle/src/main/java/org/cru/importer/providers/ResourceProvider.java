@@ -1,5 +1,7 @@
 package org.cru.importer.providers;
 
+import java.io.InputStream;
+
 import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ResourceMetadata;
 
@@ -18,6 +20,6 @@ public interface ResourceProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	public ResourceInfo getResource(ResourceMetadata metadata) throws Exception;
+	public ResourceInfo getResource(ResourceMetadata metadata, InputStream inputStream) throws Exception;
 	
 }
