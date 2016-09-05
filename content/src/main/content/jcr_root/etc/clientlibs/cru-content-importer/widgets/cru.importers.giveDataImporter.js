@@ -100,6 +100,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                 			if ($.inArray(value,requireAdditionalMappingFile) > -1) {
                 				CQ.Ext.getCmp("additional-mapping-file").show();
                 				CQ.Ext.getCmp("additional-mapping-file").allowBlank = false;
+                				CQ.Ext.getCmp("additional-mapping-file").syncSize();
                 			} else {
                 				CQ.Ext.getCmp("additional-mapping-file").hide();
                 				CQ.Ext.getCmp("additional-mapping-file").allowBlank = true;
