@@ -9,6 +9,7 @@
 	xmlns:cq="http://www.day.com/jcr/cq/1.0"
 	xmlns:jcr="http://www.jcp.org/jcr/1.0"
 	xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+	xmlns:cru="cru"
 	version="2.0">
 
 	<xsl:output method="xml" version="1.0" indent="yes" encoding="UTF-8" />
@@ -32,9 +33,9 @@
 			<!-- ============================================
 		      GIVE Properties
 		    =============================================== -->
-			<xsl:attribute name="designationNumber"><xsl:value-of select="$Designation" /></xsl:attribute>
-			<xsl:attribute name="parentDesignation"></xsl:attribute>
-			<xsl:attribute name="organizationId"></xsl:attribute>
+			<xsl:attribute name="cru:designationNumber"><xsl:value-of select="$Designation" /></xsl:attribute>
+			<xsl:attribute name="cru:parentDesignation"></xsl:attribute>
+			<xsl:attribute name="cru:organizationId"></xsl:attribute>
 			<xsl:attribute name="contentId"><xsl:value-of select="$dDocName" /></xsl:attribute>
 			
 		</metadata>
