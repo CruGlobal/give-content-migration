@@ -29,10 +29,8 @@ import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ContentMapperProvider;
+import org.cru.importer.util.XmlEntitiesUtil;
 import org.cru.importer.xml.GiveURIResolver;
-
-import com.ibm.icu.text.CharsetDetector;
-import com.ibm.icu.text.CharsetMatch;
 
 /**
  * Fills page content for Give import process using xslt
@@ -75,14 +73,10 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			IOUtils.copy(xmlInputStream, baos);
 			InputStream isArrBaos = new ByteArrayInputStream(baos.toByteArray());
 			
-			CharsetDetector detector = new CharsetDetector();
-	        detector.setText(isArrBaos);
-	        CharsetMatch match = detector.detect();
-	        if (!match.getName().equals("UTF-8")) {
-	        	byte[] utf8 = new String(baos.toByteArray(), match.getName()).getBytes("UTF-8");
-	        	isArrBaos = new ByteArrayInputStream(utf8);
-	        }
-	        
+	        String orig = new String(baos.toByteArray());
+        	orig = XmlEntitiesUtil.fixBabEntities(orig);
+        	isArrBaos = new ByteArrayInputStream(orig.getBytes("UTF-8"));
+
 			transformer.setParameter(new QName("path"), new XdmAtomicValue(resource.getPath()));
 			for (String key : transformerParameters) {
 				if (transformedKeys.containsKey(key)) {

@@ -27,9 +27,6 @@ import org.cru.importer.bean.ResultsCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.day.cq.wcm.api.Page;
-import com.day.cq.wcm.api.PageManager;
-
 /**
  * Imports pages from a zip file
  * 

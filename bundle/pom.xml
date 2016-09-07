@@ -106,23 +106,11 @@
 		    <artifactId>Saxon-HE</artifactId>
 		    <version>9.7.0-7</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/net.sf.saxon/saxon-dom -->
-		<!-- <dependency>
-		    <groupId>net.sf.saxon</groupId>
-		    <artifactId>saxon-dom</artifactId>
-		    <version>8.7</version>
-		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/xml-resolver/xml-resolver -->
 		<dependency>
 		    <groupId>xml-resolver</groupId>
 		    <artifactId>xml-resolver</artifactId>
 		    <version>1.2</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.ibm.icu/icu4j -->
-		<dependency>
-		    <groupId>com.ibm.icu</groupId>
-		    <artifactId>icu4j</artifactId>
-		    <version>57.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opencsv</groupId>
