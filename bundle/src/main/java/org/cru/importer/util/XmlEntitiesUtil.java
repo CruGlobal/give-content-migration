@@ -22,7 +22,7 @@ public class XmlEntitiesUtil {
 	 * @param source
 	 * @return
 	 */
-	public static String fixBabEntities(String source) {
+	public static String fixBadEntities(String source) {
 		String dest = source;
 		for (String[] badEntity : badEntitiesMapping) {
 			dest = dest.replaceAll(badEntity[0], badEntity[1]);

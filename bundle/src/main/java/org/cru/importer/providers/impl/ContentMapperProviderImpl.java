@@ -32,6 +32,9 @@ import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.util.XmlEntitiesUtil;
 import org.cru.importer.xml.GiveURIResolver;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
+
 /**
  * Fills page content for Give import process using xslt
  * 
@@ -64,6 +67,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
         transformer.setURIResolver(resolver);
 	}
 
+	//@SuppressWarnings("resource")
 	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception {
 		try {
 			initTransformedKeys(metadata.getPropertyNames());
@@ -71,10 +75,13 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			// Copy the stream to be sure is not closed prematurelly
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			IOUtils.copy(xmlInputStream, baos);
+
 			InputStream isArrBaos = new ByteArrayInputStream(baos.toByteArray());
-			
-	        String orig = new String(baos.toByteArray());
-        	orig = XmlEntitiesUtil.fixBabEntities(orig);
+			CharsetDetector detector = new CharsetDetector();
+	        detector.setText(isArrBaos);
+	        CharsetMatch match = detector.detect();
+	        String orig = new String(baos.toByteArray(), match.getName());
+        	orig = XmlEntitiesUtil.fixBadEntities(orig);
         	isArrBaos = new ByteArrayInputStream(orig.getBytes("UTF-8"));
 
 			transformer.setParameter(new QName("path"), new XdmAtomicValue(resource.getPath()));
