@@ -1,13 +1,12 @@
 package org.cru.importer.providers.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.jcr.ImportUUIDBehavior;
 import javax.jcr.Node;
@@ -23,14 +22,18 @@ import net.sf.saxon.s9api.XsltExecutable;
 import net.sf.saxon.s9api.XsltTransformer;
 import net.sf.saxon.trans.XPathException;
 
+import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.jackrabbit.commons.JcrUtils;
 import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ContentMapperProvider;
+import org.cru.importer.util.UnicodeBOMInputStream;
 import org.cru.importer.util.XmlEntitiesUtil;
 import org.cru.importer.xml.GiveURIResolver;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fills page content for Give import process using xslt
@@ -39,6 +42,8 @@ import org.cru.importer.xml.GiveURIResolver;
  *
  */
 public class ContentMapperProviderImpl implements ContentMapperProvider {
+
+	private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ContentMapperProviderImpl.class);
 
 	private Session session;
 	private XsltTransformer transformer;
@@ -72,10 +77,21 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			IOUtils.copy(xmlInputStream, baos);
 			InputStream isArrBaos = new ByteArrayInputStream(baos.toByteArray());
-			
+
+
+
+
 	        String orig = new String(baos.toByteArray());
         	orig = XmlEntitiesUtil.fixBabEntities(orig);
         	isArrBaos = new ByteArrayInputStream(orig.getBytes("UTF-8"));
+
+			UnicodeBOMInputStream ubis = new UnicodeBOMInputStream(isArrBaos);
+
+			InputStreamReader isr = new InputStreamReader(ubis);
+			BufferedReader br = new BufferedReader(isr);
+			ubis.skipBOM();
+
+			InputStream istwo = new ByteArrayInputStream( br.readLine().getBytes() );
 
 			transformer.setParameter(new QName("path"), new XdmAtomicValue(resource.getPath()));
 			for (String key : transformerParameters) {
@@ -86,7 +102,8 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			}
 			
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			transformer.setSource(new StreamSource(isArrBaos));
+			transformer.setSource(new StreamSource(istwo));
+			//transformer.setSource(new StreamSource(isArrBaos));
 			transformer.setDestination(processor.newSerializer(output));
 			transformer.transform();
 
@@ -94,6 +111,11 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			InputStream result = new ByteArrayInputStream(bresult);
 
 			importResult(getResourceToOverride(resource), result);
+
+			br.close();
+			isr.close();
+			ubis.close();
+
 		} catch (SaxonApiException e) {
 			if (e.getCause()!=null && e.getCause() instanceof XPathException) {
 				XPathException ex = (XPathException)e.getCause();
