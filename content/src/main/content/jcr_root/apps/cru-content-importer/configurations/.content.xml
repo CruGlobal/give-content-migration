@@ -64,7 +64,7 @@
 		pageAcceptRule="Active or Inactive=Active"
 		factoryType="asset"
 		additionalMappingFile="{Boolean}false"
-		acceptFilesPattern="^(?!__MACOSX)(.*)(?&lt;!xlsx)$"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"/>
 
 	<ministryImage
 		jcr:primaryType="nt:unstructured"
@@ -80,7 +80,7 @@
 		pageAcceptRule=""
 		factoryType="asset"
 		additionalMappingFile="{Boolean}false"
-		acceptFilesPattern="^(?!__MACOSX)(.*)(?&lt;!xlsx)$"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"/>
 
 	<fundImage
 		jcr:primaryType="nt:unstructured"
@@ -96,6 +96,6 @@
 		pageAcceptRule=""
 		factoryType="asset"
 		additionalMappingFile="{Boolean}false"
-		acceptFilesPattern="^(?!__MACOSX)(.*)(?&lt;!xlsx)$"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"/>
 
 </jcr:root>

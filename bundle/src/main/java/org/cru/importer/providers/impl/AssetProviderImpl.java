@@ -18,7 +18,6 @@ import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.ResourceProvider;
 
 import com.day.cq.commons.jcr.JcrUtil;
-import com.day.cq.dam.api.Asset;
 import com.day.cq.dam.api.AssetManager;
 
 /**
@@ -36,9 +35,10 @@ public class AssetProviderImpl implements ResourceProvider {
 	private String pageAcceptRuleKey;
 	private String pageAcceptRuleValue;
 	private String columnMimeType;
+	private ResourceResolver resolver;
 	
 	public AssetProviderImpl(ParametersCollector parametersCollector) {
-		ResourceResolver resolver = parametersCollector.getRequest().getResourceResolver();
+		this.resolver = parametersCollector.getRequest().getResourceResolver();
 		this.assetManager = resolver.adaptTo(AssetManager.class);
 		this.session = resolver.adaptTo(Session.class);
 		this.baselocation = resolver.getResource(parametersCollector.getBaselocation()).adaptTo(Node.class);
@@ -62,9 +62,9 @@ public class AssetProviderImpl implements ResourceProvider {
 			}
 		}
 		String relativePath = getRelativePath(metadata);
-		Asset asset = assetManager.getAssetForBinary(this.baselocation.getPath() + relativePath);
+		Resource asset = this.resolver.getResource(this.baselocation.getPath() + relativePath);
 		if (asset != null) {
-			return new ResourceInfo(asset.adaptTo(Resource.class),false);
+			return new ResourceInfo(asset,false);
 		} else {
 			// Copy the stream to be sure is not closed prematurely
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -73,7 +73,7 @@ public class AssetProviderImpl implements ResourceProvider {
 			
 			// Create the asset
 			asset = buildAsset(metadata, relativePath, isArrBaos);
-			return new ResourceInfo(asset.adaptTo(Resource.class),true);
+			return new ResourceInfo(asset,true);
 		}
 	}
 
@@ -87,7 +87,7 @@ public class AssetProviderImpl implements ResourceProvider {
 		return RelativePathSection.buildPath(pathSections, metadata);
 	}
 
-	private Asset buildAsset(ResourceMetadata metadata, String relativePath, InputStream inputStream) throws Exception {
+	private Resource buildAsset(ResourceMetadata metadata, String relativePath, InputStream inputStream) throws Exception {
 		Node baseNode = this.baselocation;
 		String[] targetPathChunks = relativePath.substring(1).split("/");
 		for (int i=0; i<targetPathChunks.length; i++) {
@@ -98,7 +98,7 @@ public class AssetProviderImpl implements ResourceProvider {
 					baseNode.setProperty("jcr:title", partialPath);
 					baseNode = baseNode.getParent();
 				} else {
-					return assetManager.createAsset(baseNode.getPath() + "/" + partialPath, inputStream, metadata.getValue(this.columnMimeType), false);
+					return assetManager.createAsset(baseNode.getPath() + "/" + partialPath, inputStream, metadata.getValue(this.columnMimeType), false).adaptTo(Resource.class);
 				}
 			} else {
 				baseNode = baseNode.getNode(partialPath);
