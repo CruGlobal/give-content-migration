@@ -60,7 +60,7 @@
 		rowColumnNames="{Long}2"
 		columnFileName="primaryFile"
 		columnMimeType="primaryFile:format"
-		pathCreationStrategy="[Designation:(\\d)(\\d)(\\d)(\\d)(\\d)\\d*:/$1/$2/$3/$4/$5/$0,dDocName:.*:/$0,dWebExtension 6 255:.*:\\.$0]"
+		pathCreationStrategy="[Desgination:(\\d)(\\d)(\\d)(\\d)(\\d)\\d*:/$1/$2/$3/$4/$5/$0,dDocName:.*:/$0,dWebExtension 6 255:.*:\\.$0]"
 		pageAcceptRule="Active or Inactive=Active"
 		factoryType="asset"
 		additionalMappingFile="{Boolean}false"
