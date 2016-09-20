@@ -2,6 +2,7 @@
 <xsl:transform
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
 	xmlns:fn="http://www.w3.org/2005/xpath-functions"
 	xmlns:jcr="http://www.jcp.org/jcr/1.0"
 	xmlns:cq="http://www.day.com/jcr/cq/1.0"
@@ -20,32 +21,57 @@
 	<xsl:param name="Designation" />
 
 	<xsl:template match="/">
-		<jcr:content>
-			<xsl:attribute name="jcr:primaryType">cq:PageContent</xsl:attribute>
-			<xsl:attribute name="sling:resourceType">Give/components/page/designation</xsl:attribute>
-			<xsl:attribute name="cq:template">/apps/Give/templates/designation</xsl:attribute>
-			<xsl:attribute name="jcr:title"><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></xsl:attribute>
-
-			<xsl:attribute name="designationType">People</xsl:attribute>
-			<xsl:attribute name="designationNumber"><xsl:value-of select="$Designation" /></xsl:attribute>
-			<xsl:attribute name="designationName"><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></xsl:attribute>
-			<xsl:attribute name="vanityURL"><xsl:value-of select="$Designation" /></xsl:attribute>
-			<xsl:attribute name="websiteURL"><xsl:value-of select="wcm:root/wcm:element[@name='website']" /></xsl:attribute>
-			<xsl:attribute name="paragraphText"><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></xsl:attribute>
-
+		<sv:node sv:name="jcr:content">
+		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
+		        <sv:value>cq:PageContent</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="sling:resourceType" sv:type="String">
+		        <sv:value>Give/components/page/designation</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="cq:template" sv:type="String">
+		        <sv:value>/apps/Give/templates/designation</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="jcr:title" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="designationType" sv:type="String">
+		        <sv:value>People</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="designationNumber" sv:type="String">
+		        <sv:value><xsl:value-of select="$Designation" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="designationName" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="vanityURL" sv:type="String">
+		        <sv:value><xsl:value-of select="$Designation" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="websiteURL" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='website']" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="paragraphText" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></sv:value>
+		    </sv:property>
 			<xsl:if test="not(empty(wcm:root/wcm:element[@name='wide_image']))">
-				<xsl:attribute name="coverPhoto">
-					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='wide_image'])))" />
-				</xsl:attribute>
+				<sv:property sv:name="coverPhoto" sv:type="String">
+					<sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='wide_image'])))" /></sv:value>
+				</sv:property>
 			</xsl:if>
 			<xsl:if test="not(empty(wcm:root/wcm:element[@name='image']))">
-				<xsl:attribute name="secondaryPhoto">
-					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='image'])))" />
-				</xsl:attribute>
+				<sv:property sv:name="secondaryPhoto" sv:type="String">
+					<sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='image'])))" /></sv:value>
+				</sv:property>
 			</xsl:if>
-			<xsl:attribute name="parentDesignationNumber"></xsl:attribute>
-			<xsl:attribute name="organizationID"></xsl:attribute>
-		</jcr:content>
+		    <sv:property sv:name="parentDesignationNumber" sv:type="String">
+		        <sv:value></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="organizationID" sv:type="String">
+		        <sv:value></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="secure" sv:type="Boolean">
+		        <sv:value>false</sv:value>
+		    </sv:property>
+		</sv:node>
 	</xsl:template>
 
 </xsl:transform>
