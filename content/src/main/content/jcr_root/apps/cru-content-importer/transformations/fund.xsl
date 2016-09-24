@@ -3,6 +3,7 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns:fn="http://www.w3.org/2005/xpath-functions"
+	xmlns:sv="http://www.jcp.org/jcr/sv/1.0"
 	xmlns:jcr="http://www.jcp.org/jcr/1.0"
 	xmlns:cq="http://www.day.com/jcr/cq/1.0"
 	xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
@@ -24,46 +25,80 @@
 	<xsl:param name="xSiebelWebTreatment"/>
 
 	<xsl:template match="/">
-	
+		
 		<xsl:variable name="additionalMapping" select="fn:doc(concat('give://csvAdditionalMapping?keyColumn=TREATMENT_NUMBER&amp;keyValue=', fn:encode-for-uri($xSiebelWebTreatment)))"/>
 	
-		<jcr:content>
-			<xsl:attribute name="jcr:primaryType">cq:PageContent</xsl:attribute>
-			<xsl:attribute name="sling:resourceType">Give/components/page/campaign</xsl:attribute>
-			<xsl:attribute name="cq:template">/apps/Give/templates/campaign</xsl:attribute>
-			<xsl:attribute name="jcr:title"><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></xsl:attribute>
-
-			<xsl:attribute name="designationType">Campaign</xsl:attribute>
-			<xsl:attribute name="designationNumber"><xsl:value-of select="$xSiebelDesignation" /></xsl:attribute>
-			<xsl:attribute name="designationName"><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></xsl:attribute>
-			<xsl:attribute name="vanityURL"><xsl:value-of select="$xFriendlyFilename" /></xsl:attribute>
-			<xsl:attribute name="websiteURL"><xsl:value-of select="wcm:root/wcm:element[@name='website']" /></xsl:attribute>
-			<xsl:attribute name="paragraphText"><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></xsl:attribute>
-			<xsl:attribute name="letterDate"><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))" /></xsl:attribute>
-			<xsl:attribute name="psText"><xsl:value-of select="wcm:root/wcm:element[@name='postscript']" /></xsl:attribute>
-			<xsl:if test="not(empty(wcm:root/wcm:element[@name='signature']))">
-				<xsl:attribute name="signatureImage">
-					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='signature'])))" />
-				</xsl:attribute>
-			</xsl:if>
-			
-			<xsl:attribute name="startDate"><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri($additionalMapping/data/FUND_APPEAL_START_DATE)))" /></xsl:attribute>
-			<xsl:attribute name="defaultCampaign"><xsl:value-of select="$additionalMapping/data/CAMPAIGN_NUMBER" /></xsl:attribute>
-
+		<sv:node sv:name="jcr:content">
+		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
+		        <sv:value>cq:PageContent</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="sling:resourceType" sv:type="String">
+		        <sv:value>Give/components/page/campaign</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="cq:template" sv:type="String">
+		        <sv:value>/apps/Give/templates/campaign</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="jcr:title" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="designationType" sv:type="String">
+		        <sv:value>Campaign</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="designationNumber" sv:type="String">
+		        <sv:value><xsl:value-of select="$xSiebelDesignation" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="designationName" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="vanityURL" sv:type="String">
+		        <sv:value><xsl:value-of select="$xFriendlyFilename" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="websiteURL" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='website']" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="paragraphText" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="letterDate" sv:type="String">
+		        <sv:value><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="psText" sv:type="String">
+		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='postscript']" /></sv:value>
+		    </sv:property>
+		    <xsl:if test="not(empty(wcm:root/wcm:element[@name='signature']))">
+			    <sv:property sv:name="signatureImage" sv:type="String">
+			        <sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='signature'])))" /></sv:value>
+			    </sv:property>
+		    </xsl:if>
+		    <sv:property sv:name="startDate" sv:type="String">
+		        <sv:value><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri($additionalMapping/data/FUND_APPEAL_START_DATE)))" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="defaultCampaign" sv:type="String">
+		        <sv:value><xsl:value-of select="$additionalMapping/data/CAMPAIGN_NUMBER" /></sv:value>
+		    </sv:property>
 			<xsl:if test="not(empty(wcm:root/wcm:element[@name='wide_image']))">
-				<xsl:attribute name="coverPhoto">
-					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='wide_image'])))" />
-				</xsl:attribute>
+				<sv:property sv:name="coverPhoto" sv:type="String">
+					<sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='wide_image'])))" /></sv:value>
+				</sv:property>
 			</xsl:if>
 			<xsl:if test="not(empty(wcm:root/wcm:element[@name='image']))">
-				<xsl:attribute name="secondaryPhoto">
-					<xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='image'])))" />
-				</xsl:attribute>
+				<sv:property sv:name="secondaryPhoto" sv:type="String">
+					<sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='image'])))" /></sv:value>
+				</sv:property>
 			</xsl:if>
-			
-			<xsl:attribute name="parentDesignationNumber"><xsl:value-of select="$xSiebelParentDesignation" /></xsl:attribute>
-			<xsl:attribute name="organizationID"><xsl:value-of select="$xSiebelOrganizationId" /></xsl:attribute>
-		</jcr:content>
+		    <sv:property sv:name="parentDesignationNumber" sv:type="String">
+		        <sv:value><xsl:value-of select="$xSiebelParentDesignation" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="organizationID" sv:type="String">
+		    	<sv:value><xsl:value-of select="$xSiebelOrganizationId" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="hideInNav" sv:type="Boolean">
+		        <sv:value>true</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="customized" sv:type="Boolean">
+		        <sv:value>true</sv:value>
+		    </sv:property>
+		</sv:node>
 	</xsl:template>
 
 </xsl:transform>

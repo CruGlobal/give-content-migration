@@ -71,6 +71,21 @@
 		    <sv:property sv:name="secure" sv:type="Boolean">
 		        <sv:value>false</sv:value>
 		    </sv:property>
+		    <sv:property sv:name="hideInNav" sv:type="Boolean">
+		        <sv:value>true</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="customized" sv:type="Boolean">
+		        <sv:value>true</sv:value>
+		    </sv:property>
+		    <sv:property sv:name="firstName" sv:type="String">
+		        <sv:value></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="lastName" sv:type="String">
+		        <sv:value></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="spouseName" sv:type="String">
+		        <sv:value></sv:value>
+		    </sv:property>
 		</sv:node>
 	</xsl:template>
 
