@@ -69,7 +69,7 @@
 		    <sv:property sv:name="parentDesignationNumber" sv:type="String">
 		        <sv:value><xsl:value-of select="$xSiebelParentDesignation" /></sv:value>
 		    </sv:property>
-		    <sv:property sv:name="organizationID" sv:type="String">
+		    <sv:property sv:name="organizationId" sv:type="String">
 		    	<sv:value>
 					<xsl:choose>
 						<xsl:when test="$xSiebelOrganizationId != 'N/A'">

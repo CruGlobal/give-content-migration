@@ -65,7 +65,7 @@
 		    <sv:property sv:name="parentDesignationNumber" sv:type="String">
 		        <sv:value></sv:value>
 		    </sv:property>
-		    <sv:property sv:name="organizationID" sv:type="String">
+		    <sv:property sv:name="organizationId" sv:type="String">
 		        <sv:value></sv:value>
 		    </sv:property>
 		    <sv:property sv:name="secure" sv:type="Boolean">
