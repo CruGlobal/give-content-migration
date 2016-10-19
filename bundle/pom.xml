@@ -72,6 +72,10 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.day.cq</groupId>
+            <artifactId>cq-commons</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>com.day.cq.wcm</groupId>
 			<artifactId>cq-wcm-api</artifactId>
