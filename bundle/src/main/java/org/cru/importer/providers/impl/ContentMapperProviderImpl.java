@@ -126,15 +126,17 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	/**
 	 * Imports the result xml file to the JCR
 	 * 
-	 * @param page 
+	 * @param resource
 	 * @param result
 	 * @throws Exception
 	 */
 	private void importResult(Resource resource, InputStream result) throws Exception {
+		// Get the parent path
+		String path = resource.getParent().getPath();
 		// Remove the previous content to avoid xml import error
 		session.removeItem(resource.getPath());
 		// Import the content
-		session.importXML(resource.getParent().getPath(), result, ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
+		session.importXML(path, result, ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
 	}
 	
 	/**
