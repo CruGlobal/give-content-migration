@@ -27,7 +27,9 @@
 	<xsl:template match="/">
 		
 		<xsl:variable name="additionalMapping" select="fn:doc(concat('give://csvAdditionalMapping?keyColumn=TREATMENT_NUMBER&amp;keyValue=', fn:encode-for-uri($xSiebelWebTreatment)))"/>
-	
+		<xsl:variable name="startDate" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri($additionalMapping/data/FUND_APPEAL_START_DATE)))"/>
+		<xsl:variable name="letterDate" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
+
 		<sv:node sv:name="jcr:content">
 		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
 		        <sv:value>cq:PageContent</sv:value>
@@ -59,9 +61,11 @@
 		    <sv:property sv:name="paragraphText" sv:type="String">
 		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='body']" /></sv:value>
 		    </sv:property>
-		    <sv:property sv:name="letterDate" sv:type="String">
-		        <sv:value><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))" /></sv:value>
-		    </sv:property>
+		    <xsl:if test="$letterDate != ''">
+			    <sv:property sv:name="letterDate" sv:type="Date">
+			        <sv:value><xsl:value-of select="$letterDate" /></sv:value>
+			    </sv:property>
+		    </xsl:if>
 		    <sv:property sv:name="psText" sv:type="String">
 		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='postscript']" /></sv:value>
 		    </sv:property>
@@ -70,9 +74,11 @@
 			        <sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='signature'])))" /></sv:value>
 			    </sv:property>
 		    </xsl:if>
-		    <sv:property sv:name="startDate" sv:type="String">
-		        <sv:value><xsl:value-of select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri($additionalMapping/data/FUND_APPEAL_START_DATE)))" /></sv:value>
-		    </sv:property>
+		    <xsl:if test="$startDate != ''">
+			    <sv:property sv:name="startDate" sv:type="Date">
+			        <sv:value><xsl:value-of select="$startDate" /></sv:value>
+			    </sv:property>
+		    </xsl:if>
 		    <sv:property sv:name="defaultCampaign" sv:type="String">
 		        <sv:value><xsl:value-of select="$additionalMapping/data/CAMPAIGN_NUMBER" /></sv:value>
 		    </sv:property>

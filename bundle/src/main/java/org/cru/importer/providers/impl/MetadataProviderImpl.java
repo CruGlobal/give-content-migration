@@ -106,7 +106,7 @@ public class MetadataProviderImpl implements MetadataProvider {
 		if (metadataRow != null) {
 			return new ResourceMetadata(metadataRow, colnames, excelFormatter);
 		} else {
-			throw new Exception("Can not find metadata for this file in the Excel file sarching for " + partialName);
+			throw new Exception("Can not find metadata for this file in the Excel file searching for " + partialName);
 		}
 	}
 	
