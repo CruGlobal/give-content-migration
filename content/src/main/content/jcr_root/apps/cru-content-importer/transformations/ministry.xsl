@@ -48,7 +48,7 @@
 		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='title']" /></sv:value>
 		    </sv:property>
 		    <sv:property sv:name="sling:vanityPath" sv:type="String" sv:multiple="true">
-		        <sv:value><xsl:value-of select="$Designation" /></sv:value>
+		        <sv:value>/content/give/us/en/<xsl:value-of select="$Designation" /></sv:value>
 		    </sv:property>
 		    <sv:property sv:name="websiteURL" sv:type="String">
 		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='website']" /></sv:value>
