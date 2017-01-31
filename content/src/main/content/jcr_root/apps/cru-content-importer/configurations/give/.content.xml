@@ -16,7 +16,8 @@
 		pageAcceptRule="Active or Inactive=Active"
 		factoryType="page"
 		additionalMappingFile="{Boolean}false"
-		acceptFilesPattern="^(?!__MACOSX)(.*).xml"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 
 	<ministry
 		jcr:primaryType="nt:unstructured"
@@ -32,7 +33,8 @@
 		pageAcceptRule="Active or Inactive=Active"
 		factoryType="page"
 		additionalMappingFile="{Boolean}false"
-		acceptFilesPattern="^(?!__MACOSX)(.*).xml"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 		
 	<fund
 		jcr:primaryType="nt:unstructured"
@@ -48,7 +50,8 @@
 		pageAcceptRule=""
 		factoryType="page"
 		additionalMappingFile="{Boolean}true"
-		acceptFilesPattern="^(?!__MACOSX)(.*).xml"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 
 	<staffImage
 		jcr:primaryType="nt:unstructured"
@@ -64,7 +67,8 @@
 		pageAcceptRule="Active or Inactive=Active"
 		factoryType="asset"
 		additionalMappingFile="{Boolean}false"
-		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 
 	<ministryImage
 		jcr:primaryType="nt:unstructured"
@@ -80,7 +84,8 @@
 		pageAcceptRule=""
 		factoryType="asset"
 		additionalMappingFile="{Boolean}false"
-		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 
 	<fundImage
 		jcr:primaryType="nt:unstructured"
@@ -96,6 +101,7 @@
 		pageAcceptRule=""
 		factoryType="asset"
 		additionalMappingFile="{Boolean}false"
-		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"/>
+		acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(jpg|jpeg|png|gif|tiff))$"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 
 </jcr:root>

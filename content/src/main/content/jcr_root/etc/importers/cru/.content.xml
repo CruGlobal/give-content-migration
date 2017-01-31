@@ -11,9 +11,9 @@
 	    jsLibs="[cq.widgets]"
 	    xtype="cruGiveDataImporter"
 	    options="[
-	    	/apps/cru-content-importer/configurations/staff,
-	    	/apps/cru-content-importer/configurations/ministry,
-	    	/apps/cru-content-importer/configurations/fund
+	    	/apps/cru-content-importer/configurations/give/staff,
+	    	/apps/cru-content-importer/configurations/give/ministry,
+	    	/apps/cru-content-importer/configurations/give/fund
 	    ]"
 	    tempStorePath="/var/cru-content-importer"
 	    />
@@ -24,9 +24,9 @@
 	    jsLibs="[cq.widgets]"
 	    xtype="cruGiveDataImporter"
 	    options="[
-	    	/apps/cru-content-importer/configurations/staffImage,
-	    	/apps/cru-content-importer/configurations/ministryImage,
-	    	/apps/cru-content-importer/configurations/fundImage
+	    	/apps/cru-content-importer/configurations/give/staffImage,
+	    	/apps/cru-content-importer/configurations/give/ministryImage,
+	    	/apps/cru-content-importer/configurations/give/fundImage
 	    ]"
 	    tempStorePath="/var/cru-content-importer"
 	    />

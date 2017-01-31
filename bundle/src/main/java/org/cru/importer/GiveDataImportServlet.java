@@ -22,6 +22,7 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.commons.json.io.JSONWriter;
+import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResultsCollector;
 import org.slf4j.Logger;
@@ -123,6 +124,14 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 				} else {
 					parametersCollector.setAcceptFilesPattern(acceptFilesPattern);
 				}
+	            Resource globalConfigs = getGlobalConfig(request, properties);
+	            if (globalConfigs == null) {
+	                resultsCollector.addError("globalConfigs configuration not found at configpath or node not exists at JCR.");
+	                isValid = false;
+	            } else {
+	                ValueMap globalProperties = globalConfigs.adaptTo(ValueMap.class);
+	                parametersCollector.setSanitizationMap(PropertiesUtil.toMap(globalProperties.get("sanitizationMap",String[].class), new String[]{}));
+	            }
 			}
 		} catch (Exception e) {
 			resultsCollector.addError(e.getMessage());
@@ -131,14 +140,23 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 		return isValid;
 	}
 	
-	private Resource getConfig(SlingHttpServletRequest request) {
-		String configPath = request.getParameter("configpath");
-		if (configPath != null) {
-			Resource config = request.getResourceResolver().getResource(configPath);
-			return config;
-		}
-		return null;
-	}
+    private Resource getConfig(SlingHttpServletRequest request) {
+        String configPath = request.getParameter("configpath");
+        if (configPath != null) {
+            Resource config = request.getResourceResolver().getResource(configPath);
+            return config;
+        }
+        return null;
+    }
+
+    private Resource getGlobalConfig(SlingHttpServletRequest request, ValueMap properties) {
+        String globalConfigs = properties.get("globalConfigs",String.class);
+        if (globalConfigs != null) {
+            Resource config = request.getResourceResolver().getResource(globalConfigs);
+            return config;
+        }
+        return null;
+    }
 
 	private Binary loadZipFile(Resource resource) {
 		Binary binary = null;

@@ -1,6 +1,7 @@
 package org.cru.importer.bean;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import javax.jcr.Binary;
 
@@ -23,6 +24,7 @@ public class ParametersCollector {
 	private String factoryType;
 	private InputStream additionalMappingFile;
 	private Object additionalMappingCache = null;
+	private Map<String, String> sanitizationMap;
 	
 	public String getBaselocation() {
 		return baselocation;
@@ -143,5 +145,13 @@ public class ParametersCollector {
 	public void setAcceptFilesPattern(String acceptFilesPattern) {
 		this.acceptFilesPattern = acceptFilesPattern;
 	}
+
+    public Map<String, String> getSanitizationMap() {
+        return sanitizationMap;
+    }
+
+    public void setSanitizationMap(Map<String, String> sanitizationMap) {
+        this.sanitizationMap = sanitizationMap;
+    }
 
 }

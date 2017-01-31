@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+	jcr:primaryType="nt:unstructured"
+	sanitizationMap="[
+		&amp;ntilde;=&amp;amp;ntilde;,
+		&amp;ccedil;=&amp;amp;ccedil;,
+		&amp;Ccedil;=&amp;amp;Ccedil;,
+		&amp;icirc;=&amp;amp;icirc;,
+		&amp;uuml;=&amp;amp;uuml;,
+		&amp;iquest;=&amp;amp;iquest;,
+		&amp;amp;amp;#8364;=&amp;amp;euro;,
+		&amp;dDocName=&amp;amp;dDocName,
+		www.stellant.com=www.stellent.com
+	]">
+
+</jcr:root>
