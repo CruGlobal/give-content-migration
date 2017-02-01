@@ -14,6 +14,17 @@ import javax.jcr.Node;
 import javax.jcr.Session;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.jackrabbit.commons.JcrUtils;
+import org.apache.sling.api.resource.Resource;
+import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
+import org.cru.importer.providers.ContentMapperProvider;
+import org.cru.importer.xml.GiveURIResolver;
+
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
+
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -22,18 +33,6 @@ import net.sf.saxon.s9api.XsltCompiler;
 import net.sf.saxon.s9api.XsltExecutable;
 import net.sf.saxon.s9api.XsltTransformer;
 import net.sf.saxon.trans.XPathException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.jackrabbit.commons.JcrUtils;
-import org.apache.sling.api.resource.Resource;
-import org.cru.importer.bean.ParametersCollector;
-import org.cru.importer.bean.ResourceMetadata;
-import org.cru.importer.providers.ContentMapperProvider;
-import org.cru.importer.util.XmlEntitiesUtil;
-import org.cru.importer.xml.GiveURIResolver;
-
-import com.ibm.icu.text.CharsetDetector;
-import com.ibm.icu.text.CharsetMatch;
 
 /**
  * Fills page content for Give import process using xslt
@@ -47,11 +46,13 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	private XsltTransformer transformer;
 	private Processor processor;
 	private Map<String,String> transformedKeys;
+	private Map<String, String> sanitizationMap;
 	private List<String> transformerParameters;
 	
 	public ContentMapperProviderImpl(ParametersCollector parametersCollector) throws Exception {
 		this.transformedKeys = null;
 		this.session = parametersCollector.getRequest().getResourceResolver().adaptTo(Session.class);
+		this.sanitizationMap = parametersCollector.getSanitizationMap();
 
 		Node xsltNode = this.session.getNode(parametersCollector.getXsltPath());
 		processor = new Processor(false);
@@ -81,7 +82,9 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	        detector.setText(isArrBaos);
 	        CharsetMatch match = detector.detect();
 	        String orig = new String(baos.toByteArray(), match.getName());
-        	orig = XmlEntitiesUtil.fixBadEntities(orig);
+        	for (String key : sanitizationMap.keySet()) {
+        	    orig = orig.replaceAll(key, sanitizationMap.get(key));
+        	}
         	isArrBaos = new ByteArrayInputStream(orig.getBytes("UTF-8"));
 
 			transformer.setParameter(new QName("path"), new XdmAtomicValue(resource.getPath()));
