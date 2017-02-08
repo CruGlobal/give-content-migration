@@ -90,7 +90,7 @@
 	<fundImage
 		jcr:primaryType="nt:unstructured"
 		title="Fund Image File"
-		defaultPath="/content/dam/give/campaigns"
+		defaultPath="/content/dam/give/designations"
 		pageTemplate=""
 		intermediateTemplate=""
 		transformation="/apps/cru-content-importer/transformations/fundImage.xsl"

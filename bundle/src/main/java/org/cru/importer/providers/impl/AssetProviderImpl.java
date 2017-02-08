@@ -38,7 +38,7 @@ public class AssetProviderImpl implements ResourceProvider {
 	private ResourceResolver resolver;
 	
 	public AssetProviderImpl(ParametersCollector parametersCollector) {
-		this.resolver = parametersCollector.getRequest().getResourceResolver();
+		this.resolver = parametersCollector.getResourceResolver();
 		this.assetManager = resolver.adaptTo(AssetManager.class);
 		this.session = resolver.adaptTo(Session.class);
 		this.baselocation = resolver.getResource(parametersCollector.getBaselocation()).adaptTo(Node.class);

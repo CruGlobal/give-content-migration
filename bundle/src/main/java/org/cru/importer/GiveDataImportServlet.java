@@ -4,23 +4,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.jcr.Binary;
 import javax.jcr.Node;
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
-import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
+import org.apache.sling.api.resource.LoginException;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.api.resource.ValueMap;
-import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.commons.json.io.JSONWriter;
 import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.cru.importer.bean.ParametersCollector;
@@ -35,7 +45,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @SlingServlet(
-		methods = {"POST"},
+		methods = {"POST","GET"},
 		paths={"/services/givedataimport"},
 		metatype = true,
 		label = "CRU - Give Data Import servlet",
@@ -46,33 +56,92 @@ import org.slf4j.LoggerFactory;
 		@Property(name = "service.vendor", value = "Cloud99"),
 		@Property(name = "service.pid", value = "org.cru.importer.GiveDataImportServlet", propertyPrivate = false)
 })
-public class GiveDataImportServlet extends SlingAllMethodsServlet {
+public class GiveDataImportServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 3742453523171288563L;
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(GiveDataImportServlet.class);
 	
+	private ResultsCollector resultsCollector;
+	
+    @Reference
+    private ResourceResolverFactory resourceResolverFactory;
+	
 	@Override
-	protected void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-		ParametersCollector parametersCollector = new ParametersCollector();
-		ResultsCollector resultsCollector = new ResultsCollector();
-		if (validateParams(request, parametersCollector, resultsCollector)) {
-			GiveDataImportMasterProcess process = new GiveDataImportMasterProcess(request.getResourceResolver());
-			process.runProcess(parametersCollector, resultsCollector);
-		}
-		writeResult(response, resultsCollector);
+	public void init() throws ServletException {
+	    resultsCollector = new ResultsCollector();
+	}
+	
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            if (!resultsCollector.isRunning()) {
+                resultsCollector.setRunning(true);
+                ParametersCollector parametersCollector = new ParametersCollector();
+                ResourceResolver resourceResolver = resourceResolverFactory.getAdministrativeResourceResolver(null);
+                parametersCollector.setResourceResolver(resourceResolver);
+                if (validateParams(request, parametersCollector, resultsCollector)) {
+                	GiveDataImportMasterProcess process = new GiveDataImportMasterProcess();
+                	process.runProcess(parametersCollector, resultsCollector);
+                }
+                response.getWriter().write("Process started");
+                response.setStatus(SlingHttpServletResponse.SC_OK);
+            } else {
+                response.getWriter().write("Process already running");
+                response.setStatus(SlingHttpServletResponse.SC_BAD_REQUEST);
+            }
+        } catch (LoginException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new ServletException(e);
+        }
+	}
+	
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+        response.setStatus(200);
+        response.setContentType("text/event-stream");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Cache-Control","no-cache");
+        response.setHeader("Connection","keep-alive");
+	    final AsyncContext asyncContext = request.startAsync();
+        asyncContext.setTimeout(0);
+	    resultsCollector.addObserver(new Observer() {
+            public void update(Observable o, Object arg) {
+                try {
+                    if (resultsCollector.isRunning()) {
+                        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
+                        response.getOutputStream().print("data: {\"type\":\"message\",\"description\":\"" + arg.toString() + "\"}\n\n");
+                        response.getOutputStream().flush();
+                    } else {
+                        resultsCollector.deleteObserver(this);
+                        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
+                        response.getOutputStream().print("data: {\"type\":\"close\"}\n\n");
+                        response.getOutputStream().flush();
+                        asyncContext.complete();
+                    }
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        });
+        response.getOutputStream().print("event: open\n\n");
+        for (String message: resultsCollector.getCachedMessages()) {
+            response.getOutputStream().print("data: " + message + "\n\n");
+        }
+        resultsCollector.clearCachedMessages();
+        response.getOutputStream().flush();
 	}
 
-	private boolean validateParams(SlingHttpServletRequest request, ParametersCollector parametersCollector, ResultsCollector resultsCollector) throws ServletException, IOException {
+	private boolean validateParams(HttpServletRequest request, ParametersCollector parametersCollector, ResultsCollector resultsCollector) throws ServletException, IOException {
 		boolean isValid = true;
 		try {
-			parametersCollector.setRequest(request);
 			String baselocation = request.getParameter("baselocation");
 			if (baselocation == null || baselocation.trim().equals("")) {
 				resultsCollector.addError("baselocation parameter not found.");
 				isValid = false;
 			} else {
-				Resource resource = request.getResourceResolver().getResource(baselocation);
+				Resource resource = parametersCollector.getResourceResolver().getResource(baselocation);
 				if (resource == null) {
 					resultsCollector.addError("baselocation parameter is not a valid resource.");
 					isValid = false;
@@ -85,7 +154,7 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 				resultsCollector.addError("filename parameter not found.");
 				isValid = false;
 			} else {
-				Resource pagesdata = request.getResourceResolver().getResource(filename);
+				Resource pagesdata = parametersCollector.getResourceResolver().getResource(filename);
 				if (pagesdata == null) {
 					resultsCollector.addError("filename parameter value can not be found at JCR.");
 					isValid = false;
@@ -98,7 +167,7 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 					}
 				}
 			}
-			Resource config = getConfig(request);
+			Resource config = getConfig(request, parametersCollector);
 			if (config == null) {
 				resultsCollector.addError("configpath parameter not found or node not exists at JCR.");
 				isValid = false;
@@ -113,10 +182,10 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 				parametersCollector.setIntermediateTemplate(properties.get("intermediateTemplate",String.class));
 				parametersCollector.setPageAcceptRule(properties.get("pageAcceptRule",String.class));
 				parametersCollector.setFactoryType(properties.get("factoryType",String.class));
-				if (properties.get("additionalMappingFile",Boolean.class)) {
+				/*if (properties.get("additionalMappingFile",Boolean.class)) {
 					InputStream additionalMappingFile = request.getRequestParameter("additionalMappingFile").getInputStream();
 					parametersCollector.setAdditionalMappingFile(additionalMappingFile);
-				}
+				}*/
 				String acceptFilesPattern = properties.get("acceptFilesPattern", String.class);
 				if (acceptFilesPattern == null) {
 					resultsCollector.addError("Accept files pattern property not found at configuration node.");
@@ -124,7 +193,7 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 				} else {
 					parametersCollector.setAcceptFilesPattern(acceptFilesPattern);
 				}
-	            Resource globalConfigs = getGlobalConfig(request, properties);
+	            Resource globalConfigs = getGlobalConfig(request, properties, parametersCollector);
 	            if (globalConfigs == null) {
 	                resultsCollector.addError("globalConfigs configuration not found at configpath or node not exists at JCR.");
 	                isValid = false;
@@ -140,19 +209,19 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 		return isValid;
 	}
 	
-    private Resource getConfig(SlingHttpServletRequest request) {
+    private Resource getConfig(HttpServletRequest request, ParametersCollector parametersCollector) {
         String configPath = request.getParameter("configpath");
         if (configPath != null) {
-            Resource config = request.getResourceResolver().getResource(configPath);
+            Resource config = parametersCollector.getResourceResolver().getResource(configPath);
             return config;
         }
         return null;
     }
 
-    private Resource getGlobalConfig(SlingHttpServletRequest request, ValueMap properties) {
+    private Resource getGlobalConfig(HttpServletRequest request, ValueMap properties, ParametersCollector parametersCollector) {
         String globalConfigs = properties.get("globalConfigs",String.class);
         if (globalConfigs != null) {
-            Resource config = request.getResourceResolver().getResource(globalConfigs);
+            Resource config = parametersCollector.getResourceResolver().getResource(globalConfigs);
             return config;
         }
         return null;
@@ -189,39 +258,6 @@ public class GiveDataImportServlet extends SlingAllMethodsServlet {
 			}
 		}
 		return null;
-	}
-
-	private void writeResult(SlingHttpServletResponse response, ResultsCollector collector) throws ServletException {
-		try {
-			Collections.sort(collector.getCreatedPages());
-			Collections.sort(collector.getModifiedPages());
-			Collections.sort(collector.getNotModifiedPages());
-			Collections.sort(collector.getErrors());
-			
-			response.setStatus(200);
-		    response.setContentType("text/html");
-		    response.setCharacterEncoding("utf-8");
-			JSONWriter writer = new JSONWriter(response.getWriter());
-			writer.object();
-			writeList(writer, "createdPages", collector.getCreatedPages());
-			writeList(writer, "modifiedPages", collector.getModifiedPages());
-			writeList(writer, "notModifiedPages", collector.getNotModifiedPages());
-			writeList(writer, "ignoredPages", collector.getIgnoredPages());
-			writeList(writer, "errors", collector.getErrors());
-			writer.endObject();
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
-			throw new ServletException(e);
-		}
-	}
-
-	private void writeList(JSONWriter writer, String objectKey, List<String> stringList) throws Exception {
-		writer.key(objectKey);
-		writer.array();
-		for (String string : stringList) {
-			writer.value(string);
-		}
-		writer.endArray();
 	}
 
 }

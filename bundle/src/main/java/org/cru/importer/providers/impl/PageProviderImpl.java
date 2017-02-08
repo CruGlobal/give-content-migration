@@ -30,7 +30,7 @@ public class PageProviderImpl implements ResourceProvider {
 	private String pageAcceptRuleValue;
 	
 	public PageProviderImpl(ParametersCollector parametersCollector) {
-		this.pageManager = parametersCollector.getRequest().getResourceResolver().adaptTo(PageManager.class);
+		this.pageManager = parametersCollector.getResourceResolver().adaptTo(PageManager.class);
 		this.baselocation = parametersCollector.getBaselocation();
 		this.pageTemplate = parametersCollector.getPageTemplate();
 		this.intermediateTemplate = parametersCollector.getIntermediateTemplate();

@@ -6,10 +6,11 @@ import java.util.Map;
 import javax.jcr.Binary;
 
 import org.apache.sling.api.SlingHttpServletRequest;
+import org.apache.sling.api.resource.ResourceResolver;
 
 public class ParametersCollector {
 
-	private SlingHttpServletRequest request;
+    private ResourceResolver resourceResolver;
 	private String baselocation;
 	private Binary contentFile;
 	private String columnFileName;
@@ -40,14 +41,6 @@ public class ParametersCollector {
 
 	public void setContentFile(Binary binary) {
 		this.contentFile = binary;
-	}
-
-	public SlingHttpServletRequest getRequest() {
-		return request;
-	}
-
-	public void setRequest(SlingHttpServletRequest request) {
-		this.request = request;
 	}
 
 	public String getColumnFileName() {
@@ -152,6 +145,14 @@ public class ParametersCollector {
 
     public void setSanitizationMap(Map<String, String> sanitizationMap) {
         this.sanitizationMap = sanitizationMap;
+    }
+
+    public ResourceResolver getResourceResolver() {
+        return resourceResolver;
+    }
+
+    public void setResourceResolver(ResourceResolver resourceResolver) {
+        this.resourceResolver = resourceResolver;
     }
 
 }
