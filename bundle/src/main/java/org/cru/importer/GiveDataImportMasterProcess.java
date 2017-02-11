@@ -124,7 +124,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 		} catch (Exception e) {
 			resultsCollector.addError(e.getMessage());
 		} finally {
-		    resultsCollector.setRunning(false);
+		    resultsCollector.stopRunning();
 			IOUtils.closeQuietly(in);
 		}
 	}

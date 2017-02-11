@@ -6,36 +6,38 @@ import java.util.Observable;
 
 public class ResultsCollector extends Observable {
 	
-	private List<String> cachedMessages;
-	
+	private List<ProcessMessage> cachedMessages;
 	private boolean isRunning;
+	private int errors;
 
 	public ResultsCollector() {
-		cachedMessages =  new LinkedList<String>();
+		cachedMessages =  new LinkedList<ProcessMessage>();
 		isRunning = false;
+		errors = 0;
 	}
 	
 	public void addCreatedPage(String page) {
-	    addMessage("Created Resource: " + page);
+	    addMessage(ProcessMessage.createCreatedMessage(page));
 	}
 	
     public void addModifiedPage(String page) {
-        addMessage("Modified Resource: " + page);
+        addMessage(ProcessMessage.createModifiedMessage(page));
 	}
 
 	public void addNotModifiedPage(String page) {
-	    addMessage("Not Modified Resource: " + page);
+	    addMessage(ProcessMessage.createNotModifiedMessage(page));
 	}
 	
 	public void addError(String page) {
-	    addMessage("Error: " + page);
+	    errors++;
+	    addMessage(ProcessMessage.createErrorMessage(page));
 	}
 
 	public void addIgnoredPages(String page) {
-	    addMessage("Ignored Resource: " + page);
+	    addMessage(ProcessMessage.createIgnoredMessage(page));
 	}
 	
-    private void addMessage(String message) {
+    private void addMessage(ProcessMessage message) {
         if (super.countObservers() > 0) {
             super.setChanged();
             super.notifyObservers(message);
@@ -44,7 +46,7 @@ public class ResultsCollector extends Observable {
         }
     }
     
-    public List<String> getCachedMessages() {
+    public List<ProcessMessage> getCachedMessages() {
         return cachedMessages;
     }
 
@@ -52,14 +54,20 @@ public class ResultsCollector extends Observable {
         cachedMessages.clear();
     }
 
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    public void setRunning(boolean isRunning) {
-        this.isRunning = isRunning;
+    public void stopRunning() {
+        this.isRunning = false;
         super.setChanged();
-        super.notifyObservers(isRunning);
+        super.notifyObservers(ProcessMessage.createFinishMessage(errors));
+        this.errors = 0;
+    }
+    
+    public synchronized boolean checkRunning() {
+        if (isRunning) {
+            return true;
+        } else {
+            isRunning = true;
+            return false;
+        }
     }
 
 }

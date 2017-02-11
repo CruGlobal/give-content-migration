@@ -2,8 +2,6 @@ package org.cru.importer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.zip.ZipEntry;
@@ -12,8 +10,6 @@ import java.util.zip.ZipInputStream;
 import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,9 +27,9 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.apache.sling.api.resource.ValueMap;
-import org.apache.sling.commons.json.io.JSONWriter;
 import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ProcessMessage;
 import org.cru.importer.bean.ResultsCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,21 +58,15 @@ public class GiveDataImportServlet extends HttpServlet {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(GiveDataImportServlet.class);
 	
-	private ResultsCollector resultsCollector;
+	private static ResultsCollector resultsCollector = new ResultsCollector();
 	
     @Reference
     private ResourceResolverFactory resourceResolverFactory;
-	
-	@Override
-	public void init() throws ServletException {
-	    resultsCollector = new ResultsCollector();
-	}
-	
+
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            if (!resultsCollector.isRunning()) {
-                resultsCollector.setRunning(true);
+            if (!resultsCollector.checkRunning()) {
                 ParametersCollector parametersCollector = new ParametersCollector();
                 ResourceResolver resourceResolver = resourceResolverFactory.getAdministrativeResourceResolver(null);
                 parametersCollector.setResourceResolver(resourceResolver);
@@ -84,11 +74,13 @@ public class GiveDataImportServlet extends HttpServlet {
                 	GiveDataImportMasterProcess process = new GiveDataImportMasterProcess();
                 	process.runProcess(parametersCollector, resultsCollector);
                 }
-                response.getWriter().write("Process started");
+                response.getWriter().write(ProcessMessage.createStartMessage().toString());
                 response.setStatus(SlingHttpServletResponse.SC_OK);
+                response.setContentType("application/json");
             } else {
-                response.getWriter().write("Process already running");
-                response.setStatus(SlingHttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(ProcessMessage.createRunningMessage().toString());
+                response.setStatus(SlingHttpServletResponse.SC_OK);
+                response.setContentType("application/json");
             }
         } catch (LoginException e) {
             LOGGER.error(e.getMessage(), e);
@@ -109,15 +101,12 @@ public class GiveDataImportServlet extends HttpServlet {
 	    resultsCollector.addObserver(new Observer() {
             public void update(Observable o, Object arg) {
                 try {
-                    if (resultsCollector.isRunning()) {
-                        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
-                        response.getOutputStream().print("data: {\"type\":\"message\",\"description\":\"" + arg.toString() + "\"}\n\n");
-                        response.getOutputStream().flush();
-                    } else {
+                    ProcessMessage message = (ProcessMessage) arg;
+                    HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
+                    response.getOutputStream().print("data: " + message.toString() + "\n\n");
+                    response.getOutputStream().flush();
+                    if (message.getType().equals(ProcessMessage.FINISH)) {
                         resultsCollector.deleteObserver(this);
-                        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
-                        response.getOutputStream().print("data: {\"type\":\"close\"}\n\n");
-                        response.getOutputStream().flush();
                         asyncContext.complete();
                     }
                 } catch (IOException e) {
@@ -126,8 +115,8 @@ public class GiveDataImportServlet extends HttpServlet {
             }
         });
         response.getOutputStream().print("event: open\n\n");
-        for (String message: resultsCollector.getCachedMessages()) {
-            response.getOutputStream().print("data: " + message + "\n\n");
+        for (ProcessMessage message: resultsCollector.getCachedMessages()) {
+            response.getOutputStream().print("data: " + message.toString() + "\n\n");
         }
         resultsCollector.clearCachedMessages();
         response.getOutputStream().flush();
@@ -182,10 +171,19 @@ public class GiveDataImportServlet extends HttpServlet {
 				parametersCollector.setIntermediateTemplate(properties.get("intermediateTemplate",String.class));
 				parametersCollector.setPageAcceptRule(properties.get("pageAcceptRule",String.class));
 				parametersCollector.setFactoryType(properties.get("factoryType",String.class));
-				/*if (properties.get("additionalMappingFile",Boolean.class)) {
-					InputStream additionalMappingFile = request.getRequestParameter("additionalMappingFile").getInputStream();
-					parametersCollector.setAdditionalMappingFile(additionalMappingFile);
-				}*/
+				if (properties.get("additionalMappingFile",Boolean.class)) {
+				    Resource additionalMappingFileResource = parametersCollector.getResourceResolver().getResource(request.getParameter("additionalMappingFile"));
+				    if (additionalMappingFileResource == null) {
+	                    resultsCollector.addError("additional mapping file parameter value can not be found at JCR.");
+	                    isValid = false;
+				    } else {
+			            Node node = additionalMappingFileResource.adaptTo(Node.class);
+			            if (node.hasProperty("jcr:content/jcr:data")) {
+			                javax.jcr.Property data = node.getProperty("jcr:content/jcr:data");
+			                parametersCollector.setAdditionalMappingFile(data.getBinary().getStream());
+			            }
+				    }
+				}
 				String acceptFilesPattern = properties.get("acceptFilesPattern", String.class);
 				if (acceptFilesPattern == null) {
 					resultsCollector.addError("Accept files pattern property not found at configuration node.");
