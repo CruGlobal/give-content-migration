@@ -2,61 +2,72 @@ package org.cru.importer.bean;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
 
-public class ResultsCollector {
+public class ResultsCollector extends Observable {
 	
-	private List<String> createdPages;
-	private List<String> modifiedPages;
-	private List<String> notModifiedPages;
-	private List<String> ignoredPages;
-	private List<String> errors;
+	private List<ProcessMessage> cachedMessages;
+	private boolean isRunning;
+	private int errors;
 
 	public ResultsCollector() {
-		createdPages = new LinkedList<String>();
-		modifiedPages = new LinkedList<String>();
-		notModifiedPages = new LinkedList<String>();
-		errors = new LinkedList<String>();
-		ignoredPages =  new LinkedList<String>();
+		cachedMessages =  new LinkedList<ProcessMessage>();
+		isRunning = false;
+		errors = 0;
 	}
 	
 	public void addCreatedPage(String page) {
-		createdPages.add(page);
+	    addMessage(ProcessMessage.createCreatedMessage(page));
 	}
 	
-	public void addModifiedPage(String page) {
-		modifiedPages.add(page);
+    public void addModifiedPage(String page) {
+        addMessage(ProcessMessage.createModifiedMessage(page));
 	}
 
 	public void addNotModifiedPage(String page) {
-		notModifiedPages.add(page);
+	    addMessage(ProcessMessage.createNotModifiedMessage(page));
 	}
 	
 	public void addError(String page) {
-		errors.add(page);
+	    errors++;
+	    addMessage(ProcessMessage.createErrorMessage(page));
 	}
 
 	public void addIgnoredPages(String page) {
-		ignoredPages.add(page);
+	    addMessage(ProcessMessage.createIgnoredMessage(page));
 	}
+	
+    private void addMessage(ProcessMessage message) {
+        if (super.countObservers() > 0) {
+            super.setChanged();
+            super.notifyObservers(message);
+        } else {
+            cachedMessages.add(message);
+        }
+    }
+    
+    public List<ProcessMessage> getCachedMessages() {
+        return cachedMessages;
+    }
 
-	public List<String> getCreatedPages() {
-		return createdPages;
-	}
+    public void clearCachedMessages() {
+        cachedMessages.clear();
+    }
 
-	public List<String> getModifiedPages() {
-		return modifiedPages;
-	}
-
-	public List<String> getNotModifiedPages() {
-		return notModifiedPages;
-	}
-
-	public List<String> getErrors() {
-		return errors;
-	}
-
-	public List<String> getIgnoredPages() {
-		return ignoredPages;
-	}
+    public void stopRunning() {
+        this.isRunning = false;
+        super.setChanged();
+        super.notifyObservers(ProcessMessage.createFinishMessage(errors));
+        this.errors = 0;
+    }
+    
+    public synchronized boolean checkRunning() {
+        if (isRunning) {
+            return true;
+        } else {
+            isRunning = true;
+            return false;
+        }
+    }
 
 }

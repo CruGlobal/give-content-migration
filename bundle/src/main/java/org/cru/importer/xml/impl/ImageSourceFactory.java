@@ -66,7 +66,7 @@ public class ImageSourceFactory implements GiveSourceFactory {
 		if (params.containsKey(PARAM_IMAGE) && !params.get(PARAM_IMAGE).equals("")) {
 			String imageCode = captureImageCode(params.get(PARAM_IMAGE));
 			if (imageCode != null) {
-				image = searchInDam(parametersCollector.getRequest().getResourceResolver(), imageCode);
+				image = searchInDam(parametersCollector.getResourceResolver(), imageCode);
 			}
 		}
 		image = "<image>" + image + "</image>";

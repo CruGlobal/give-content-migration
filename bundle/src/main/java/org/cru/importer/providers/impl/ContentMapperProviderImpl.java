@@ -51,7 +51,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	
 	public ContentMapperProviderImpl(ParametersCollector parametersCollector) throws Exception {
 		this.transformedKeys = null;
-		this.session = parametersCollector.getRequest().getResourceResolver().adaptTo(Session.class);
+		this.session = parametersCollector.getResourceResolver().adaptTo(Session.class);
 		this.sanitizationMap = parametersCollector.getSanitizationMap();
 
 		Node xsltNode = this.session.getNode(parametersCollector.getXsltPath());

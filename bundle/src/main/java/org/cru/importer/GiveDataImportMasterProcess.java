@@ -10,11 +10,8 @@ import java.util.zip.ZipInputStream;
 
 import javax.jcr.Session;
 
-import net.sf.saxon.trans.XPathException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ResourceMetadata;
@@ -30,29 +27,43 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.saxon.trans.XPathException;
+
 /**
  * Master process: Process the content file and create the content
  * 
  * @author Nestor de Dios
  *
  */
-public class GiveDataImportMasterProcess {
+public class GiveDataImportMasterProcess implements Runnable {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(GiveDataImportMasterProcess.class);
 	
 	private Session session;
-	
-	public GiveDataImportMasterProcess(ResourceResolver resolver) {
-		this.session = resolver.adaptTo(Session.class);
-	}
+	private ParametersCollector parametersCollector;
+	private ResultsCollector resultsCollector;
 
 	/**
-	 * Starts the import process. Iterate over all xml files contained in the zip file and process each one.
-	 * 
-	 * @param parametersCollector
-	 * @param resultsCollector
+	 * Implementation for Runnable
 	 */
-	public void runProcess(ParametersCollector parametersCollector, ResultsCollector resultsCollector) {
+    public void run() {
+        runProcessInternal();
+    }
+
+    /**
+     * Starts the import process. Iterate over all xml files contained in the zip file and process each one.
+     * @param parametersCollector
+     * @param resultsCollector
+     */
+    public void runProcess(ParametersCollector parametersCollector, ResultsCollector resultsCollector) {
+        this.session = parametersCollector.getResourceResolver().adaptTo(Session.class);
+        this.parametersCollector = parametersCollector;
+        this.resultsCollector = resultsCollector;
+        Thread thread = new Thread(this);
+        thread.start();
+    }
+
+	private void runProcessInternal() {
 		InputStream in = null;
 		try {
 			DataImportFactory dataImportFactory = getDataImporFactory(parametersCollector);
@@ -113,6 +124,7 @@ public class GiveDataImportMasterProcess {
 		} catch (Exception e) {
 			resultsCollector.addError(e.getMessage());
 		} finally {
+		    resultsCollector.stopRunning();
 			IOUtils.closeQuietly(in);
 		}
 	}
