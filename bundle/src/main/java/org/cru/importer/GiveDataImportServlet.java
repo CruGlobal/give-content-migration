@@ -73,6 +73,8 @@ public class GiveDataImportServlet extends HttpServlet {
                 if (validateParams(request, parametersCollector, resultsCollector)) {
                 	GiveDataImportMasterProcess process = new GiveDataImportMasterProcess();
                 	process.runProcess(parametersCollector, resultsCollector);
+                } else {
+                    resultsCollector.stopRunning();
                 }
                 response.getWriter().write(ProcessMessage.createStartMessage().toString());
                 response.setStatus(SlingHttpServletResponse.SC_OK);
