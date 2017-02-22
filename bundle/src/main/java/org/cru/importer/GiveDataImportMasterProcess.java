@@ -48,6 +48,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 	 */
     public void run() {
         runProcessInternal();
+        resultsCollector.setCurrentProcess(null);
     }
 
     /**
@@ -61,6 +62,7 @@ public class GiveDataImportMasterProcess implements Runnable {
         this.resultsCollector = resultsCollector;
         Thread thread = new Thread(this);
         thread.start();
+        resultsCollector.setCurrentProcess(thread);
     }
 
 	private void runProcessInternal() {
@@ -78,7 +80,8 @@ public class GiveDataImportMasterProcess implements Runnable {
 				acceptFilesPattern = Pattern.compile(parametersCollector.getAcceptFilesPattern());
 			}
 			Set<String> proccesed = new HashSet<String>();
-			while ((entry = zis.getNextEntry()) != null) {
+			Thread currentThread = Thread.currentThread();
+			while ((entry = zis.getNextEntry()) != null && !currentThread.isInterrupted()) {
 				if (entry.isDirectory()) {
 					continue;
 				}
@@ -109,7 +112,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 							resultsCollector.addIgnoredPages(filename);
 							LOGGER.info("Ignored file: " + filename);
 						}
-					} catch (Exception e) {
+                    } catch (Exception e) {
 						if (session.hasPendingChanges()) {
 							session.refresh(false);
 						}
@@ -121,7 +124,13 @@ public class GiveDataImportMasterProcess implements Runnable {
 					LOGGER.info("File not accepted: " + filename);
 				}
 			}
+			if (currentThread.isInterrupted()) {
+                LOGGER.info("Import proccess interrupted.");
+			} else {
+			    LOGGER.info("Import proccess finished.");
+			}
 		} catch (Exception e) {
+		    LOGGER.error("Import proccess failed.", e);
 			resultsCollector.addError(e.getMessage());
 		} finally {
 		    resultsCollector.stopRunning();

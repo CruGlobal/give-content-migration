@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
@@ -31,6 +32,7 @@ import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ProcessMessage;
 import org.cru.importer.bean.ResultsCollector;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +64,20 @@ public class GiveDataImportServlet extends HttpServlet {
 	
     @Reference
     private ResourceResolverFactory resourceResolverFactory;
+    
+    @Deactivate
+    protected void deactivate(final ComponentContext componentContext) {
+        LOGGER.info("deactivate import servlet.");
+        Thread currentProcess = resultsCollector.getCurrentProcess();
+        if (currentProcess != null) {
+            currentProcess.interrupt();
+        }
+    }
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            LOGGER.info("Start import process");
             if (!resultsCollector.checkRunning()) {
                 ParametersCollector parametersCollector = new ParametersCollector();
                 ResourceResolver resourceResolver = resourceResolverFactory.getAdministrativeResourceResolver(null);
@@ -73,13 +85,16 @@ public class GiveDataImportServlet extends HttpServlet {
                 if (validateParams(request, parametersCollector, resultsCollector)) {
                 	GiveDataImportMasterProcess process = new GiveDataImportMasterProcess();
                 	process.runProcess(parametersCollector, resultsCollector);
+                	LOGGER.info("Import process started");
                 } else {
                     resultsCollector.stopRunning();
+                    LOGGER.info("Import process not started (validations fail)");
                 }
                 response.getWriter().write(ProcessMessage.createStartMessage().toString());
                 response.setStatus(SlingHttpServletResponse.SC_OK);
                 response.setContentType("application/json");
             } else {
+                LOGGER.info("Import process already running");
                 response.getWriter().write(ProcessMessage.createRunningMessage().toString());
                 response.setStatus(SlingHttpServletResponse.SC_OK);
                 response.setContentType("application/json");
@@ -93,7 +108,8 @@ public class GiveDataImportServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	        throws ServletException, IOException {
-        response.setStatus(200);
+	    LOGGER.info("Generating status updates");
+	    response.setStatus(200);
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control","no-cache");
