@@ -9,6 +9,7 @@ public class ResultsCollector extends Observable {
 	private List<ProcessMessage> cachedMessages;
 	private boolean isRunning;
 	private int errors;
+	private Thread currentProcess;
 
 	public ResultsCollector() {
 		cachedMessages =  new LinkedList<ProcessMessage>();
@@ -68,6 +69,14 @@ public class ResultsCollector extends Observable {
             isRunning = true;
             return false;
         }
+    }
+
+    public Thread getCurrentProcess() {
+        return currentProcess;
+    }
+
+    public void setCurrentProcess(Thread currentProcess) {
+        this.currentProcess = currentProcess;
     }
 
 }
