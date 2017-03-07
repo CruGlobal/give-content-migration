@@ -140,11 +140,14 @@ public class MetadataProviderImpl implements MetadataProvider {
 	private XSSFRow getMetadataRow(int sheetIndex, String partialName) {
 		XSSFRow metadataRow = null;
 		XSSFSheet sheet = workbook.getSheetAt(sheetIndex);
+		String lowerPartialName = partialName.toLowerCase();
 		for (int j = rowColumnNames + 1; j <= sheet.getLastRowNum() && metadataRow == null; j++){
 			XSSFRow row = sheet.getRow(j);
-			String rowFileName = getStringValue(row, columnFileNames);
-			if (rowFileName.endsWith(partialName)) {
-				metadataRow = row;
+			if (row != null) {
+    			String rowFileName = getStringValue(row, columnFileNames);
+    			if (rowFileName.toLowerCase().endsWith(lowerPartialName)) {
+    				metadataRow = row;
+    			}
 			}
 		}
 		return metadataRow;

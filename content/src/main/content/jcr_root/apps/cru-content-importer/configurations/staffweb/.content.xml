@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+	jcr:primaryType="sling:OrderedFolder">
+	
+	<article
+		jcr:primaryType="nt:unstructured"
+		title="Article"
+		defaultPath="/content/cru/us/en/staff"
+		pageTemplate="/apps/StaffWeb/components/page/article"
+		intermediateTemplate="/apps/StaffWeb/components/page/content"
+		transformation="/apps/cru-content-importer/transformations/staffweb/article.xsl"
+		rowColumnNames="{Long}0"
+		columnFileName="primaryFile"
+		columnMimeType=""
+		pathCreationStrategy="[finalUrl:(.*)\\..*:/$1]"
+		pageAcceptRule=""
+		factoryType="page"
+		additionalMappingFile="{Boolean}false"
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
+
+</jcr:root>

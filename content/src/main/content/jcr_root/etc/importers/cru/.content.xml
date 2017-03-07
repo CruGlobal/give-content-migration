@@ -30,4 +30,15 @@
 	    ]"
 	    tempStorePath="/var/cru-content-importer"
 	    />
+	<staffwebpageimport
+	    jcr:primaryType="sling:Folder"
+	    jcr:title="Staff Web Pages Importer"
+	    sling:resourceType="cq/ui/components/widget"
+	    jsLibs="[cq.widgets]"
+	    xtype="cruGiveDataImporter"
+	    options="[
+	    	/apps/cru-content-importer/configurations/staffweb/article
+	    ]"
+	    tempStorePath="/var/cru-content-importer"
+	    />
 </jcr:root>
