@@ -78,29 +78,33 @@ public class MetadataProviderImpl implements MetadataProvider {
 		} catch (Exception e) {
 			sheetIndex = -1;
 		}
+		if (sheetIndex >= workbook.getNumberOfSheets()){
+		    sheetIndex = -1;
+		}
 		XSSFRow metadataRow = null;
-		if (sheetIndex == -1) {
-			// first search in cache
-			for (int i=0;i<workbook.getNumberOfSheets() && metadataRow==null;i++) {
-				Map<String,XSSFRow> cache = getCache(i);
-				if (cache.containsKey(partialName)) {
-					metadataRow = cache.get(partialName);
-				}
-			}
-			// Then iterate over sheets
-			for (int i=0;i<workbook.getNumberOfSheets() && metadataRow==null;i++) {
-				metadataRow = getMetadataRow(i, partialName);
-			}
-		} else {
-			// First search in cache
-			Map<String,XSSFRow> cache = getCache(sheetIndex);
-			if (cache.containsKey(partialName)) {
-				metadataRow = cache.get(partialName);
-			}
-			// Then search in the sheet
-			if (metadataRow == null) {
-				metadataRow = getMetadataRow(sheetIndex, partialName);
-			}
+		if (sheetIndex != -1) {
+		 // First search in cache
+            Map<String,XSSFRow> cache = getCache(sheetIndex);
+            if (cache.containsKey(partialName)) {
+                metadataRow = cache.get(partialName);
+            }
+            // Then search in the sheet
+            if (metadataRow == null) {
+                metadataRow = getMetadataRow(sheetIndex, partialName);
+            }
+		} 
+		if (metadataRow == null) {
+		    // first search in cache
+            for (int i=0;i<workbook.getNumberOfSheets() && metadataRow==null;i++) {
+                Map<String,XSSFRow> cache = getCache(i);
+                if (cache.containsKey(partialName)) {
+                    metadataRow = cache.get(partialName);
+                }
+            }
+            // Then iterate over sheets
+            for (int i=0;i<workbook.getNumberOfSheets() && metadataRow==null;i++) {
+                metadataRow = getMetadataRow(i, partialName);
+            }
 		}
 		// Step 2: extract the metadata
 		if (metadataRow != null) {
