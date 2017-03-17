@@ -17,8 +17,6 @@ import java.util.Map;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.trans.XPathException;
-
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -29,6 +27,8 @@ import org.cru.importer.xml.GiveSourceFactory;
 import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.sf.saxon.trans.XPathException;
 
 @Component(
 	metatype = true,
@@ -43,11 +43,9 @@ import org.slf4j.LoggerFactory;
 public class formatDateSourceFactory implements GiveSourceFactory {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(formatDateSourceFactory.class);
-	
-	private static final String[] AVAILABLE_INCOMING_FORMATS = {"MMMM dd, yyyy","MMMM yyyy","dd-MMMM-yy"};
-	private static final String AEM_FORMAT = "yyyy-MM-dd";
-	
+	private static final String AEM_FORMAT = "yyyy-MM-dd'T'hh:mm:ss.'000+00:00'";
 	private static final String PARAM_DATE = "date";
+	private static final String PARAM_OUTPUT_FORMAT = "outputformat";
 	private List<DateFormat> incomingDateFormatters = null;
 	private DateFormat aemDateFormatter = null;
 	
@@ -59,11 +57,11 @@ public class formatDateSourceFactory implements GiveSourceFactory {
 			LOGGER.warn("Error parsing parmeters: " + parameters + "  - Error: " + e.getMessage());
 			params = new HashMap<String, String>();
 		}
+		Date extractedDate = null;
 		String date = "";
 		if (params.containsKey(PARAM_DATE) && !params.get(PARAM_DATE).equals("")) {
 			String origDate = params.get(PARAM_DATE);
-			Date extractedDate = null;
-			for (DateFormat formatter : getIncomingDateFormatters()) {
+			for (DateFormat formatter : getIncomingDateFormatters(parametersCollector)) {
 				try {
 					extractedDate = formatter.parse(origDate);
 					break;
@@ -71,7 +69,14 @@ public class formatDateSourceFactory implements GiveSourceFactory {
 				}
 			}
 			if (extractedDate != null) {
-				date = getAemDateFormatter().format(extractedDate) + "T00:00:00.000+00:00";
+			    String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
+			    if (outputFormat!=null && !"".equals(outputFormat)){
+			        date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);
+			    } else {
+			        date = getAemDateFormatter().format(extractedDate);
+			    }
+			} else {
+			    throw new XPathException("Invalid date format: "+origDate);
 			}
 		}
 		date = "<date>" + date + "</date>";
@@ -79,10 +84,10 @@ public class formatDateSourceFactory implements GiveSourceFactory {
 		return new StreamSource(stream);
 	}
 
-	public List<DateFormat> getIncomingDateFormatters() {
+	public List<DateFormat> getIncomingDateFormatters(ParametersCollector parametersCollector) {
 		if (incomingDateFormatters == null) {
 			incomingDateFormatters = new LinkedList<DateFormat>();
-			for (String format : AVAILABLE_INCOMING_FORMATS) {
+			for (String format : parametersCollector.getAcceptedDateFormats()) {
 				incomingDateFormatters.add(new SimpleDateFormat(format, Locale.US));
 			}
 		}

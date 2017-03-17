@@ -120,11 +120,13 @@ public class MetadataProviderImpl implements MetadataProvider {
 			rowsCache[i] = new HashMap<String, XSSFRow>();
 			for (int j = rowColumnNames + 1; j <= currentsheet.getLastRowNum(); j++){
 				XSSFRow currentrow = currentsheet.getRow(j);
-				String rowFileName = getStringValue(currentrow, columnFileNames);
-				try {
-					rowFileName = rowFileName.substring(rowFileName.indexOf("@"));
-					rowsCache[i].put(rowFileName, currentrow);
-				} catch (Exception e) {
+				if (currentrow != null) {
+				    String rowFileName = getStringValue(currentrow, columnFileNames);
+				    try {
+				        rowFileName = rowFileName.substring(rowFileName.indexOf("@"));
+				        rowsCache[i].put(rowFileName, currentrow);
+				    } catch (Exception e) {
+				    }
 				}
 			}
 		}

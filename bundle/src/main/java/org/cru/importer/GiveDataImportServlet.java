@@ -216,6 +216,12 @@ public class GiveDataImportServlet extends HttpServlet {
 	            } else {
 	                ValueMap globalProperties = globalConfigs.adaptTo(ValueMap.class);
 	                parametersCollector.setSanitizationMap(PropertiesUtil.toMap(globalProperties.get("sanitizationMap",String[].class), new String[]{}));
+	                String[] acceptedDateFormats = PropertiesUtil.toStringArray(globalProperties.get("acceptedDateFormats",String[].class), new String[]{});
+	                String[] trimmedAcceptedDateFormats = new String[acceptedDateFormats.length];
+	                for (int i = 0; i < acceptedDateFormats.length; i++) {
+	                    trimmedAcceptedDateFormats[i] = acceptedDateFormats[i].trim();
+	                }
+	                parametersCollector.setAcceptedDateFormats(trimmedAcceptedDateFormats);
 	            }
 			}
 		} catch (Exception e) {

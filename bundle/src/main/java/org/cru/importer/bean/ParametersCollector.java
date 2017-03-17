@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.jcr.Binary;
 
-import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.resource.ResourceResolver;
 
 public class ParametersCollector {
@@ -26,8 +25,9 @@ public class ParametersCollector {
 	private InputStream additionalMappingFile;
 	private Object additionalMappingCache = null;
 	private Map<String, String> sanitizationMap;
+	private String[] acceptedDateFormats;
 	
-	public String getBaselocation() {
+    public String getBaselocation() {
 		return baselocation;
 	}
 	
@@ -155,4 +155,11 @@ public class ParametersCollector {
         this.resourceResolver = resourceResolver;
     }
 
+    public String[] getAcceptedDateFormats() {
+        return acceptedDateFormats;
+    }
+    
+    public void setAcceptedDateFormats(String[] acceptedDateFormats) {
+       this.acceptedDateFormats = acceptedDateFormats;
+    }
 }

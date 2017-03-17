@@ -5,15 +5,15 @@ import java.util.Map;
 
 import javax.xml.transform.Source;
 
-import net.sf.saxon.lib.StandardURIResolver;
-import net.sf.saxon.trans.XPathException;
-
 import org.cru.importer.bean.ParametersCollector;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.sf.saxon.lib.StandardURIResolver;
+import net.sf.saxon.trans.XPathException;
 
 /**
  * Resolve specific URLs of give project.
@@ -78,9 +78,9 @@ public class GiveURIResolver extends StandardURIResolver {
 				}
 			}
 			return sourceFactory.resolve(parametersCollector, parameters);
-		} catch (Exception e) {
+        } catch (Exception e) {
 			LOGGER.error("Unable to load source factory for " + href, e);
-			throw new XPathException("Unable to load source factory for " + href);
+			throw new XPathException(e.getMessage());
 		}
 	}
 

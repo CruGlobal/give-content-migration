@@ -23,6 +23,10 @@
 	<xsl:param name="dDocName" />
 
 	<xsl:template match="/">
+	
+		<xsl:variable name="date" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
+		<xsl:variable name="dateText" select="fn:doc(concat('give://formatDate?outputformat=yyyy-MM-dd&amp;date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
+	
 		<sv:node sv:name="jcr:content">
 		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
 		        <sv:value>cq:PageContent</sv:value>
@@ -48,9 +52,16 @@
 		    <sv:property sv:name="author" sv:type="String">
 		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='by_line']" /></sv:value>
 		    </sv:property>
-		    <sv:property sv:name="date" sv:type="String">
-		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='by_line_date']" /></sv:value>
-		    </sv:property>
+		    <xsl:if test="$dateText != ''">
+		    	<sv:property sv:name="dateText" sv:type="String">
+		        	<sv:value><xsl:value-of select="$dateText" /></sv:value>
+		    	</sv:property>
+		    </xsl:if>
+		    <xsl:if test="$date != ''">
+		    	<sv:property sv:name="date" sv:type="Date">
+		        	<sv:value><xsl:value-of select="$date" /></sv:value>
+		    	</sv:property>
+		    </xsl:if>
 		    <sv:node sv:name="image">
 			    <sv:property sv:name="jcr:primaryType" sv:type="Name">
 			        <sv:value>nt:unstructured</sv:value>
