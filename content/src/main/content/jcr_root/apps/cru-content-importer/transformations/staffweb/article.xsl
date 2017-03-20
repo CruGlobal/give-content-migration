@@ -25,7 +25,7 @@
 	<xsl:template match="/">
 	
 		<xsl:variable name="date" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
-		<xsl:variable name="dateText" select="fn:doc(concat('give://formatDate?outputformat=yyyy-MM-dd&amp;date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
+		<xsl:variable name="dateText" select="fn:doc(concat('give://formatDate?outputformat=dd MMMM yyyy&amp;date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
 	
 		<sv:node sv:name="jcr:content">
 		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
