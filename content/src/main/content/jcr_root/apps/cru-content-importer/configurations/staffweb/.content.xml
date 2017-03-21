@@ -18,5 +18,22 @@
 		additionalMappingFile="{Boolean}false"
 		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>
+	
+	<handbook
+		jcr:primaryType="nt:unstructured"
+		title="Handbook"
+		defaultPath="/content/cru/us/en/staff"
+		pageTemplate="/apps/StaffWeb/components/page/content"
+		intermediateTemplate="/apps/StaffWeb/components/page/content"
+		transformation="/apps/cru-content-importer/transformations/staffweb/handbook.xsl"
+		rowColumnNames="{Long}0"
+		columnFileName="primaryFile"
+		columnMimeType=""
+		pathCreationStrategy="[finalUrl:(.*)\\..*:/$1]"
+		pageAcceptRule=""
+		factoryType="page"
+		additionalMappingFile="{Boolean}false"
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 
 </jcr:root>

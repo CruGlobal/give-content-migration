@@ -37,7 +37,8 @@
 	    jsLibs="[cq.widgets]"
 	    xtype="cruGiveDataImporter"
 	    options="[
-	    	/apps/cru-content-importer/configurations/staffweb/article
+	    	/apps/cru-content-importer/configurations/staffweb/article,
+	    	/apps/cru-content-importer/configurations/staffweb/handbook
 	    ]"
 	    tempStorePath="/var/cru-content-importer"
 	    />
