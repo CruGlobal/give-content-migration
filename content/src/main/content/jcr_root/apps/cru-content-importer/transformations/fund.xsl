@@ -26,8 +26,8 @@
 
 	<xsl:template match="/">
 		
-		<xsl:variable name="additionalMapping" select="fn:doc(concat('give://csvAdditionalMapping?keyColumn=TREATMENT_NUMBER&amp;keyValue=', fn:encode-for-uri($xSiebelWebTreatment)))"/>
-		<xsl:variable name="startDate" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri($additionalMapping/data/FUND_APPEAL_START_DATE)))"/>
+		<xsl:variable name="additionalMapping" select="fn:doc(concat('give://csvAdditionalMapping?keyColumn=TREATMENT_NUMBER&amp;keyValue=', fn:encode-for-uri($xSiebelWebTreatment), '&amp;priority=[CAMPAIGN_LAUNCHED_DT,LAST,DATE]'))"/>
+		<xsl:variable name="startDate" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri($additionalMapping/data/FUND_APPEAL_START_DT)))"/>
 		<xsl:variable name="letterDate" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
 
 		<sv:node sv:name="jcr:content">
