@@ -38,7 +38,8 @@
 	    xtype="cruGiveDataImporter"
 	    options="[
 	    	/apps/cru-content-importer/configurations/staffweb/article,
-	    	/apps/cru-content-importer/configurations/staffweb/handbook
+	    	/apps/cru-content-importer/configurations/staffweb/handbook,
+	    	/apps/cru-content-importer/configurations/staffweb/landingpage
 	    ]"
 	    tempStorePath="/var/cru-content-importer"
 	    />

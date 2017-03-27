@@ -17,7 +17,8 @@
       replacing all non alphanumeric characters by underscore
     =============================================== -->
 	<xsl:param name="dDocTitle" />
-
+	<xsl:param name="xDescription" />
+	
 	<xsl:template match="/">
 		<sv:node sv:name="jcr:content">
 		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
@@ -34,6 +35,9 @@
 		    </sv:property>
 		    <sv:property sv:name="jcr:title" sv:type="String">
 		        <sv:value><xsl:value-of select="$dDocTitle" /></sv:value>
+		    </sv:property>
+		    <sv:property sv:name="jcr:description" sv:type="String">
+		        <sv:value><xsl:value-of select="$xDescription" /></sv:value>
 		    </sv:property>
 		    <sv:property sv:name="subtitle" sv:type="String">
 		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='subtitle']" /></sv:value>
@@ -112,7 +116,7 @@
 				    <sv:property sv:name="sling:resourceType" sv:type="String">
 				        <sv:value>StaffWeb/components/section/text</sv:value>
 				    </sv:property>
-				     <sv:property sv:name="text" sv:type="String">
+				    <sv:property sv:name="text" sv:type="String">
 				     	<sv:value><xsl:value-of select="wcm:element[@name='section_content']" /></sv:value>
 				    </sv:property>
 		    	</sv:node>

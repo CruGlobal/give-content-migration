@@ -36,4 +36,20 @@
 		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 
+	<landingpage
+		jcr:primaryType="nt:unstructured"
+		title="Landingpage"
+		defaultPath="/content/cru/us/en/staff"
+		pageTemplate="/apps/StaffWeb/components/page/content"
+		intermediateTemplate="/apps/StaffWeb/components/page/content"
+		transformation="/apps/cru-content-importer/transformations/staffweb/landingpage.xsl"
+		rowColumnNames="{Long}0"
+		columnFileName="primaryFile"
+		columnMimeType=""
+		pathCreationStrategy="[finalUrl:(.*)\\..*:/$1]"
+		pageAcceptRule=""
+		factoryType="page"
+		additionalMappingFile="{Boolean}false"
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 </jcr:root>
