@@ -81,7 +81,7 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
 
     private CsvCache getCache(ParametersCollector parametersCollector, String key, String[] priority) {
         if (parametersCollector.getAdditionalMappingCache() == null) {
-            CsvCache csvCache = new CsvCache(key, priority);
+            CsvCache csvCache = new CsvCache(key, priority, parametersCollector);
             try {
                 CSVReader reader = new CSVReader(new InputStreamReader(parametersCollector.getAdditionalMappingFile()));
                 String[] row;
@@ -119,10 +119,12 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
         private Integer priorityColumnPos;
         private String priorityType;
         private Integer priorityOrder;
+        private ParametersCollector parametersCollector;
 
-        public CsvCache(String key, String[] priority) {
+        public CsvCache(String key, String[] priority, ParametersCollector parametersCollector) {
             super();
             this.key = key;
+            this.parametersCollector = parametersCollector;
             this.keyPos = -1;
             this.rowsCache = new HashMap<String, String[]>();
             if (priority != null) {
@@ -176,7 +178,7 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
         private boolean keepCacheRow(String cacheValue, String newValue) {
             if (DATE.equals(priorityType)) {
                 for (DateFormat formatter : ((formatDateSourceFactory) formatDateSourceFactory)
-                        .getIncomingDateFormatters()) {
+                        .getIncomingDateFormatters(parametersCollector)) {
                     try {
                         boolean result = formatter.parse(cacheValue)
                                 .compareTo(formatter.parse(newValue)) == priorityOrder;
