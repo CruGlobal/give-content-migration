@@ -14,7 +14,8 @@
 		MMMM.dd.yyyy,
 		dd.MMMM.yyyy,
 		dd MMMM yyyy,
-		dd-MMMM-yy]"
+		dd-MMMM-yy,
+		M/d/yyyy]"
 	sanitizationMap="[
 		&amp;ntilde;=&amp;amp;ntilde;,
 		&amp;ccedil;=&amp;amp;ccedil;,

@@ -1,6 +1,7 @@
 package org.cru.importer.bean;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.jcr.Binary;
@@ -23,9 +24,25 @@ public class ParametersCollector {
 	private String pageAcceptRule;
 	private String factoryType;
 	private InputStream additionalMappingFile;
-	private Object additionalMappingCache = null;
 	private Map<String, String> sanitizationMap;
 	private String[] acceptedDateFormats;
+	private Map<String, Object> cache;
+	
+	public ParametersCollector() {
+	    cache = new HashMap<String, Object>();
+	}
+	
+	public boolean isCached(String key) {
+	    return cache.containsKey(key);
+	}
+	
+	public void putCache(String key, Object value){
+	    cache.put(key, value);
+	}
+	
+	public Object getCached(String key) {
+	    return cache.get(key);
+	}
 	
     public String getBaselocation() {
 		return baselocation;
@@ -105,14 +122,6 @@ public class ParametersCollector {
 
 	public void setAdditionalMappingFile(InputStream additionalMappingFile) {
 		this.additionalMappingFile = additionalMappingFile;
-	}
-
-	public Object getAdditionalMappingCache() {
-		return additionalMappingCache;
-	}
-
-	public void setAdditionalMappingCache(Object additionalMappingCache) {
-		this.additionalMappingCache = additionalMappingCache;
 	}
 
 	public String[] getPathCreationStrategy() {

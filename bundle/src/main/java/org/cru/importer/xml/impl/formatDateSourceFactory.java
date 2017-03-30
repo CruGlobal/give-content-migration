@@ -43,11 +43,14 @@ import net.sf.saxon.trans.XPathException;
 public class formatDateSourceFactory implements GiveSourceFactory {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(formatDateSourceFactory.class);
+	
+    private static final String CACHE_DATE_FORMATS_KEY = "dateFormats";
+
 	private static final String AEM_FORMAT = "yyyy-MM-dd'T'hh:mm:ss.'000+00:00'";
-	private static final String PARAM_DATE = "date";
+    private static final DateFormat AEM_DATE_FORMATTER = new SimpleDateFormat(AEM_FORMAT, Locale.US);
+
+    private static final String PARAM_DATE = "date";
 	private static final String PARAM_OUTPUT_FORMAT = "outputformat";
-	private List<DateFormat> incomingDateFormatters = null;
-	private DateFormat aemDateFormatter = null;
 	
 	public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException {
 		Map<String, String> params;
@@ -57,48 +60,45 @@ public class formatDateSourceFactory implements GiveSourceFactory {
 			LOGGER.warn("Error parsing parmeters: " + parameters + "  - Error: " + e.getMessage());
 			params = new HashMap<String, String>();
 		}
-		Date extractedDate = null;
+		
 		String date = "";
 		if (params.containsKey(PARAM_DATE) && !params.get(PARAM_DATE).equals("")) {
 			String origDate = params.get(PARAM_DATE);
-			for (DateFormat formatter : getIncomingDateFormatters(parametersCollector)) {
-				try {
-					extractedDate = formatter.parse(origDate);
-					break;
-				} catch (ParseException e) {
-				}
-			}
-			if (extractedDate != null) {
-			    String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
-			    if (outputFormat!=null && !"".equals(outputFormat)){
-			        date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);
-			    } else {
-			        date = getAemDateFormatter().format(extractedDate);
-			    }
-			} else {
-			    throw new XPathException("Invalid date format: "+origDate);
-			}
+			Date extractedDate = parseDate(parametersCollector, origDate);
+		    String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
+		    if (outputFormat!=null && !"".equals(outputFormat)){
+		        date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);
+		    } else {
+		        date = AEM_DATE_FORMATTER.format(extractedDate);
+		    }
 		}
 		date = "<date>" + date + "</date>";
 		InputStream stream = new ByteArrayInputStream(date.getBytes(StandardCharsets.UTF_8));
 		return new StreamSource(stream);
 	}
+	
+	public Date parseDate(ParametersCollector parametersCollector, String origDate) throws XPathException {
+        for (DateFormat formatter : getIncomingDateFormatters(parametersCollector)) {
+            try {
+                Date extractedDate = formatter.parse(origDate);
+                return extractedDate;
+            } catch (ParseException e) {
+            }
+        }
+        throw new XPathException("Invalid date format: " + origDate);
+	}
 
-	public List<DateFormat> getIncomingDateFormatters(ParametersCollector parametersCollector) {
-		if (incomingDateFormatters == null) {
-			incomingDateFormatters = new LinkedList<DateFormat>();
+	@SuppressWarnings("unchecked")
+    public List<DateFormat> getIncomingDateFormatters(ParametersCollector parametersCollector) {
+	    if (!parametersCollector.isCached(CACHE_DATE_FORMATS_KEY)) {
+	        List<DateFormat> incomingDateFormatters = new LinkedList<DateFormat>();
 			for (String format : parametersCollector.getAcceptedDateFormats()) {
 				incomingDateFormatters.add(new SimpleDateFormat(format, Locale.US));
 			}
+			parametersCollector.putCache(CACHE_DATE_FORMATS_KEY, incomingDateFormatters);
+			return incomingDateFormatters;
 		}
-		return incomingDateFormatters;
-	}
-
-	public DateFormat getAemDateFormatter() {
-		if (aemDateFormatter == null) {
-			aemDateFormatter = new SimpleDateFormat(AEM_FORMAT, Locale.US);
-		}
-		return aemDateFormatter;
+		return (List<DateFormat>) parametersCollector.getCached(CACHE_DATE_FORMATS_KEY);
 	}
 
 }

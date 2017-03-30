@@ -6,8 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +38,8 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AdditionalCSVMappingSourceFactory.class);
 
+    private static final String CACHE_CSV_MAPPING_KEY = "csvMapping";
+    
     private static final String PARAM_KEY_COLUMN = "keyColumn";
     private static final String PARAM_KEY_VALUE = "keyValue";
 
@@ -72,15 +73,14 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
         String[] result = null;
         if (!Strings.isNullOrEmpty(param)) {
             String[] arrays = param.split("\\[");
-
             String actual = arrays[1].split("\\]")[0];
             result = actual.split(",");
         }
         return result;
     }
 
-    private CsvCache getCache(ParametersCollector parametersCollector, String key, String[] priority) {
-        if (parametersCollector.getAdditionalMappingCache() == null) {
+    private CsvCache getCache(ParametersCollector parametersCollector, String key, String[] priority) throws XPathException {
+        if (!parametersCollector.isCached(CACHE_CSV_MAPPING_KEY)) {
             CsvCache csvCache = new CsvCache(key, priority, parametersCollector);
             try {
                 CSVReader reader = new CSVReader(new InputStreamReader(parametersCollector.getAdditionalMappingFile()));
@@ -98,10 +98,10 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
             } catch (IOException e) {
                 LOGGER.error("Error loading CSV file", e);
             }
-            parametersCollector.setAdditionalMappingCache(csvCache);
+            parametersCollector.putCache(CACHE_CSV_MAPPING_KEY, csvCache);
             return csvCache;
         } else {
-            return (CsvCache) parametersCollector.getAdditionalMappingCache();
+            return (CsvCache) parametersCollector.getCached(CACHE_CSV_MAPPING_KEY);
         }
     }
 
@@ -164,7 +164,7 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
             }
         }
 
-        public void addDataRow(String[] dataRow) {
+        public void addDataRow(String[] dataRow) throws XPathException {
             String keyValue = dataRow[this.keyPos];
             String[] cacheRow = this.rowsCache.get(keyValue);
             if (cacheRow != null && priorityColumnPos != null) {
@@ -175,18 +175,12 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
             this.rowsCache.put(keyValue, dataRow);
         }
 
-        private boolean keepCacheRow(String cacheValue, String newValue) {
+        private boolean keepCacheRow(String cacheValue, String newValue) throws XPathException {
             if (DATE.equals(priorityType)) {
-                for (DateFormat formatter : ((formatDateSourceFactory) formatDateSourceFactory)
-                        .getIncomingDateFormatters(parametersCollector)) {
-                    try {
-                        boolean result = formatter.parse(cacheValue)
-                                .compareTo(formatter.parse(newValue)) == priorityOrder;
-                        return result;
-                    } catch (ParseException e) {
-                        LOGGER.debug("Error parsing Dates " + formatter.toString(), e);
-                    }
-                }
+                formatDateSourceFactory dateFormatter = ((formatDateSourceFactory) formatDateSourceFactory);
+                Date cacheDate = dateFormatter.parseDate(parametersCollector, cacheValue);
+                Date newDate = dateFormatter.parseDate(parametersCollector, newValue);
+                return cacheDate.compareTo(newDate) == priorityOrder;
             } else if (INT.equals(priorityType)) {
                 Integer cacheInt = Integer.parseInt(cacheValue);
                 Integer newInt = Integer.parseInt(newValue);
