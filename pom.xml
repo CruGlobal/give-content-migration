@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <!-- ====================================================================== -->
     <!-- P A R E N T P R O J E C T D E S C R I P T I O N -->
@@ -97,71 +98,73 @@
                 <version>4.8.1</version>
                 <scope>test</scope>
             </dependency>
-			<dependency>
-				<groupId>org.apache.sling</groupId>
-				<artifactId>org.apache.sling.commons.json</artifactId>
-				<version>2.0.6</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>2.4</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.poi</groupId>
-				<artifactId>poi-ooxml</artifactId>
-				<version>3.8</version>
-				<scope>provided</scope>
-			</dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.commons.json</artifactId>
+                <version>2.0.6</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>3.8</version>
+                <scope>provided</scope>
+            </dependency>
             <dependency>
                 <groupId>com.day.cq</groupId>
                 <artifactId>cq-commons</artifactId>
                 <version>5.9.22</version>
                 <scope>provided</scope>
             </dependency>
-			<dependency>
-				<groupId>com.day.cq.wcm</groupId>
-				<artifactId>cq-wcm-api</artifactId>
-				<version>5.7.2</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.adobe.aem</groupId>
-				<artifactId>aem-api</artifactId>
-				<version>6.0.0.1</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.sling</groupId>
-				<artifactId>org.apache.sling.models.api</artifactId>
-				<version>1.2.2</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency> 
-			    <groupId>org.apache.geronimo.specs</groupId> 
-			    <artifactId>geronimo-atinject_1.0_spec</artifactId>
-			    <version>1.0</version> 
-			    <scope>provided</scope> 
-			</dependency>
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-lang3</artifactId>
-				<version>3.3.2</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-			    <groupId>joda-time</groupId>
-			    <artifactId>joda-time</artifactId>
-			    <version>2.7</version>
-			    <scope>provided</scope>
-			</dependency>
-			<dependency>
-			    <groupId>org.jsoup</groupId>
-			    <artifactId>jsoup</artifactId>
-			    <version>1.9.2</version>
-			</dependency>
+            <dependency>
+                <groupId>com.day.cq.wcm</groupId>
+                <artifactId>cq-wcm-api</artifactId>
+                <version>5.7.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <!-- Adobe's Uber Jar -->
+            <dependency>
+                <groupId>com.adobe.aem</groupId>
+                <artifactId>uber-jar</artifactId>
+                <version>6.2.0</version>
+                <classifier>apis</classifier>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.models.api</artifactId>
+                <version>1.2.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-atinject_1.0_spec</artifactId>
+                <version>1.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.3.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.7</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>1.9.2</version>
+            </dependency>
             <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
@@ -171,11 +174,9 @@
         </dependencies>
     </dependencyManagement>
 
-    <!--
-        Inclusion of repositories in POMs is controversial, to say the least.
-        It would be best if you proxied the Adobe repository using a Maven
-        Repository Manager. Once you do that, remove these sections.
-     -->
+    <!-- Inclusion of repositories in POMs is controversial, to say the least. 
+        It would be best if you proxied the Adobe repository using a Maven Repository 
+        Manager. Once you do that, remove these sections. -->
     <repositories>
         <repository>
             <id>adobe</id>
@@ -256,7 +257,7 @@
                         <password>${crx.password}</password>
                     </configuration>
                 </plugin>
-                <!--This plugin's configuration is used to store Eclipse
+                <!--This plugin's configuration is used to store Eclipse 
                     m2e settings only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -281,7 +282,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore/>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -313,8 +314,8 @@
             </build>
         </profile>
     </profiles>
-  <modules>
-    <module>bundle</module>
-    <module>content</module>
-  </modules>
+    <modules>
+        <module>bundle</module>
+        <module>content</module>
+    </modules>
 </project>
