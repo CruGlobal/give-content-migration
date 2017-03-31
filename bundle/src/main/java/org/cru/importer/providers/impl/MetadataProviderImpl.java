@@ -3,6 +3,8 @@ package org.cru.importer.providers.impl;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -20,7 +22,7 @@ import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.MetadataProvider;
 
 /**
- * Extract the metadata for Give import process
+ * Extract the metadata for Give import process (From Excel file)
  * 
  * @author Nestor de Dios
  *
@@ -63,6 +65,22 @@ public class MetadataProviderImpl implements MetadataProvider {
 		}
 	}
 
+
+    public String decodePropertyName(String propertyName) throws Exception {
+        if (colnames.containsKey(propertyName)) {
+            return propertyName;
+        } else {
+            Pattern pattern = Pattern.compile(propertyName);
+            for (String key : colnames.keySet()) {
+                Matcher m = pattern.matcher(key);
+                if (m.find()) {
+                    return key;
+                }
+            }
+            throw new Exception("Excel file does not contain a column matching with: " + propertyName);
+        }
+    }
+	
 	public ResourceMetadata getMetadata(String filename) throws Exception {
 		// Step 1: Find the filename in the Excel file
 		String partialName;

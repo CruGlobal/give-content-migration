@@ -29,8 +29,8 @@ public class PageImportFactoryImpl implements DataImportFactory {
 		return new MetadataProviderImpl(parametersCollector);
 	}
 
-	public ResourceProvider createResourceProvider(ParametersCollector parametersCollector) throws Exception {
-		return new PageProviderImpl(parametersCollector);
+	public ResourceProvider createResourceProvider(ParametersCollector parametersCollector, MetadataProvider metadataProvider) throws Exception {
+		return new PageProviderImpl(parametersCollector, metadataProvider);
 	}
 
 	public ContentMapperProvider createContentMapperProvider(ParametersCollector parametersCollector) throws Exception {

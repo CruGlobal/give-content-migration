@@ -19,4 +19,14 @@ public interface MetadataProvider {
 	 */
 	public ResourceMetadata getMetadata(String filename) throws Exception;
 	
+	/**
+	 * Decodes a property name of the metadata provider from the given name.
+	 * The given name can be a property name or a regex to match with a property name.
+	 * 
+	 * @param propertyName
+	 * @return
+	 * @throws Exception 
+	 */
+	public String decodePropertyName(String propertyName) throws Exception;
+	
 }

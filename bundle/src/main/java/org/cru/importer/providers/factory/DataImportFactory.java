@@ -28,10 +28,11 @@ public interface DataImportFactory {
 	 * Cretes a resource provider
 	 * 
 	 * @param parametersCollector
+	 * @param metadataProvider 
 	 * @return
 	 * @throws Exception
 	 */
-	public ResourceProvider createResourceProvider(ParametersCollector parametersCollector) throws Exception;
+	public ResourceProvider createResourceProvider(ParametersCollector parametersCollector, MetadataProvider metadataProvider) throws Exception;
 	
 	/**
 	 * Creates a content mapper provider

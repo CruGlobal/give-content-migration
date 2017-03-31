@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.cru.importer.providers.MetadataProvider;
+
 /**
  * Section of a relative path to build the final resource path
  * 
@@ -23,13 +25,14 @@ public class RelativePathSection {
 		this.replacement = replacement;
 	}
 
-	public static List<RelativePathSection> buildFromStrategy(String[] strategy) {
+	public static List<RelativePathSection> buildFromStrategy(MetadataProvider metadataProvider, String[] strategy) throws Exception {
 		List<RelativePathSection> result = new LinkedList<RelativePathSection>();
 		for (int i=0;i<strategy.length;i++) {
 			String[] path = strategy[i].split(":");
 			String paramName = path[0];
 			String replacement = path[2];
 			Pattern pattern = Pattern.compile(path[1]);
+			paramName = metadataProvider.decodePropertyName(paramName);
 			RelativePathSection section = new RelativePathSection(paramName, pattern, replacement);
 			result.add(section);
 		}

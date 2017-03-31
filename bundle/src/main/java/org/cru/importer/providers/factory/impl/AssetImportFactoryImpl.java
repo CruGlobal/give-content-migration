@@ -29,8 +29,8 @@ public class AssetImportFactoryImpl implements DataImportFactory {
 		return new MetadataProviderImpl(parametersCollector);
 	}
 
-	public ResourceProvider createResourceProvider(ParametersCollector parametersCollector) throws Exception {
-		return new AssetProviderImpl(parametersCollector);
+	public ResourceProvider createResourceProvider(ParametersCollector parametersCollector, MetadataProvider metadataProvider) throws Exception {
+		return new AssetProviderImpl(parametersCollector, metadataProvider);
 	}
 
 	public ContentMapperProvider createContentMapperProvider(ParametersCollector parametersCollector) throws Exception {

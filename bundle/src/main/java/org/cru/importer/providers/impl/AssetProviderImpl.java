@@ -15,6 +15,7 @@ import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.RelativePathSection;
 import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ResourceMetadata;
+import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.ResourceProvider;
 
 import com.day.cq.commons.jcr.JcrUtil;
@@ -37,12 +38,12 @@ public class AssetProviderImpl implements ResourceProvider {
 	private String columnMimeType;
 	private ResourceResolver resolver;
 	
-	public AssetProviderImpl(ParametersCollector parametersCollector) {
+	public AssetProviderImpl(ParametersCollector parametersCollector, MetadataProvider metadataProvider) throws Exception {
 		this.resolver = parametersCollector.getResourceResolver();
 		this.assetManager = resolver.adaptTo(AssetManager.class);
 		this.session = resolver.adaptTo(Session.class);
 		this.baselocation = resolver.getResource(parametersCollector.getBaselocation()).adaptTo(Node.class);
-		this.pathSections = RelativePathSection.buildFromStrategy(parametersCollector.getPathCreationStrategy());
+		this.pathSections = RelativePathSection.buildFromStrategy(metadataProvider, parametersCollector.getPathCreationStrategy());
 		this.columnMimeType = parametersCollector.getColumnMimeType();
 		if (parametersCollector.getPageAcceptRule().equals("")) {
 			this.pageAcceptRuleKey = null;

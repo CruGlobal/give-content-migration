@@ -8,6 +8,7 @@ import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.RelativePathSection;
 import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ResourceMetadata;
+import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.ResourceProvider;
 
 import com.day.cq.wcm.api.Page;
@@ -29,12 +30,12 @@ public class PageProviderImpl implements ResourceProvider {
 	private String pageAcceptRuleKey;
 	private String pageAcceptRuleValue;
 	
-	public PageProviderImpl(ParametersCollector parametersCollector) {
+	public PageProviderImpl(ParametersCollector parametersCollector, MetadataProvider metadataProvider) throws Exception {
 		this.pageManager = parametersCollector.getResourceResolver().adaptTo(PageManager.class);
 		this.baselocation = parametersCollector.getBaselocation();
 		this.pageTemplate = parametersCollector.getPageTemplate();
 		this.intermediateTemplate = parametersCollector.getIntermediateTemplate();
-		this.pathSections = RelativePathSection.buildFromStrategy(parametersCollector.getPathCreationStrategy());
+		this.pathSections = RelativePathSection.buildFromStrategy(metadataProvider, parametersCollector.getPathCreationStrategy());
 		if (parametersCollector.getPageAcceptRule().equals("")) {
 			this.pageAcceptRuleKey = null;
 			this.pageAcceptRuleValue = null;

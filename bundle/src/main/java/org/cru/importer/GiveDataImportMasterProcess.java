@@ -70,7 +70,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 		try {
 			DataImportFactory dataImportFactory = getDataImporFactory(parametersCollector);
 			MetadataProvider metadataProvider = dataImportFactory.createMetadataProvider(parametersCollector);
-			ResourceProvider resourceProvider = dataImportFactory.createResourceProvider(parametersCollector);
+			ResourceProvider resourceProvider = dataImportFactory.createResourceProvider(parametersCollector, metadataProvider);
 			ContentMapperProvider contentMapperProvider = dataImportFactory.createContentMapperProvider(parametersCollector);
 			in = parametersCollector.getContentFile().getStream();
 			ZipInputStream zis = new ZipInputStream(in);
