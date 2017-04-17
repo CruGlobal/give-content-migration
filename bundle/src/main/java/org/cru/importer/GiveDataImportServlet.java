@@ -108,36 +108,46 @@ public class GiveDataImportServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	        throws ServletException, IOException {
-	    LOGGER.info("Generating status updates");
-	    response.setStatus(200);
-        response.setContentType("text/event-stream");
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Cache-Control","no-cache");
-        response.setHeader("Connection","keep-alive");
-	    final AsyncContext asyncContext = request.startAsync();
-        asyncContext.setTimeout(0);
-	    resultsCollector.addObserver(new Observer() {
-            public void update(Observable o, Object arg) {
-                try {
-                    ProcessMessage message = (ProcessMessage) arg;
-                    HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
-                    response.getOutputStream().print("data: " + message.toString() + "\n\n");
-                    response.getOutputStream().flush();
-                    if (message.getType().equals(ProcessMessage.FINISH)) {
-                        resultsCollector.deleteObserver(this);
-                        asyncContext.complete();
+	    String check = request.getParameter("check");
+	    if (check == null) {
+    	    LOGGER.info("Generating status updates");
+    	    response.setStatus(200);
+            response.setContentType("text/event-stream");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control","no-cache");
+            response.setHeader("Connection","keep-alive");
+    	    final AsyncContext asyncContext = request.startAsync();
+            asyncContext.setTimeout(0);
+    	    resultsCollector.addObserver(new Observer() {
+                public void update(Observable o, Object arg) {
+                    try {
+                        ProcessMessage message = (ProcessMessage) arg;
+                        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
+                        response.getOutputStream().print("data: " + message.toString() + "\n\n");
+                        response.getOutputStream().flush();
+                        if (message.getType().equals(ProcessMessage.FINISH)) {
+                            resultsCollector.deleteObserver(this);
+                            asyncContext.complete();
+                        }
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
                     }
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
                 }
+            });
+            response.getOutputStream().print("event: open\n\n");
+            for (ProcessMessage message: resultsCollector.getCachedMessages()) {
+                response.getOutputStream().print("data: " + message.toString() + "\n\n");
             }
-        });
-        response.getOutputStream().print("event: open\n\n");
-        for (ProcessMessage message: resultsCollector.getCachedMessages()) {
-            response.getOutputStream().print("data: " + message.toString() + "\n\n");
-        }
-        resultsCollector.clearCachedMessages();
-        response.getOutputStream().flush();
+            resultsCollector.clearCachedMessages();
+            response.getOutputStream().flush();
+	    } else {
+	        if (resultsCollector.isRunning()) {
+	            response.setStatus(200);
+	            response.getWriter().write(ProcessMessage.createRunningMessage().toString());
+	        } else {
+	            response.setStatus(204);
+	        }
+	    }
 	}
 
 	private boolean validateParams(HttpServletRequest request, ParametersCollector parametersCollector, ResultsCollector resultsCollector) throws ServletException, IOException {

@@ -1,10 +1,9 @@
 cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
-    props: null,
-    conn:new CQ.Ext.data.Connection(),
-    data:null,
+
     resultsTemplate:null,
     resultsFrame:null,
     resultsDiv:null,
+
     constructor: function(config) {
         this.debug = config.debug;
         
@@ -102,38 +101,12 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                       waitTitle: "Processing",
                       waitMsg: "Starting process...",
                       success: function(form, action){
-                           try {
-                               var data = JSON.parse(action.response.responseXML.body.innerText);
-                               CQ.Ext.getCmp("importer-container").showResults(data);
-                           } catch(e) {
-                               console.log(e);
-                           }
-                           var source = new EventSource('/services/givedataimport');
-                           source.onmessage=function(event) {
-                               var data = JSON.parse(event.data);
-                               CQ.Ext.getCmp("importer-container").showResults(data);
-                               if (data.type=="finished") {
-                                   source.close();
-                               }
-                           };
-                           return true;
+                          CQ.Ext.getCmp("importer-container").processResponse(action.response.responseXML.body.innerText);
+                          return true;
                       },
                       failure: function(form, action){
-                           try {
-                               var data = JSON.parse(action.response.responseXML.body.innerText);
-                               CQ.Ext.getCmp("importer-container").showResults(data);
-                           } catch(e) {
-                               console.log(e);
-                           }
-                           var source = new EventSource('/services/givedataimport');
-                           source.onmessage=function(event) {
-                               var data = JSON.parse(event.data);
-                               CQ.Ext.getCmp("importer-container").showResults(data);
-                               if (data.type=="finished") {
-                                   source.close();
-                               }
-                           };
-                           return true;
+                          CQ.Ext.getCmp("importer-container").processResponse(action.response.responseXML.body.innerText);
+                          return true;
                       }
                   };
                   var importer = CQ.Ext.getCmp("importer-container");
@@ -186,9 +159,51 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                         ]
                     }
                 ]
-            }]
+            }],
+            "listeners" : {
+                "afterrender" : function(viewport){
+                    var importer = CQ.Ext.getCmp("importer-container");
+                    importer.resultsTemplate = CQ.HTTP.get('/etc/clientlibs/cru-content-importer/widgets/import-results.html').responseText;
+                    importer.checkRunning();
+                }
+            }
         });
-        cru.importers.giveDataImporter.resultsTemplate = CQ.HTTP.get('/etc/clientlibs/cru-content-importer/widgets/import-results.html');
+    },
+
+    checkRunning : function() {
+        CQ.Ext.Ajax.request({
+            url: '/services/givedataimport?check=true',
+            success: function(response, opts) {
+                // Possible responses:
+                // - 200 (process already running)
+                // - 204 (process not running)
+                if (response.status == 200) {
+                    var importer = CQ.Ext.getCmp("importer-container");
+                    importer.initResults();
+                    importer.processResponse(response.responseText);
+                }
+            },
+            failure: function(response, opts) {
+                console.log('server-side failure with status code ' + response.status);
+            }
+        });
+    },
+    
+    processResponse: function(response) {
+        try {
+            var data = JSON.parse(response);
+            CQ.Ext.getCmp("importer-container").showResults(data);
+        } catch(e) {
+            console.log(e);
+        }
+        var source = new EventSource('/services/givedataimport');
+        source.onmessage=function(event) {
+            var data = JSON.parse(event.data);
+            CQ.Ext.getCmp("importer-container").showResults(data);
+            if (data.type=="finished") {
+                source.close();
+            }
+        };
     },
     
     initComponent: function() {
@@ -196,10 +211,14 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
     },
     
     initResults: function() {
+        var importer = CQ.Ext.getCmp("importer-container");
         var results = document.getElementById('importer-results');
-        results.srcdoc = cru.importers.giveDataImporter.resultsTemplate.responseText;
-        cru.importers.giveDataImporter.resultsFrame = null;
-        cru.importers.giveDataImporter.resultsDiv = null;
+        var iframeDocument = results.contentWindow.document;
+        iframeDocument.open('text/html', 'replace');
+        iframeDocument.write(importer.resultsTemplate);
+        iframeDocument.close();
+        importer.resultsFrame = null;
+        importer.resultsDiv = null;
     },
 
     showResults: function(data) {
@@ -218,19 +237,20 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
     },
     
     addResult: function(content) {
-        var results = cru.importers.giveDataImporter.resultsFrame;
+        var importer = CQ.Ext.getCmp("importer-container");
+        var results = importer.resultsFrame;
         if (results==null) {
             results = document.getElementById('importer-results').contentWindow;
-            cru.importers.giveDataImporter.resultsDiv = results.document.getElementById("results-content");
-            cru.importers.giveDataImporter.resultsFrame = results;
+            importer.resultsDiv = results.document.getElementById("results-content");
+            importer.resultsFrame = results;
         }
         var contentNode = results.document.createElement('div');
         contentNode.innerHTML = content;
         for (var i = 0; i < contentNode.childNodes.length; i++) {
-            cru.importers.giveDataImporter.resultsDiv.appendChild(contentNode.childNodes[i]);
+            importer.resultsDiv.appendChild(contentNode.childNodes[i]);
         }
         contentNode = results.document.createElement('br');
-        cru.importers.giveDataImporter.resultsDiv.appendChild(contentNode);
+        importer.resultsDiv.appendChild(contentNode);
         results.scrollTo(0, 100000);
     },
 

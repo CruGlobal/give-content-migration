@@ -71,6 +71,10 @@ public class ResultsCollector extends Observable {
         }
     }
 
+    public boolean isRunning() {
+        return isRunning;
+    }
+
     public Thread getCurrentProcess() {
         return currentProcess;
     }
