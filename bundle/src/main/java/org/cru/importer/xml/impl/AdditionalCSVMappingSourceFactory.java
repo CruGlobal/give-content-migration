@@ -24,10 +24,16 @@ import com.opencsv.CSVReader;
 
 import net.sf.saxon.trans.XPathException;
 
-@Component(metatype = true, label = "Give importer - csvAdditionalMapping", description = "Get additional mapping data from a CSV source. Use the formatDate URL with parameter keyColumn and keyValue")
+@Component(
+    metatype = true,
+    label = "Give importer - csvAdditionalMapping",
+    description = "Get additional mapping data from a CSV source. Use the formatDate URL with parameter keyColumn and keyValue"
+)
 @Service
-@Properties({ @Property(name = GiveSourceFactory.OSGI_PROPERTY_TYPE, value = "csvAdditionalMapping"),
-        @Property(name = Constants.SERVICE_RANKING, intValue = 1) })
+@Properties({
+    @Property(name = GiveSourceFactory.OSGI_PROPERTY_TYPE, value = "csvAdditionalMapping"),
+    @Property(name = Constants.SERVICE_RANKING, intValue = 1)
+})
 public class AdditionalCSVMappingSourceFactory extends GiveSourceFactoryBase {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AdditionalCSVMappingSourceFactory.class);

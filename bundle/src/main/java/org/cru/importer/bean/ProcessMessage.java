@@ -10,6 +10,7 @@ public class ProcessMessage {
     public static final String NOT_MODIFIED = "notModified";
     public static final String IGNORED = "ignored";
     public static final String ERROR = "error";
+    public static final String WARNING = "warning";
     
     private String type;
 
@@ -60,6 +61,10 @@ public class ProcessMessage {
     
     public static ProcessMessage createRunningMessage() {
         return new ProcessMessage(RUNNING, "");
+    }
+
+    public static ProcessMessage createWarningMessage(String description) {
+        return new ProcessMessage(WARNING, description);
     }
     
 }

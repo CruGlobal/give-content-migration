@@ -12,9 +12,11 @@ import javax.jcr.Session;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
 import org.osgi.framework.Constants;
@@ -48,6 +50,9 @@ public class ImageSourceFactory extends GiveSourceFactoryBase {
 	private static final String IMAGE_ID_EXRACTOR_REGEX = "wcmUrl\\(\\s*?'.*?'\\s*?,\\s*?'(.*?)'"; // TODO: Move to service property
 	private static Pattern pattern = Pattern.compile(IMAGE_ID_EXRACTOR_REGEX);
 
+    @Reference
+    private ResultsCollector resultsCollector;
+	
     @Override
     protected String resolve(ParametersCollector parametersCollector, Map<String, String> params)
             throws XPathException {
@@ -100,9 +105,10 @@ public class ImageSourceFactory extends GiveSourceFactoryBase {
 			if (hits.size() > 0) {
 				return hits.get(0).getPath();
 			} else {
-				LOGGER.warn("Image " + imageCode + " cannot be found");
+			    String message = "Image " + imageCode + " cannot be found";
+				LOGGER.warn(message);
+				resultsCollector.addWarning(message);
 				return "";
-				//throw new XPathException("Image " + imageCode + " cannot be found");
 			}
 		} catch (RepositoryException e) {
 			throw new XPathException("Cannot get the image path for " + imageCode);

@@ -1,86 +1,30 @@
 package org.cru.importer.bean;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Observable;
+import java.util.Observer;
 
-public class ResultsCollector extends Observable {
-	
-	private List<ProcessMessage> cachedMessages;
-	private boolean isRunning;
-	private int errors;
-	private Thread currentProcess;
+public interface ResultsCollector {
 
-	public ResultsCollector() {
-		cachedMessages =  new LinkedList<ProcessMessage>();
-		isRunning = false;
-		errors = 0;
-	}
-	
-	public void addCreatedPage(String page) {
-	    addMessage(ProcessMessage.createCreatedMessage(page));
-	}
-	
-    public void addModifiedPage(String page) {
-        addMessage(ProcessMessage.createModifiedMessage(page));
-	}
+    void addCreatedPage(String page);
 
-	public void addNotModifiedPage(String page) {
-	    addMessage(ProcessMessage.createNotModifiedMessage(page));
-	}
-	
-	public void addError(String page) {
-	    errors++;
-	    addMessage(ProcessMessage.createErrorMessage(page));
-	}
+    void addModifiedPage(String page);
 
-	public void addIgnoredPages(String page) {
-	    addMessage(ProcessMessage.createIgnoredMessage(page));
-	}
-	
-    private void addMessage(ProcessMessage message) {
-        if (super.countObservers() > 0) {
-            super.setChanged();
-            super.notifyObservers(message);
-        } else {
-            cachedMessages.add(message);
-        }
-    }
+    void addNotModifiedPage(String page);
+
+    void addError(String page);
+
+    void addIgnoredPages(String page);
+
+    void addFinishMessage();
+
+    List<ProcessMessage> getCachedMessages();
+
+    void clearCachedMessages();
     
-    public List<ProcessMessage> getCachedMessages() {
-        return cachedMessages;
-    }
-
-    public void clearCachedMessages() {
-        cachedMessages.clear();
-    }
-
-    public void stopRunning() {
-        this.isRunning = false;
-        super.setChanged();
-        super.notifyObservers(ProcessMessage.createFinishMessage(errors));
-        this.errors = 0;
-    }
+    void addObserver(Observer o);
     
-    public synchronized boolean checkRunning() {
-        if (isRunning) {
-            return true;
-        } else {
-            isRunning = true;
-            return false;
-        }
-    }
+    void deleteObserver(Observer o);
 
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    public Thread getCurrentProcess() {
-        return currentProcess;
-    }
-
-    public void setCurrentProcess(Thread currentProcess) {
-        this.currentProcess = currentProcess;
-    }
+    void addWarning(String message);
 
 }

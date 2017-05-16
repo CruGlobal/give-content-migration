@@ -37,9 +37,9 @@ public class ClearHTMLTextFactory extends GiveSourceFactoryBase {
         if (params.containsKey(PARAM_TEXT) && !params.get(PARAM_TEXT).equals("")) {
             String htmlSourceParameter = params.get(PARAM_TEXT);
             if (htmlSourceParameter != null) {
-                Document doc = Jsoup.parse( htmlSourceParameter );
+                Document doc = Jsoup.parse(htmlSourceParameter);
                 doc.outputSettings().charset("UTF-8");
-                plainText = Jsoup.clean( doc.body().html(), Whitelist.simpleText() );
+                plainText = Jsoup.clean(doc.body().html(), Whitelist.simpleText());
             }
         }
         return "<plaintext>" + plainText + "</plaintext>";

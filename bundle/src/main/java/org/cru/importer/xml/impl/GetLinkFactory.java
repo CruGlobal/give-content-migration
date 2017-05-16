@@ -45,7 +45,7 @@ public class GetLinkFactory extends GiveSourceFactoryBase {
     }
 
     private String extractLink(String htmlSourceParameter) {
-        Document doc = Jsoup.parse( htmlSourceParameter );
+        Document doc = Jsoup.parse(htmlSourceParameter);
         String link = doc.select(TAG_A).attr(ATTRIB_HREF);
         if(!link.startsWith("http")){
             //TODO: TBD how to process internal links

@@ -73,7 +73,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 		try {
 			initTransformedKeys(metadata.getPropertyNames());
 			
-			// Copy the stream to be sure is not closed prematurelly
+			// Copy the stream to be sure is not closed prematurely
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			IOUtils.copy(xmlInputStream, baos);
 

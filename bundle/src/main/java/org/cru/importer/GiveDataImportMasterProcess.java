@@ -12,6 +12,7 @@ import javax.jcr.Session;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.cru.importer.bean.CurrentStatus;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ResourceMetadata;
@@ -42,27 +43,30 @@ public class GiveDataImportMasterProcess implements Runnable {
 	private Session session;
 	private ParametersCollector parametersCollector;
 	private ResultsCollector resultsCollector;
+	private CurrentStatus currentStatus;
 
 	/**
 	 * Implementation for Runnable
 	 */
     public void run() {
         runProcessInternal();
-        resultsCollector.setCurrentProcess(null);
+        currentStatus.setCurrentProcess(null);
     }
 
     /**
      * Starts the import process. Iterate over all xml files contained in the zip file and process each one.
      * @param parametersCollector
      * @param resultsCollector
+     * @param currentStatus
      */
-    public void runProcess(ParametersCollector parametersCollector, ResultsCollector resultsCollector) {
+    public void runProcess(ParametersCollector parametersCollector, ResultsCollector resultsCollector, CurrentStatus currentStatus) {
         this.session = parametersCollector.getResourceResolver().adaptTo(Session.class);
         this.parametersCollector = parametersCollector;
         this.resultsCollector = resultsCollector;
+        this.currentStatus = currentStatus;
         Thread thread = new Thread(this);
         thread.start();
-        resultsCollector.setCurrentProcess(thread);
+        currentStatus.setCurrentProcess(thread);
     }
 
 	private void runProcessInternal() {
@@ -133,7 +137,8 @@ public class GiveDataImportMasterProcess implements Runnable {
 		    LOGGER.error("Import proccess failed.", e);
 			resultsCollector.addError(e.getMessage());
 		} finally {
-		    resultsCollector.stopRunning();
+            currentStatus.stopRunning();
+		    resultsCollector.addFinishMessage();
 			IOUtils.closeQuietly(in);
 		}
 	}

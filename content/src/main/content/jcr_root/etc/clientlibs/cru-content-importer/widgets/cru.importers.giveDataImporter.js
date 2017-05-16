@@ -232,6 +232,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
             case "notModified": content = "<div class='action ignore'>Not Modified</div><div class='title'></div><div class='path'>" + data.description + "</div>"; break;
             case "ignored": content = "<div class='action ignore'>Ignored (not modified)</div><div class='title'></div><div class='path'>" + data.description + "</div>"; break;
             case "error": content = "<div class='action error'>Error</div><div class='title'></div><div class='path'>" + data.description + "</div>"; break;
+            case "warning": content = "<div class='action warning'>Warning</div><div class='title'></div><div class='path'>" + data.description + "</div>"; break;
         }
         CQ.Ext.getCmp("importer-container").addResult(content);
     },
