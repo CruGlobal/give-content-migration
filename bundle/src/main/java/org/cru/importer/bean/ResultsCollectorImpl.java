@@ -4,16 +4,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
-public class ResultsCollector extends Observable {
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
+
+@Component(
+    metatype = true,
+    label = "Give importer - ResultsCollectorImpl",
+    description = "Collect results across the import process"
+)
+@Service
+public class ResultsCollectorImpl extends Observable implements ResultsCollector {
 	
 	private List<ProcessMessage> cachedMessages;
-	private boolean isRunning;
 	private int errors;
-	private Thread currentProcess;
 
-	public ResultsCollector() {
+	public ResultsCollectorImpl() {
 		cachedMessages =  new LinkedList<ProcessMessage>();
-		isRunning = false;
 		errors = 0;
 	}
 	
@@ -38,6 +44,16 @@ public class ResultsCollector extends Observable {
 	    addMessage(ProcessMessage.createIgnoredMessage(page));
 	}
 	
+    public void addFinishMessage() {
+        super.setChanged();
+        super.notifyObservers(ProcessMessage.createFinishMessage(errors));
+        this.errors = 0;
+    }
+    
+    public void addWarning(String message) {
+        addMessage(ProcessMessage.createWarningMessage(message));
+    }
+	
     private void addMessage(ProcessMessage message) {
         if (super.countObservers() > 0) {
             super.setChanged();
@@ -53,34 +69,6 @@ public class ResultsCollector extends Observable {
 
     public void clearCachedMessages() {
         cachedMessages.clear();
-    }
-
-    public void stopRunning() {
-        this.isRunning = false;
-        super.setChanged();
-        super.notifyObservers(ProcessMessage.createFinishMessage(errors));
-        this.errors = 0;
-    }
-    
-    public synchronized boolean checkRunning() {
-        if (isRunning) {
-            return true;
-        } else {
-            isRunning = true;
-            return false;
-        }
-    }
-
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    public Thread getCurrentProcess() {
-        return currentProcess;
-    }
-
-    public void setCurrentProcess(Thread currentProcess) {
-        this.currentProcess = currentProcess;
     }
 
 }
