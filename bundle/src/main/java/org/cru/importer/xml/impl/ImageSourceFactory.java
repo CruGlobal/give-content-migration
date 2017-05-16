@@ -1,9 +1,5 @@
 package org.cru.importer.xml.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +8,6 @@ import java.util.regex.Pattern;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-
-import net.sf.saxon.trans.XPathException;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
@@ -23,8 +15,8 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.bean.ParametersCollector;
-import org.cru.importer.util.UrlUtil;
 import org.cru.importer.xml.GiveSourceFactory;
+import org.cru.importer.xml.GiveSourceFactoryBase;
 import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +26,8 @@ import com.day.cq.search.Query;
 import com.day.cq.search.QueryBuilder;
 import com.day.cq.search.result.Hit;
 import com.day.cq.search.result.SearchResult;
+
+import net.sf.saxon.trans.XPathException;
 
 @Component(
 	metatype = true,
@@ -45,7 +39,7 @@ import com.day.cq.search.result.SearchResult;
 	@Property(name = GiveSourceFactory.OSGI_PROPERTY_TYPE, value = "searchImage"),
 	@Property(name = Constants.SERVICE_RANKING, intValue = 1)
 })
-public class ImageSourceFactory implements GiveSourceFactory {
+public class ImageSourceFactory extends GiveSourceFactoryBase {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(ImageSourceFactory.class);
 	
@@ -54,25 +48,18 @@ public class ImageSourceFactory implements GiveSourceFactory {
 	private static final String IMAGE_ID_EXRACTOR_REGEX = "wcmUrl\\(\\s*?'.*?'\\s*?,\\s*?'(.*?)'"; // TODO: Move to service property
 	private static Pattern pattern = Pattern.compile(IMAGE_ID_EXRACTOR_REGEX);
 
-	public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException {
-		Map<String, String> params;
-		try {
-			params = UrlUtil.splitQuery(parameters);
-		} catch (UnsupportedEncodingException e) {
-			LOGGER.warn("Error parsing parmeters: " + parameters + "  - Error: " + e.getMessage());
-			params = new HashMap<String, String>();
-		}
-		String image = "";
-		if (params.containsKey(PARAM_IMAGE) && !params.get(PARAM_IMAGE).equals("")) {
-			String imageCode = captureImageCode(params.get(PARAM_IMAGE));
-			if (imageCode != null) {
-				image = searchInDam(parametersCollector.getResourceResolver(), imageCode);
-			}
-		}
-		image = "<image>" + image + "</image>";
-		InputStream stream = new ByteArrayInputStream(image.getBytes(StandardCharsets.UTF_8));
-		return new StreamSource(stream);
-	}
+    @Override
+    protected String resolve(ParametersCollector parametersCollector, Map<String, String> params)
+            throws XPathException {
+        String image = "";
+        if (params.containsKey(PARAM_IMAGE) && !params.get(PARAM_IMAGE).equals("")) {
+            String imageCode = captureImageCode(params.get(PARAM_IMAGE));
+            if (imageCode != null) {
+                image = searchInDam(parametersCollector.getResourceResolver(), imageCode);
+            }
+        }
+        return "<image>" + image + "</image>";
+    }
 
 	/**
 	 * Get the image id from the img tag

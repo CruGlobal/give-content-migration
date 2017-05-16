@@ -5,7 +5,7 @@
 	<article
 		jcr:primaryType="nt:unstructured"
 		title="Article"
-		defaultPath="/content/cru/us/en/staff"
+		defaultPath="/content/staffweb/us/en"
 		pageTemplate="/apps/StaffWeb/components/page/article"
 		intermediateTemplate="/apps/StaffWeb/components/page/content"
 		transformation="/apps/cru-content-importer/transformations/staffweb/article.xsl"
@@ -22,7 +22,7 @@
 	<handbook
 		jcr:primaryType="nt:unstructured"
 		title="Handbook"
-		defaultPath="/content/cru/us/en/staff"
+		defaultPath="/content/staffweb/us/en"
 		pageTemplate="/apps/StaffWeb/components/page/content"
 		intermediateTemplate="/apps/StaffWeb/components/page/content"
 		transformation="/apps/cru-content-importer/transformations/staffweb/handbook.xsl"
@@ -39,7 +39,7 @@
 	<landingpage
 		jcr:primaryType="nt:unstructured"
 		title="Landingpage"
-		defaultPath="/content/cru/us/en/staff"
+		defaultPath="/content/staffweb/us/en"
 		pageTemplate="/apps/StaffWeb/components/page/content"
 		intermediateTemplate="/apps/StaffWeb/components/page/content"
 		transformation="/apps/cru-content-importer/transformations/staffweb/landingpage.xsl"

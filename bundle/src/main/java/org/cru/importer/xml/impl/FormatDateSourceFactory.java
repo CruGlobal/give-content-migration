@@ -1,32 +1,23 @@
 package org.cru.importer.xml.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
-import org.cru.importer.util.UrlUtil;
+import org.cru.importer.xml.DateParserService;
 import org.cru.importer.xml.GiveSourceFactory;
+import org.cru.importer.xml.GiveSourceFactoryBase;
 import org.osgi.framework.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.sf.saxon.trans.XPathException;
 
@@ -40,9 +31,7 @@ import net.sf.saxon.trans.XPathException;
 	@Property(name = GiveSourceFactory.OSGI_PROPERTY_TYPE, value = "formatDate"),
 	@Property(name = Constants.SERVICE_RANKING, intValue = 1)
 })
-public class formatDateSourceFactory implements GiveSourceFactory {
-	
-	private final static Logger LOGGER = LoggerFactory.getLogger(formatDateSourceFactory.class);
+public class FormatDateSourceFactory extends GiveSourceFactoryBase implements DateParserService {
 	
     private static final String CACHE_DATE_FORMATS_KEY = "dateFormats";
 
@@ -52,30 +41,22 @@ public class formatDateSourceFactory implements GiveSourceFactory {
     private static final String PARAM_DATE = "date";
 	private static final String PARAM_OUTPUT_FORMAT = "outputformat";
 	
-	public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException {
-		Map<String, String> params;
-		try {
-			params = UrlUtil.splitQuery(parameters);
-		} catch (UnsupportedEncodingException e) {
-			LOGGER.warn("Error parsing parmeters: " + parameters + "  - Error: " + e.getMessage());
-			params = new HashMap<String, String>();
-		}
-		
-		String date = "";
-		if (params.containsKey(PARAM_DATE) && !params.get(PARAM_DATE).equals("")) {
-			String origDate = params.get(PARAM_DATE);
-			Date extractedDate = parseDate(parametersCollector, origDate);
-		    String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
-		    if (outputFormat!=null && !"".equals(outputFormat)){
-		        date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);
-		    } else {
-		        date = AEM_DATE_FORMATTER.format(extractedDate);
-		    }
-		}
-		date = "<date>" + date + "</date>";
-		InputStream stream = new ByteArrayInputStream(date.getBytes(StandardCharsets.UTF_8));
-		return new StreamSource(stream);
-	}
+    @Override
+    protected String resolve(ParametersCollector parametersCollector, Map<String, String> params)
+            throws XPathException {
+        String date = "";
+        if (params.containsKey(PARAM_DATE) && !params.get(PARAM_DATE).equals("")) {
+            String origDate = params.get(PARAM_DATE);
+            Date extractedDate = parseDate(parametersCollector, origDate);
+            String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
+            if (outputFormat!=null && !"".equals(outputFormat)){
+                date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);
+            } else {
+                date = AEM_DATE_FORMATTER.format(extractedDate);
+            }
+        }
+        return "<date>" + date + "</date>";
+    }
 	
 	public Date parseDate(ParametersCollector parametersCollector, String origDate) throws XPathException {
         for (DateFormat formatter : getIncomingDateFormatters(parametersCollector)) {

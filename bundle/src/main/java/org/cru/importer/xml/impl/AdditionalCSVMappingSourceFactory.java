@@ -1,17 +1,10 @@
 package org.cru.importer.xml.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
@@ -19,8 +12,9 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
-import org.cru.importer.util.UrlUtil;
+import org.cru.importer.xml.DateParserService;
 import org.cru.importer.xml.GiveSourceFactory;
+import org.cru.importer.xml.GiveSourceFactoryBase;
 import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +28,7 @@ import net.sf.saxon.trans.XPathException;
 @Service
 @Properties({ @Property(name = GiveSourceFactory.OSGI_PROPERTY_TYPE, value = "csvAdditionalMapping"),
         @Property(name = Constants.SERVICE_RANKING, intValue = 1) })
-public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
+public class AdditionalCSVMappingSourceFactory extends GiveSourceFactoryBase {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AdditionalCSVMappingSourceFactory.class);
 
@@ -45,17 +39,12 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
 
     private static final String PARAM_ORDER_BY = "priority";
 
-    @Reference(target = "(" + GiveSourceFactory.OSGI_PROPERTY_TYPE + "=formatDate)")
-    GiveSourceFactory formatDateSourceFactory;
+    @Reference
+    DateParserService formatDateSourceFactory;
 
-    public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException {
-        Map<String, String> params;
-        try {
-            params = UrlUtil.splitQuery(parameters);
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Error parsing parmeters: " + parameters + "  - Error: " + e.getMessage());
-            params = new HashMap<String, String>();
-        }
+    @Override
+    protected String resolve(ParametersCollector parametersCollector, Map<String, String> params)
+            throws XPathException {
         String additionalMapping = "";
         if (params.containsKey(PARAM_KEY_COLUMN) && !params.get(PARAM_KEY_COLUMN).equals("")
                 && params.containsKey(PARAM_KEY_VALUE) && !params.get(PARAM_KEY_VALUE).equals("")) {
@@ -64,9 +53,7 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
             CsvCache csvCache = getCache(parametersCollector, key, priority);
             additionalMapping = csvCache.getFormattedRow(params.get(PARAM_KEY_VALUE));
         }
-        additionalMapping = "<data>" + additionalMapping + "</data>";
-        InputStream stream = new ByteArrayInputStream(additionalMapping.getBytes(StandardCharsets.UTF_8));
-        return new StreamSource(stream);
+        return "<data>" + additionalMapping + "</data>";
     }
 
     private String[] getArray(String param) {
@@ -177,7 +164,7 @@ public class AdditionalCSVMappingSourceFactory implements GiveSourceFactory {
 
         private boolean keepCacheRow(String cacheValue, String newValue) throws XPathException {
             if (DATE.equals(priorityType)) {
-                formatDateSourceFactory dateFormatter = ((formatDateSourceFactory) formatDateSourceFactory);
+                FormatDateSourceFactory dateFormatter = ((FormatDateSourceFactory) formatDateSourceFactory);
                 Date cacheDate = dateFormatter.parseDate(parametersCollector, cacheValue);
                 Date newDate = dateFormatter.parseDate(parametersCollector, newValue);
                 return cacheDate.compareTo(newDate) == priorityOrder;

@@ -46,7 +46,7 @@
 		    <sv:property sv:name="jcr:description" sv:type="String">
 		        <sv:value><xsl:value-of select="$xDescription" /></sv:value>
 		    </sv:property>
-		    <sv:property sv:name="dDocName" sv:type="String">
+		    <sv:property sv:name="contentId" sv:type="String">
 		        <sv:value><xsl:value-of select="$dDocName" /></sv:value>
 		    </sv:property>
 		    <sv:property sv:name="author" sv:type="String">
