@@ -5,6 +5,7 @@ import javax.xml.transform.Source;
 import net.sf.saxon.trans.XPathException;
 
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 
 /**
  * Defines an interface to build source factories for give project
@@ -24,10 +25,11 @@ public interface GiveSourceFactory {
 	 * Resolve a URI
 	 * 
 	 * @param parametersCollector
+	 * @param currentMetadata 
 	 * @param parameters
 	 * @return
 	 * @throws XPathException
 	 */
-	public Source resolve(ParametersCollector parametersCollector, String parameters) throws XPathException;
+	public Source resolve(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, String parameters) throws XPathException;
 	
 }

@@ -6,7 +6,6 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
-import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
 import org.jsoup.Jsoup;
@@ -32,8 +31,7 @@ public class GetLinkFactory extends GiveSourceFactoryBase {
 	private static final String ATTRIB_HREF = "href";
 	
     @Override
-    protected String resolve(ParametersCollector parametersCollector, Map<String, String> params)
-            throws XPathException {
+    protected String resolve(Map<String, String> params) throws XPathException {
         String link = "";
         if (params.containsKey(PARAM_TEXT) && !params.get(PARAM_TEXT).equals("")) {
             String htmlSourceParameter = params.get(PARAM_TEXT);

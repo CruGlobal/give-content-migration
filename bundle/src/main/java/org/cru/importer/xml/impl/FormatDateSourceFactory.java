@@ -42,12 +42,11 @@ public class FormatDateSourceFactory extends GiveSourceFactoryBase implements Da
 	private static final String PARAM_OUTPUT_FORMAT = "outputformat";
 	
     @Override
-    protected String resolve(ParametersCollector parametersCollector, Map<String, String> params)
-            throws XPathException {
+    protected String resolve(Map<String, String> params) throws XPathException {
         String date = "";
         if (params.containsKey(PARAM_DATE) && !params.get(PARAM_DATE).equals("")) {
             String origDate = params.get(PARAM_DATE);
-            Date extractedDate = parseDate(parametersCollector, origDate);
+            Date extractedDate = parseDate(super.getParametersCollector(), origDate);
             String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
             if (outputFormat!=null && !"".equals(outputFormat)){
                 date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);

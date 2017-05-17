@@ -49,14 +49,13 @@ public class AdditionalCSVMappingSourceFactory extends GiveSourceFactoryBase {
     DateParserService formatDateSourceFactory;
 
     @Override
-    protected String resolve(ParametersCollector parametersCollector, Map<String, String> params)
-            throws XPathException {
+    protected String resolve(Map<String, String> params) throws XPathException {
         String additionalMapping = "";
         if (params.containsKey(PARAM_KEY_COLUMN) && !params.get(PARAM_KEY_COLUMN).equals("")
                 && params.containsKey(PARAM_KEY_VALUE) && !params.get(PARAM_KEY_VALUE).equals("")) {
             String key = params.get(PARAM_KEY_COLUMN);
             String[] priority = getArray(params.get(PARAM_ORDER_BY));
-            CsvCache csvCache = getCache(parametersCollector, key, priority);
+            CsvCache csvCache = getCache(key, priority);
             additionalMapping = csvCache.getFormattedRow(params.get(PARAM_KEY_VALUE));
         }
         return "<data>" + additionalMapping + "</data>";
@@ -72,7 +71,8 @@ public class AdditionalCSVMappingSourceFactory extends GiveSourceFactoryBase {
         return result;
     }
 
-    private CsvCache getCache(ParametersCollector parametersCollector, String key, String[] priority) throws XPathException {
+    private CsvCache getCache(String key, String[] priority) throws XPathException {
+        ParametersCollector parametersCollector = super.getParametersCollector();
         if (!parametersCollector.isCached(CACHE_CSV_MAPPING_KEY)) {
             CsvCache csvCache = new CsvCache(key, priority, parametersCollector);
             try {

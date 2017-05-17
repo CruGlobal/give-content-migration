@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.xml.transform.Source;
 
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -32,6 +33,7 @@ public class GiveURIResolver extends StandardURIResolver {
 	private ParametersCollector parametersCollector;
 	private BundleContext bundleContext;
 	private Map<String, GiveSourceFactory> cache;
+	private ResourceMetadata currentMetadata;
 	
 	public GiveURIResolver(ParametersCollector parametersCollector) {
 		this.parametersCollector = parametersCollector;
@@ -77,11 +79,15 @@ public class GiveURIResolver extends StandardURIResolver {
 					throw new XPathException("There are not source factory defined for " + factory);
 				}
 			}
-			return sourceFactory.resolve(parametersCollector, parameters);
+			return sourceFactory.resolve(parametersCollector, currentMetadata, parameters);
         } catch (Exception e) {
 			LOGGER.error("Unable to load source factory for " + href, e);
 			throw new XPathException(e.getMessage());
 		}
 	}
+
+    public void setCurrentMetadata(ResourceMetadata currentMetadata) {
+        this.currentMetadata = currentMetadata;
+    }
 
 }

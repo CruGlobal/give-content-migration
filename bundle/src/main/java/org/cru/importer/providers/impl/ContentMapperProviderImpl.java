@@ -48,6 +48,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	private Map<String,String> transformedKeys;
 	private Map<String, String> sanitizationMap;
 	private List<String> transformerParameters;
+	private GiveURIResolver resolver;
 	
 	public ContentMapperProviderImpl(ParametersCollector parametersCollector) throws Exception {
 		this.transformedKeys = null;
@@ -57,7 +58,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 		Node xsltNode = this.session.getNode(parametersCollector.getXsltPath());
 		processor = new Processor(false);
         XsltCompiler comp = processor.newXsltCompiler();
-        GiveURIResolver resolver = new GiveURIResolver(parametersCollector);
+        resolver = new GiveURIResolver(parametersCollector);
         comp.setURIResolver(resolver);
         XsltExecutable exp = comp.compile(new StreamSource(JcrUtils.readFile(xsltNode)));
         transformerParameters = new LinkedList<String>();
@@ -96,6 +97,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			}
 			
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			resolver.setCurrentMetadata(metadata);
 			transformer.setSource(new StreamSource(isArrBaos));
 			transformer.setDestination(processor.newSerializer(output));
 			transformer.transform();
