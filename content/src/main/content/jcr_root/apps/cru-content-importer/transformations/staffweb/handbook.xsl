@@ -121,7 +121,7 @@
 				        <sv:value>StaffWeb/components/section/text</sv:value>
 				    </sv:property>
 				    <sv:property sv:name="text" sv:type="String">
-				     	<sv:value><xsl:value-of select="wcm:element[@name='section_content']" /></sv:value>
+				     	<sv:value><xsl:value-of select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:element[@name='section_content'])))" /></sv:value>
 				    </sv:property>
 		    	</sv:node>
 		    </sv:node>

@@ -14,6 +14,7 @@ import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.xml.DateParserService;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
@@ -42,11 +43,11 @@ public class FormatDateSourceFactory extends GiveSourceFactoryBase implements Da
 	private static final String PARAM_OUTPUT_FORMAT = "outputformat";
 	
     @Override
-    protected String resolve(Map<String, String> params) throws XPathException {
+    protected String resolve(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, Map<String, String> params)
+            throws XPathException {
         String date = "";
         if (params.containsKey(PARAM_DATE) && !params.get(PARAM_DATE).equals("")) {
-            String origDate = params.get(PARAM_DATE);
-            Date extractedDate = parseDate(super.getParametersCollector(), origDate);
+            Date extractedDate = parseDate(parametersCollector, params.get(PARAM_DATE));
             String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
             if (outputFormat!=null && !"".equals(outputFormat)){
                 date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);

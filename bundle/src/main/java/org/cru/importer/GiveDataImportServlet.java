@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -203,6 +204,8 @@ public class GiveDataImportServlet extends HttpServlet {
 				parametersCollector.setIntermediateTemplate(properties.get("intermediateTemplate",String.class));
 				parametersCollector.setPageAcceptRule(properties.get("pageAcceptRule",String.class));
 				parametersCollector.setFactoryType(properties.get("factoryType",String.class));
+                parametersCollector.setReferenceResolutionBasePathPages(properties.get("referenceResolutionBasePathPages",String.class));
+                parametersCollector.setReferenceResolutionBasePathAssets(properties.get("referenceResolutionBasePathAssets",String.class));
 				if (properties.get("additionalMappingFile",Boolean.class)) {
 				    Resource additionalMappingFileResource = parametersCollector.getResourceResolver().getResource(request.getParameter("additionalMappingFile"));
 				    if (additionalMappingFileResource == null) {
@@ -230,12 +233,10 @@ public class GiveDataImportServlet extends HttpServlet {
 	            } else {
 	                ValueMap globalProperties = globalConfigs.adaptTo(ValueMap.class);
 	                parametersCollector.setSanitizationMap(PropertiesUtil.toMap(globalProperties.get("sanitizationMap",String[].class), new String[]{}));
-	                String[] acceptedDateFormats = PropertiesUtil.toStringArray(globalProperties.get("acceptedDateFormats",String[].class), new String[]{});
-	                String[] trimmedAcceptedDateFormats = new String[acceptedDateFormats.length];
-	                for (int i = 0; i < acceptedDateFormats.length; i++) {
-	                    trimmedAcceptedDateFormats[i] = acceptedDateFormats[i].trim();
-	                }
-	                parametersCollector.setAcceptedDateFormats(trimmedAcceptedDateFormats);
+                    String[] acceptedDateFormats = PropertiesUtil.toStringArray(globalProperties.get("acceptedDateFormats",String[].class), new String[]{});
+                    parametersCollector.setAcceptedDateFormats(StringUtils.stripAll(acceptedDateFormats));
+                    String[] referenceResolutionIgnoredPrefixes = PropertiesUtil.toStringArray(globalProperties.get("referenceResolutionIgnoredPrefixes",String[].class), new String[]{});
+                    parametersCollector.setReferenceResolutionIgnoredPrefixes(StringUtils.stripAll(referenceResolutionIgnoredPrefixes));
 	            }
 			}
 		} catch (Exception e) {
@@ -244,7 +245,7 @@ public class GiveDataImportServlet extends HttpServlet {
 		}
 		return isValid;
 	}
-	
+
     private Resource getConfig(HttpServletRequest request, ParametersCollector parametersCollector) {
         String configPath = request.getParameter("configpath");
         if (configPath != null) {

@@ -93,34 +93,38 @@ public class GiveDataImportMasterProcess implements Runnable {
 				LOGGER.info("Start processing file: " + filename);
 				if (!proccesed.contains(filename) && acceptsFile(acceptFilesPattern, filename)) {
 					proccesed.add(filename);
+					String currentFilename = "";
 					try {
 						ResourceMetadata metadata = metadataProvider.getMetadata(filename);
 						ResourceInfo resourceInfo = resourceProvider.getResource(metadata, zis);
+						currentFilename = metadata.getValue(parametersCollector.getColumnFileName());
 						if (resourceInfo != null) {
 							contentMapperProvider.mapFields(resourceInfo.getResource(), metadata, zis);
 							String pageReference = resourceInfo.getResource().getPath();
+							String message = currentFilename + " - " + pageReference;
 							if (session.hasPendingChanges()) {
 								session.save();
 								if (resourceInfo.isNewResource()) {
-									resultsCollector.addCreatedPage(pageReference);
-									LOGGER.info("New resource created at: " + pageReference);
+									resultsCollector.addCreatedPage(message);
+									LOGGER.info("New resource created - " + message);
 								} else {
-									resultsCollector.addModifiedPage(pageReference);
-									LOGGER.info("Existed resource modified at: " + pageReference);
+									resultsCollector.addModifiedPage(message);
+									LOGGER.info("Existed resource modified - " + message);
 								}
 							} else {
-								resultsCollector.addNotModifiedPage(pageReference);
-								LOGGER.info("Not modified resource at: " + pageReference);
+								resultsCollector.addNotModifiedPage(message);
+								LOGGER.info("Not modified resource - " + message);
 							}
 						} else {
-							resultsCollector.addIgnoredPages(filename);
+							resultsCollector.addIgnoredPages(currentFilename + " - Ignored by file name accept policy");
 							LOGGER.info("Ignored file: " + filename);
 						}
                     } catch (Exception e) {
 						if (session.hasPendingChanges()) {
 							session.refresh(false);
 						}
-						String errorMessage = filename + ": " + StringEscapeUtils.escapeJson(e.getMessage());
+						String file = (currentFilename.equals(""))? filename : currentFilename;
+						String errorMessage = file + " - " + e.getMessage();
 						resultsCollector.addError(errorMessage);
 						LOGGER.info("Error importing " + errorMessage);
 					}

@@ -27,13 +27,8 @@ import net.sf.saxon.trans.XPathException;
 public abstract class GiveSourceFactoryBase implements GiveSourceFactory {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GiveSourceFactoryBase.class);
-    
-    private ParametersCollector parametersCollector;
-    private ResourceMetadata currentMetadata;
-    
+
     public Source resolve(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, String parameters) throws XPathException {
-        this.parametersCollector = parametersCollector;
-        this.currentMetadata = currentMetadata;
         Map<String, String> params;
         try {
             params = UrlUtil.splitQuery(parameters);
@@ -41,7 +36,7 @@ public abstract class GiveSourceFactoryBase implements GiveSourceFactory {
             LOGGER.warn("Error parsing parmeters: " + parameters + "  - Error: " + e.getMessage());
             params = new HashMap<String, String>();
         }
-        String response = resolve(params);
+        String response = resolve(parametersCollector, currentMetadata, params);
         InputStream stream = new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8));
         return new StreamSource(stream);
     }
@@ -53,17 +48,9 @@ public abstract class GiveSourceFactoryBase implements GiveSourceFactory {
      * @return
      * @throws XPathException
      */
-    protected abstract String resolve(Map<String, String> params) throws XPathException;
+    protected abstract String resolve(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, Map<String, String> params) throws XPathException;
 
-    public ParametersCollector getParametersCollector() {
-        return parametersCollector;
-    }
-
-    public ResourceMetadata getCurrentMetadata() {
-        return currentMetadata;
-    }
-    
-    public String getCurrentFilename() {
+    public String getCurrentFilename(ParametersCollector parametersCollector, ResourceMetadata currentMetadata) {
         return currentMetadata.getValue(parametersCollector.getColumnFileName());
     }
 

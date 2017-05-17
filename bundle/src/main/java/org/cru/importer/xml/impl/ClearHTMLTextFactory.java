@@ -6,6 +6,8 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
+import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
 import org.jsoup.Jsoup;
@@ -30,15 +32,13 @@ public class ClearHTMLTextFactory extends GiveSourceFactoryBase {
 	private static final String PARAM_TEXT = "htmlSource";
 
     @Override
-    protected String resolve(Map<String, String> params) throws XPathException {
+    protected String resolve(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, Map<String, String> params)
+            throws XPathException {
         String plainText = "";
         if (params.containsKey(PARAM_TEXT) && !params.get(PARAM_TEXT).equals("")) {
-            String htmlSourceParameter = params.get(PARAM_TEXT);
-            if (htmlSourceParameter != null) {
-                Document doc = Jsoup.parse(htmlSourceParameter);
-                doc.outputSettings().charset("UTF-8");
-                plainText = Jsoup.clean(doc.body().html(), Whitelist.simpleText());
-            }
+            Document doc = Jsoup.parse(params.get(PARAM_TEXT));
+            doc.outputSettings().charset("UTF-8");
+            plainText = Jsoup.clean(doc.body().html(), Whitelist.simpleText());
         }
         return "<plaintext>" + plainText + "</plaintext>";
     }

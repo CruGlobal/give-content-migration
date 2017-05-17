@@ -108,7 +108,7 @@
 			</xsl:if>
 			<xsl:if test="not(wcm:element[@name='teaser'] = '')">
 				<sv:property sv:name="text" sv:type="String">
-			    	<sv:value><xsl:value-of select="wcm:element[@name='teaser']" /></sv:value>
+			    	<sv:value><xsl:value-of select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:element[@name='teaser'])))" /></sv:value>
 				</sv:property>
 			</xsl:if>
 			<xsl:if test="not(wcm:element[@name='image_large'] = '')">

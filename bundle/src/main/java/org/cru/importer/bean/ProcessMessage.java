@@ -1,5 +1,7 @@
 package org.cru.importer.bean;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 public class ProcessMessage {
     
     public static final String START = "started";
@@ -28,7 +30,7 @@ public class ProcessMessage {
     
     @Override
     public String toString() {
-        return "{\"type\":\"" + type + "\",\"description\":\"" + description + "\"}";
+        return "{\"type\":\"" + type + "\",\"description\":\"" + StringEscapeUtils.escapeJson(description) + "\"}";
     }
     
     public static ProcessMessage createCreatedMessage(String description) {

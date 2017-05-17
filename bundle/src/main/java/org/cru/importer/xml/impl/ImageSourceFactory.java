@@ -1,33 +1,20 @@
 package org.cru.importer.xml.impl;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.apache.sling.api.resource.ResourceResolver;
-import org.cru.importer.bean.ResultsCollector;
+import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
+import org.cru.importer.xml.ReferenceResolutionService;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.osgi.framework.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.day.cq.search.PredicateGroup;
-import com.day.cq.search.Query;
-import com.day.cq.search.QueryBuilder;
-import com.day.cq.search.result.Hit;
-import com.day.cq.search.result.SearchResult;
 
 import net.sf.saxon.trans.XPathException;
 
@@ -43,76 +30,33 @@ import net.sf.saxon.trans.XPathException;
 })
 public class ImageSourceFactory extends GiveSourceFactoryBase {
 	
-	private final static Logger LOGGER = LoggerFactory.getLogger(ImageSourceFactory.class);
-	
 	private static final String PARAM_IMAGE = "image";
-	private static final String IMAGES_CONTENT_PATH = "/content/dam"; // TODO: Move to service property
-	private static final String IMAGE_ID_EXRACTOR_REGEX = "wcmUrl\\(\\s*?'.*?'\\s*?,\\s*?'(.*?)'"; // TODO: Move to service property
-	private static Pattern pattern = Pattern.compile(IMAGE_ID_EXRACTOR_REGEX);
 
+	private static final String TAG_IMG = "img";
+	private static final String ATTRIB_SRC = "src";
+	    
     @Reference
-    private ResultsCollector resultsCollector;
-	
+    private ReferenceResolutionService referenceResolutionService;
+
     @Override
-    protected String resolve(Map<String, String> params) throws XPathException {
+    protected String resolve(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, Map<String, String> params)
+            throws XPathException {
         String image = "";
         if (params.containsKey(PARAM_IMAGE) && !params.get(PARAM_IMAGE).equals("")) {
-            String imageCode = captureImageCode(params.get(PARAM_IMAGE));
-            if (imageCode != null) {
-                image = searchInDam(imageCode);
-            }
+            image = extractImage(parametersCollector, currentMetadata, params.get(PARAM_IMAGE));
         }
         return "<image>" + image + "</image>";
     }
-
-	/**
-	 * Get the image id from the img tag
-	 * @param imageStr
-	 * @return
-	 * @throws XPathException
-	 */
-	private String captureImageCode(String imageStr) throws XPathException {
-		// Example: imageStr = "<img src=\"[!--$wcmUrl('resource','CMS3_254491')--]\" alt="Photo of Cherry Fields" />";
-		Matcher matcher = pattern.matcher(imageStr);
-		if (matcher.find()) {
-		    return matcher.group(1);
-		} else {
-            String message = super.getCurrentFilename() + " - Impossible to extract image ID from string: " + imageStr;
-            LOGGER.warn(message);
-            resultsCollector.addWarning(StringEscapeUtils.escapeJson(message));
-			return null;
-		}
-	}
-
-	/**
-	 * Search the image ID in the DAM and return the path for the image
-	 * @param imageCode
-	 * @return
-	 * @throws XPathException
-	 */
-	private String searchInDam(String imageCode) throws XPathException {
-		try {
-		    ResourceResolver resourceResolver = super.getParametersCollector().getResourceResolver();
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("path", IMAGES_CONTENT_PATH);
-			map.put("type", "dam:Asset");
-			map.put("1_property", "jcr:content/metadata/contentId");
-			map.put("1_property.value", imageCode);
-
-			Query query = resourceResolver.adaptTo(QueryBuilder.class).createQuery(PredicateGroup.create(map), resourceResolver.adaptTo(Session.class));
-			SearchResult result = query.getResult();
-			List<Hit> hits = result.getHits();
-			if (hits.size() > 0) {
-				return hits.get(0).getPath();
-			} else {
-			    String message = super.getCurrentFilename() + " - image with contentID: " + imageCode + " cannot be found";
-				LOGGER.warn(message);
-				resultsCollector.addWarning(StringEscapeUtils.escapeJson(message));
-				return "";
-			}
-		} catch (RepositoryException e) {
-			throw new XPathException(super.getCurrentFilename() + " - Cannot get the image with contentID: " + imageCode);
-		}
-	}
+    
+    private String extractImage(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, String htmlSource) {
+        Document doc = Jsoup.parse(htmlSource);
+        String image = doc.select(TAG_IMG).attr(ATTRIB_SRC);
+        String imageResolved = referenceResolutionService.resolveReference(parametersCollector, currentMetadata, image);
+        if (image.equals(imageResolved)) {
+            return ""; // Leave image empty if not present (we don't want to be displayed as a broken image)
+        } else {
+            return imageResolved;
+        }
+    }
 
 }

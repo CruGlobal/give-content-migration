@@ -12,6 +12,7 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.xml.DateParserService;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
@@ -49,13 +50,14 @@ public class AdditionalCSVMappingSourceFactory extends GiveSourceFactoryBase {
     DateParserService formatDateSourceFactory;
 
     @Override
-    protected String resolve(Map<String, String> params) throws XPathException {
+    protected String resolve(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, Map<String, String> params)
+            throws XPathException {
         String additionalMapping = "";
         if (params.containsKey(PARAM_KEY_COLUMN) && !params.get(PARAM_KEY_COLUMN).equals("")
                 && params.containsKey(PARAM_KEY_VALUE) && !params.get(PARAM_KEY_VALUE).equals("")) {
             String key = params.get(PARAM_KEY_COLUMN);
             String[] priority = getArray(params.get(PARAM_ORDER_BY));
-            CsvCache csvCache = getCache(key, priority);
+            CsvCache csvCache = getCache(parametersCollector, key, priority);
             additionalMapping = csvCache.getFormattedRow(params.get(PARAM_KEY_VALUE));
         }
         return "<data>" + additionalMapping + "</data>";
@@ -71,8 +73,7 @@ public class AdditionalCSVMappingSourceFactory extends GiveSourceFactoryBase {
         return result;
     }
 
-    private CsvCache getCache(String key, String[] priority) throws XPathException {
-        ParametersCollector parametersCollector = super.getParametersCollector();
+    private CsvCache getCache(ParametersCollector parametersCollector, String key, String[] priority) throws XPathException {
         if (!parametersCollector.isCached(CACHE_CSV_MAPPING_KEY)) {
             CsvCache csvCache = new CsvCache(key, priority, parametersCollector);
             try {

@@ -27,6 +27,9 @@ public class ParametersCollector {
 	private Map<String, String> sanitizationMap;
 	private String[] acceptedDateFormats;
 	private Map<String, Object> cache;
+	private String[] referenceResolutionIgnoredPrefixes;
+    private String referenceResolutionBasePathPages;
+    private String referenceResolutionBasePathAssets;
 	
 	public ParametersCollector() {
 	    cache = new HashMap<String, Object>();
@@ -169,6 +172,31 @@ public class ParametersCollector {
     }
     
     public void setAcceptedDateFormats(String[] acceptedDateFormats) {
-       this.acceptedDateFormats = acceptedDateFormats;
+        this.acceptedDateFormats = acceptedDateFormats;
     }
+
+    public void setReferenceResolutionIgnoredPrefixes(String[] referenceResolutionIgnoredPrefixes) {
+        this.referenceResolutionIgnoredPrefixes = referenceResolutionIgnoredPrefixes;
+    }
+    
+    public String[] getReferenceResolutionIgnoredPrefixes() {
+        return this.referenceResolutionIgnoredPrefixes;
+    }
+
+    public String getReferenceResolutionBasePathPages() {
+        return referenceResolutionBasePathPages;
+    }
+
+    public void setReferenceResolutionBasePathPages(String referenceResolutionBasePathPages) {
+        this.referenceResolutionBasePathPages = referenceResolutionBasePathPages;
+    }
+
+    public String getReferenceResolutionBasePathAssets() {
+        return referenceResolutionBasePathAssets;
+    }
+
+    public void setReferenceResolutionBasePathAssets(String referenceResolutionBasePathAssets) {
+        this.referenceResolutionBasePathAssets = referenceResolutionBasePathAssets;
+    }
+
 }
