@@ -237,6 +237,8 @@ public class GiveDataImportServlet extends HttpServlet {
                     parametersCollector.setAcceptedDateFormats(StringUtils.stripAll(acceptedDateFormats));
                     String[] referenceResolutionIgnoredPrefixes = PropertiesUtil.toStringArray(globalProperties.get("referenceResolutionIgnoredPrefixes",String[].class), new String[]{});
                     parametersCollector.setReferenceResolutionIgnoredPrefixes(StringUtils.stripAll(referenceResolutionIgnoredPrefixes));
+                    String[] referenceResolutionReplacements = PropertiesUtil.toStringArray(globalProperties.get("referenceResolutionReplacements",String[].class), new String[]{});
+                    parametersCollector.setReferenceResolutionReplacements(StringUtils.stripAll(referenceResolutionReplacements));
 	            }
 			}
 		} catch (Exception e) {

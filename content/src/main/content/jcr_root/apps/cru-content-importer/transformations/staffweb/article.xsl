@@ -26,6 +26,8 @@
 	
 		<xsl:variable name="date" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
 		<xsl:variable name="dateText" select="fn:doc(concat('give://formatDate?outputformat=dd MMMM yyyy&amp;date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
+		<xsl:variable name="image" select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='article_image'])))"/>
+		<xsl:variable name="text" select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:root/wcm:element[@name='body'])))"/>
 	
 		<sv:node sv:name="jcr:content">
 		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
@@ -69,9 +71,11 @@
 			    <sv:property sv:name="sling:resourceType" sv:type="String">
 			        <sv:value>foundation/components/image</sv:value>
 			    </sv:property>
-			    <sv:property sv:name="fileReference" sv:type="String">
-			        <sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='article_image'])))" /></sv:value>
-			    </sv:property>
+			    <xsl:if test="$image != ''">
+			        <sv:property sv:name="fileReference" sv:type="String">
+			            <sv:value><xsl:value-of select="$image" /></sv:value>
+			        </sv:property>
+			    </xsl:if>
 		    </sv:node>
 		    <sv:node sv:name="post-body-parsys">
 			    <sv:property sv:name="jcr:primaryType" sv:type="Name">
@@ -88,7 +92,7 @@
 				        <sv:value>StaffWeb/components/section/text</sv:value>
 				    </sv:property>
 				    <sv:property sv:name="text" sv:type="String">
-				        <sv:value><xsl:value-of select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:root/wcm:element[@name='body'])))" /></sv:value>
+				        <sv:value><xsl:value-of select="$text" /></sv:value>
 				    </sv:property>
 			    </sv:node>
 		    </sv:node>

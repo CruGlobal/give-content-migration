@@ -13,9 +13,6 @@ import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
 import org.cru.importer.xml.ReferenceResolutionService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.osgi.framework.Constants;
 
 import net.sf.saxon.trans.XPathException;
@@ -33,8 +30,6 @@ import net.sf.saxon.trans.XPathException;
 public class UrlTransformerFactory extends GiveSourceFactoryBase {
 	
 	private static final String PARAM_TEXT = "htmlSource";
-	private static final String TAG_A = "a";
-	private static final String ATTRIB_HREF = "href";
 	
 	@Reference
 	private ReferenceResolutionService referenceResolutionService;
@@ -44,20 +39,10 @@ public class UrlTransformerFactory extends GiveSourceFactoryBase {
             throws XPathException {
         String html = "";
         if (params.containsKey(PARAM_TEXT) && !params.get(PARAM_TEXT).equals("")) {
-            html = transformReferences(parametersCollector, currentMetadata, params.get(PARAM_TEXT));
+            html = referenceResolutionService.resolveAllReferences(parametersCollector, currentMetadata, params.get(PARAM_TEXT));
             html = StringEscapeUtils.escapeXml11(html);
         }
         return "<html>" + html + "</html>";
-    }
-
-    private String transformReferences(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, String htmlSourceParameter) {
-        Document doc = Jsoup.parse(htmlSourceParameter);
-        for (Element element : doc.select(TAG_A)) {
-            String href = element.attr(ATTRIB_HREF);
-            href = referenceResolutionService.resolveReference(parametersCollector, currentMetadata, href);
-            element.attr(ATTRIB_HREF, href);
-        }
-        return doc.body().html();
     }
 
 }

@@ -30,6 +30,7 @@ public class ParametersCollector {
 	private String[] referenceResolutionIgnoredPrefixes;
     private String referenceResolutionBasePathPages;
     private String referenceResolutionBasePathAssets;
+    private String[] referenceResolutionReplacements;
 	
 	public ParametersCollector() {
 	    cache = new HashMap<String, Object>();
@@ -197,6 +198,14 @@ public class ParametersCollector {
 
     public void setReferenceResolutionBasePathAssets(String referenceResolutionBasePathAssets) {
         this.referenceResolutionBasePathAssets = referenceResolutionBasePathAssets;
+    }
+
+    public String[] getReferenceResolutionReplacements() {
+        return referenceResolutionReplacements;
+    }
+
+    public void setReferenceResolutionReplacements(String[] referenceResolutionReplacements) {
+        this.referenceResolutionReplacements = referenceResolutionReplacements;
     }
 
 }

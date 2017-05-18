@@ -8,6 +8,10 @@
 		/,
 		.
 	]"
+	referenceResolutionReplacements="[
+		a.href,
+		img.src
+	]"
 	acceptedDateFormats="[
 		'Published' MMMM dd\, yyyy hh:mm,
 		'Published' MMMM dd\, yyyy,
