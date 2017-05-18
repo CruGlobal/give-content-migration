@@ -19,6 +19,7 @@
 		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
+		postProcessServices="[UpdatePageReferences]"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 	
 	<handbook
@@ -38,6 +39,7 @@
 		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
+		postProcessServices="[UpdatePageReferences]"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 
 	<landingpage
@@ -57,5 +59,6 @@
 		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
+		postProcessServices="[UpdatePageReferences]"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 </jcr:root>

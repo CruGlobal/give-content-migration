@@ -6,12 +6,14 @@
 		https:,
 		mailto:,
 		/,
-		.
-	]"
+		.]"
 	referenceResolutionReplacements="[
 		a.href,
-		img.src
-	]"
+		img.src]"
+	updatePageReferencesPolicy="[
+		StaffWeb/components/section/text:text:html,
+		StaffWeb/components/section/tile:text:html,
+		StaffWeb/components/section/tile:href:override]"
 	acceptedDateFormats="[
 		'Published' MMMM dd\, yyyy hh:mm,
 		'Published' MMMM dd\, yyyy,

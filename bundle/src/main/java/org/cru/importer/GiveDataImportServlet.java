@@ -226,6 +226,8 @@ public class GiveDataImportServlet extends HttpServlet {
 				} else {
 					parametersCollector.setAcceptFilesPattern(acceptFilesPattern);
 				}
+                String[] postProcessServices = PropertiesUtil.toStringArray(properties.get("postProcessServices",String[].class), new String[]{});
+                parametersCollector.setPostProcessServices(StringUtils.stripAll(postProcessServices));
 	            Resource globalConfigs = getGlobalConfig(request, properties, parametersCollector);
 	            if (globalConfigs == null) {
 	                resultsCollector.addError("globalConfigs configuration not found at configpath or node not exists at JCR.");
@@ -239,6 +241,8 @@ public class GiveDataImportServlet extends HttpServlet {
                     parametersCollector.setReferenceResolutionIgnoredPrefixes(StringUtils.stripAll(referenceResolutionIgnoredPrefixes));
                     String[] referenceResolutionReplacements = PropertiesUtil.toStringArray(globalProperties.get("referenceResolutionReplacements",String[].class), new String[]{});
                     parametersCollector.setReferenceResolutionReplacements(StringUtils.stripAll(referenceResolutionReplacements));
+                    String[] updatePageReferencesPolicy = PropertiesUtil.toStringArray(globalProperties.get("updatePageReferencesPolicy",String[].class), new String[]{});
+                    parametersCollector.setUpdatePageReferencesPolicy(StringUtils.stripAll(updatePageReferencesPolicy));
 	            }
 			}
 		} catch (Exception e) {

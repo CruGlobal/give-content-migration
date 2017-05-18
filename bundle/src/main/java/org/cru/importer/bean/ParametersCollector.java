@@ -31,6 +31,8 @@ public class ParametersCollector {
     private String referenceResolutionBasePathPages;
     private String referenceResolutionBasePathAssets;
     private String[] referenceResolutionReplacements;
+    private String[] postProcessServices;
+    private String[] updatePageReferencesPolicy;
 	
 	public ParametersCollector() {
 	    cache = new HashMap<String, Object>();
@@ -206,6 +208,22 @@ public class ParametersCollector {
 
     public void setReferenceResolutionReplacements(String[] referenceResolutionReplacements) {
         this.referenceResolutionReplacements = referenceResolutionReplacements;
+    }
+
+    public String[] getPostProcessServices() {
+        return postProcessServices;
+    }
+
+    public void setPostProcessServices(String[] postProcessServices) {
+        this.postProcessServices = postProcessServices;
+    }
+
+    public String[] getUpdatePageReferencesPolicy() {
+        return updatePageReferencesPolicy;
+    }
+
+    public void setUpdatePageReferencesPolicy(String[] updatePageReferencesPolicy) {
+        this.updatePageReferencesPolicy = updatePageReferencesPolicy;
     }
 
 }

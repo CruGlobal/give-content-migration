@@ -2,6 +2,8 @@ package org.cru.importer;
 
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,7 +13,6 @@ import java.util.zip.ZipInputStream;
 import javax.jcr.Session;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.cru.importer.bean.CurrentStatus;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceInfo;
@@ -21,6 +22,7 @@ import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.ResourceProvider;
 import org.cru.importer.providers.factory.DataImportFactory;
+import org.cru.importer.service.PostProcessService;
 import org.cru.importer.xml.GiveURIResolver;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -76,6 +78,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 			MetadataProvider metadataProvider = dataImportFactory.createMetadataProvider(parametersCollector);
 			ResourceProvider resourceProvider = dataImportFactory.createResourceProvider(parametersCollector, metadataProvider);
 			ContentMapperProvider contentMapperProvider = dataImportFactory.createContentMapperProvider(parametersCollector);
+			List<PostProcessService> postProcessServices = getPostProcessServices(parametersCollector);
 			in = parametersCollector.getContentFile().getStream();
 			ZipInputStream zis = new ZipInputStream(in);
 			ZipEntry entry = null;
@@ -115,6 +118,9 @@ public class GiveDataImportMasterProcess implements Runnable {
 								resultsCollector.addNotModifiedPage(message);
 								LOGGER.info("Not modified resource - " + message);
 							}
+							for (PostProcessService service : postProcessServices) {
+							    service.process(parametersCollector, metadata, resourceInfo.getResource());
+                            }
 						} else {
 							resultsCollector.addIgnoredPages(currentFilename + " - Ignored by file name accept policy");
 							LOGGER.info("Ignored file: " + filename);
@@ -147,7 +153,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 		}
 	}
 
-	private boolean acceptsFile(Pattern acceptFilesPattern, String filename) {
+    private boolean acceptsFile(Pattern acceptFilesPattern, String filename) {
 		if (acceptFilesPattern != null) {
 			Matcher matcher = acceptFilesPattern.matcher(filename);
 			return matcher.matches();
@@ -156,14 +162,41 @@ public class GiveDataImportMasterProcess implements Runnable {
 	}
 	
 	private DataImportFactory getDataImporFactory(ParametersCollector parametersCollector) throws Exception {
-		BundleContext bundleContext = FrameworkUtil.getBundle(GiveURIResolver.class).getBundleContext();
-		String typeFilter = String.format("(%s=%s)", DataImportFactory.OSGI_PROPERTY_TYPE, parametersCollector.getFactoryType());
-		ServiceReference[] serviceReference = bundleContext.getServiceReferences(DataImportFactory.class.getName(), typeFilter);
-		if (serviceReference != null && serviceReference.length > 0) {
-			return (DataImportFactory) bundleContext.getService(serviceReference[0]);
+		Object service = getService(getBundleContext(), DataImportFactory.class.getName(), DataImportFactory.OSGI_PROPERTY_TYPE, parametersCollector.getFactoryType());
+		if (service != null) {
+		    return (DataImportFactory) service;
 		} else {
 			throw new XPathException("There are not import factory defined for " + parametersCollector.getFactoryType());
 		}
 	}
+
+    private List<PostProcessService> getPostProcessServices(ParametersCollector parametersCollector) throws Exception {
+        BundleContext bundleContext = getBundleContext();
+        String processClassName = PostProcessService.class.getName();
+        List<PostProcessService> postProcessServices = new LinkedList<PostProcessService>();
+        for (String serviceName : parametersCollector.getPostProcessServices()) {
+            Object service = getService(bundleContext, processClassName, PostProcessService.OSGI_PROPERTY_PROCESS, serviceName);
+            if (service != null) {
+                postProcessServices.add((PostProcessService) service);
+            } else {
+                throw new XPathException("There are not post process service defined for " + serviceName);
+            }
+        }
+        return postProcessServices;
+    }
+    
+    private BundleContext getBundleContext() {
+        return FrameworkUtil.getBundle(GiveURIResolver.class).getBundleContext();
+    }
+    
+    private Object getService(BundleContext bundleContext, String className, String FilterType, String filterValue) throws Exception {
+        String typeFilter = String.format("(%s=%s)", FilterType, filterValue);
+        ServiceReference[] serviceReference = bundleContext.getServiceReferences(className, typeFilter);
+        if (serviceReference != null && serviceReference.length > 0) {
+            return bundleContext.getService(serviceReference[0]);
+        } else {
+            return null;
+        }
+    }
 
 }

@@ -1,6 +1,9 @@
 package org.cru.importer.service;
 
+import java.util.List;
+
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ReferenceReplacement;
 import org.cru.importer.bean.ResourceMetadata;
 
 /**
@@ -32,4 +35,11 @@ public interface ReferenceResolutionService {
      */
     String resolveAllReferences(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, String htmlSourceParameter);
     
+    /**
+     * Return the list of available reference replacements
+     * 
+     * @param parametersCollector
+     * @return
+     */
+    List<ReferenceReplacement> getReferenceReplacements(ParametersCollector parametersCollector);
 }

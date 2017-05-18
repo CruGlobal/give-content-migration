@@ -14,6 +14,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ReferenceReplacement;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.service.ReferenceResolutionService;
@@ -152,24 +153,4 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
         }
     }
     
-    private class ReferenceReplacement {
-        
-        private String selector;
-        private String attribute;
-
-        public ReferenceReplacement(String replacement) {
-            int index = replacement.lastIndexOf(".");
-            this.selector = replacement.substring(0, index);
-            this.attribute = replacement.substring(index + 1);
-        }
-        
-        public String getSelector() {
-            return selector;
-        }
-        public String getAttribute() {
-            return attribute;
-        }
-
-    }
-
 }
