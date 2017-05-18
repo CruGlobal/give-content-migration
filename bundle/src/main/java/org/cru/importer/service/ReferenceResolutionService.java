@@ -1,4 +1,4 @@
-package org.cru.importer.xml;
+package org.cru.importer.service;
 
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;

@@ -1,4 +1,4 @@
-package org.cru.importer.xml;
+package org.cru.importer.service;
 
 import java.util.Date;
 

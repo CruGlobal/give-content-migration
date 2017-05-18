@@ -13,7 +13,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
-import org.cru.importer.xml.DateParserService;
+import org.cru.importer.service.DateParserService;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
 import org.osgi.framework.Constants;
@@ -47,7 +47,7 @@ public class AdditionalCSVMappingSourceFactory extends GiveSourceFactoryBase {
     private static final String PARAM_ORDER_BY = "priority";
 
     @Reference
-    DateParserService formatDateSourceFactory;
+    private DateParserService dateFormatter;
 
     @Override
     protected String resolve(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, Map<String, String> params)
@@ -171,7 +171,6 @@ public class AdditionalCSVMappingSourceFactory extends GiveSourceFactoryBase {
 
         private boolean keepCacheRow(String cacheValue, String newValue) throws XPathException {
             if (DATE.equals(priorityType)) {
-                FormatDateSourceFactory dateFormatter = ((FormatDateSourceFactory) formatDateSourceFactory);
                 Date cacheDate = dateFormatter.parseDate(parametersCollector, cacheValue);
                 Date newDate = dateFormatter.parseDate(parametersCollector, newValue);
                 return cacheDate.compareTo(newDate) == priorityOrder;

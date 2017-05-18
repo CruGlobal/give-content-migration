@@ -10,9 +10,9 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
+import org.cru.importer.service.ReferenceResolutionService;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
-import org.cru.importer.xml.ReferenceResolutionService;
 import org.osgi.framework.Constants;
 
 import net.sf.saxon.trans.XPathException;

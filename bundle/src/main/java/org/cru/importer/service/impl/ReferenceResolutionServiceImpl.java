@@ -1,4 +1,4 @@
-package org.cru.importer.xml.impl;
+package org.cru.importer.service.impl;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -16,7 +16,7 @@ import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.bean.ResultsCollector;
-import org.cru.importer.xml.ReferenceResolutionService;
+import org.cru.importer.service.ReferenceResolutionService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
