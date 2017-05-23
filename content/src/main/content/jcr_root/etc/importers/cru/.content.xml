@@ -39,7 +39,8 @@
 	    options="[
 	    	/apps/cru-content-importer/configurations/staffweb/article,
 	    	/apps/cru-content-importer/configurations/staffweb/handbook,
-	    	/apps/cru-content-importer/configurations/staffweb/landingpage
+	    	/apps/cru-content-importer/configurations/staffweb/landingpage,
+	    	/apps/cru-content-importer/configurations/staffweb/iframe
 	    ]"
 	    tempStorePath="/var/cru-content-importer"
 	    />
