@@ -244,6 +244,7 @@ public class GiveDataImportServlet extends HttpServlet {
                     String[] updatePageReferencesPolicy = PropertiesUtil.toStringArray(globalProperties.get("updatePageReferencesPolicy",String[].class), new String[]{});
                     parametersCollector.setUpdatePageReferencesPolicy(StringUtils.stripAll(updatePageReferencesPolicy));
 	            }
+	            parametersCollector.setMetadataFilePatern(properties.get("metadataFilePatern",String.class));
 			}
 		} catch (Exception e) {
 			resultsCollector.addError(e.getMessage());

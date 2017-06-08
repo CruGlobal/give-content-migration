@@ -81,4 +81,23 @@
 		referenceResolutionBasePathAssets="/content/dam"
 		postProcessServices="[UpdatePageReferences]"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>	
+
+    <assets
+        jcr:primaryType="nt:unstructured"
+        title="Assets"
+        defaultPath="/content/dam/staffweb"
+        pageTemplate=""
+        intermediateTemplate=""
+        transformation="/apps/cru-content-importer/transformations/staffweb/assets.xsl"
+        rowColumnNames="{Long}0"
+        columnFileName="primaryFile"
+        columnMimeType="primaryFile:format"
+        pathCreationStrategy="[dDocType 6 30:.*:/$0,dDocAccount 6 30:.*:/$0,dCreateDate 5 20:(.{5})(\\d{4})-(\\d{2})(.*):/$2/$3,dDocName 6 30:.*:/$0,dWebExtension 6 255:.*:\\.$0]"
+        pageAcceptRule=""
+        factoryType="asset"
+        additionalMappingFile="{Boolean}false"
+        acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(.*))$"
+        globalConfigs="/apps/cru-content-importer/configurations/global"
+        metadataFilePatern="(.*)(/staffweb-)(.*)"/>
+
 </jcr:root>

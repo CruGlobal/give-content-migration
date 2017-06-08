@@ -33,6 +33,7 @@ public class ParametersCollector {
     private String[] referenceResolutionReplacements;
     private String[] postProcessServices;
     private String[] updatePageReferencesPolicy;
+    private String metadataFilePatern;
 	
 	public ParametersCollector() {
 	    cache = new HashMap<String, Object>();
@@ -224,6 +225,14 @@ public class ParametersCollector {
 
     public void setUpdatePageReferencesPolicy(String[] updatePageReferencesPolicy) {
         this.updatePageReferencesPolicy = updatePageReferencesPolicy;
+    }
+
+    public String getMetadataFilePatern() {
+        return metadataFilePatern;
+    }
+
+    public void setMetadataFilePatern(String metadataFilePatern) {
+        this.metadataFilePatern = metadataFilePatern;
     }
 
 }

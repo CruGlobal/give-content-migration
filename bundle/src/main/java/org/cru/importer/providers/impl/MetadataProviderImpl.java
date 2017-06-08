@@ -21,6 +21,8 @@ import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.MetadataProvider;
 
+import com.google.common.base.Strings;
+
 /**
  * Extract the metadata for Give import process (From Excel file)
  * 
@@ -37,7 +39,7 @@ public class MetadataProviderImpl implements MetadataProvider {
 	Map<String,XSSFRow>[] rowsCache;
 
 	public MetadataProviderImpl(ParametersCollector parametersCollector) throws Exception {
-		workbook = getWorkbook(parametersCollector.getContentFile());
+		workbook = getWorkbook(parametersCollector);
 		columnFileNames = -1;
 		rowColumnNames = parametersCollector.getRowColumnNames();
 		excelFormatter = new DataFormatter();
@@ -183,24 +185,40 @@ public class MetadataProviderImpl implements MetadataProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	private XSSFWorkbook getWorkbook(Binary contentFile) throws Exception {
-		InputStream is = contentFile.getStream();
-		try {
-			ZipInputStream zis = new ZipInputStream(is);
-			ZipEntry entry = null;
-			while ((entry = zis.getNextEntry()) != null) {
-				if (entry.isDirectory()) {
-					continue;
-				}
-				if (entry.getName().toLowerCase().endsWith(".xlsx")) {
-					return new XSSFWorkbook(zis);
-				}
-			}
-			return null;
-		} finally {
-			IOUtils.closeQuietly(is);
-		}
-	}
+    @SuppressWarnings("resource")
+    private XSSFWorkbook getWorkbook(ParametersCollector parametersCollector) throws Exception {
+        Binary contentFile = parametersCollector.getContentFile();
+        InputStream is = contentFile.getStream();
+        try {
+            ZipInputStream zis = new ZipInputStream(is);
+
+            ZipEntry entry = null;
+            Pattern acceptFilesPattern = null;
+            if (!Strings.isNullOrEmpty(parametersCollector.getMetadataFilePatern())) {
+                acceptFilesPattern = Pattern.compile(parametersCollector.getMetadataFilePatern());
+            }
+            while ((entry = zis.getNextEntry()) != null) {
+                if (entry.isDirectory()) {
+                    continue;
+                }
+                if (entry.getName().toLowerCase().endsWith(".xlsx")
+                        && acceptsFile(acceptFilesPattern, entry.getName().toLowerCase())) {
+                    return new XSSFWorkbook(zis);
+                }
+            }
+            return null;
+        } finally {
+            IOUtils.closeQuietly(is);
+        }
+    }
+
+    private boolean acceptsFile(Pattern acceptFilesPattern, String filename) {
+        if (acceptFilesPattern != null) {
+            Matcher matcher = acceptFilesPattern.matcher(filename);
+            return matcher.matches();
+        }
+        return true;
+    }
 	
 	/**
 	 * Extract a string value representation from the cell
