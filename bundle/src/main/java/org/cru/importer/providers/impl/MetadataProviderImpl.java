@@ -1,7 +1,10 @@
 package org.cru.importer.providers.impl;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,6 +13,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.jcr.Binary;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -67,7 +71,6 @@ public class MetadataProviderImpl implements MetadataProvider {
 		}
 	}
 
-
     public String decodePropertyName(String propertyName) throws Exception {
         if (colnames.containsKey(propertyName)) {
             return propertyName;
@@ -83,11 +86,11 @@ public class MetadataProviderImpl implements MetadataProvider {
         }
     }
 	
-	public ResourceMetadata getMetadata(String filename) throws Exception {
+	public List<ResourceMetadata> getMetadata(String filename) throws Exception {
 		// Step 1: Find the filename in the Excel file
 		String partialName;
 		try {
-			partialName = filename.substring(filename.indexOf("@"));
+			partialName = FilenameUtils.getBaseName(filename);
 		} catch (Exception e) {
 			partialName = filename;
 		}
@@ -128,7 +131,7 @@ public class MetadataProviderImpl implements MetadataProvider {
 		}
 		// Step 2: extract the metadata
 		if (metadataRow != null) {
-			return new ResourceMetadata(metadataRow, colnames, excelFormatter);
+			return Arrays.asList(new ResourceMetadata(metadataRow, colnames, excelFormatter, partialName, false));
 		} else {
 			throw new Exception("Can not find metadata for this file in the Excel file searching for " + partialName);
 		}
@@ -147,7 +150,7 @@ public class MetadataProviderImpl implements MetadataProvider {
 				if (currentrow != null) {
 				    String rowFileName = getStringValue(currentrow, columnFileNames);
 				    try {
-				        rowFileName = rowFileName.substring(rowFileName.indexOf("@"));
+				        rowFileName = FilenameUtils.getBaseName(rowFileName);
 				        rowsCache[i].put(rowFileName, currentrow);
 				    } catch (Exception e) {
 				    }
@@ -226,7 +229,7 @@ public class MetadataProviderImpl implements MetadataProvider {
 	 * @param column
 	 * @return
 	 */
-	private String getStringValue(Row row, int column) {
+	protected String getStringValue(Row row, int column) {
 		Cell cell = row.getCell(column);
 		return excelFormatter.formatCellValue(cell);
 		/*if (cell != null) {

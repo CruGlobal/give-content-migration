@@ -1,14 +1,12 @@
 package org.cru.importer.providers.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.List;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.cru.importer.bean.ParametersCollector;
@@ -55,7 +53,7 @@ public class AssetProviderImpl implements ResourceProvider {
 		}
 	}
 
-	public ResourceInfo getResource(ResourceMetadata metadata, InputStream inputStream) throws Exception {
+	public ResourceInfo getResource(ResourceMetadata metadata, byte[] fileContent) throws Exception {
 		if (this.pageAcceptRuleKey != null && metadata.getPropertyNames().contains(this.pageAcceptRuleKey)) {
 			String val = metadata.getValue(this.pageAcceptRuleKey);
 			if (!val.equals(this.pageAcceptRuleValue)) {
@@ -67,11 +65,7 @@ public class AssetProviderImpl implements ResourceProvider {
 		if (asset != null) {
 			return new ResourceInfo(asset,false);
 		} else {
-			// Copy the stream to be sure is not closed prematurely
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			IOUtils.copy(inputStream, baos);
-			InputStream isArrBaos = new ByteArrayInputStream(baos.toByteArray());
-			
+			InputStream isArrBaos = new ByteArrayInputStream(fileContent);
 			// Create the asset
 			asset = buildAsset(metadata, relativePath, isArrBaos);
 			return new ResourceInfo(asset,true);

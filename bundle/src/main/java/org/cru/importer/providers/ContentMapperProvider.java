@@ -1,7 +1,5 @@
 package org.cru.importer.providers;
 
-import java.io.InputStream;
-
 import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.ResourceMetadata;
 
@@ -18,9 +16,9 @@ public interface ContentMapperProvider {
 	 * 
 	 * @param resource
 	 * @param metadata
-	 * @param inputStream
+	 * @param fileContent
 	 * @throws Exception
 	 */
-	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream inputStream) throws Exception;
+	public void mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception;
 	
 }

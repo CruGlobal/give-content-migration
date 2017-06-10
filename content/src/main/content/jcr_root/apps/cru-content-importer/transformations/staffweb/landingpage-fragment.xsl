@@ -13,68 +13,30 @@
 	<xsl:output method="xml" omit-xml-declaration="yes" version="1.0" indent="yes" encoding="UTF-8" />
 
 	<xsl:param name="path" />
-	<!-- ============================================
-      Every Excel column are available as a parameter.
-      Just declare in this section the required parameter using the column label,
-      replacing all non alphanumeric characters by underscore
-    =============================================== -->
-	<xsl:param name="urlLabel" />
-	<xsl:param name="dDocName_6_30" />
+	<xsl:param name="fragment" />
 	
-	<xsl:template match="/">
-		<sv:node sv:name="jcr:content">
-		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
-		        <sv:value>cq:PageContent</sv:value>
-		    </sv:property>
-		    <sv:property sv:name="sling:resourceType" sv:type="String">
-		        <sv:value>StaffWeb/components/page/content</sv:value>
-		    </sv:property>
-		    <sv:property sv:name="cq:template" sv:type="String">
-		        <sv:value>/apps/StaffWeb/templates/content</sv:value>
-		    </sv:property>
-		    <sv:property sv:name="cq:designPath" sv:type="String">
-		        <sv:value>/etc/designs/staffweb</sv:value>
-		    </sv:property>
-		    <sv:property sv:name="jcr:title" sv:type="String">
-		        <sv:value><xsl:value-of select="$urlLabel" /></sv:value>
-		    </sv:property>
-		    <sv:property sv:name="contentId" sv:type="String">
-		        <sv:value><xsl:value-of select="$dDocName_6_30" /></sv:value>
-		    </sv:property>
- 			<sv:property sv:name="hideInNav" sv:type="Boolean">
-		        <sv:value>true</sv:value>
-		    </sv:property>
-		    <sv:node sv:name="image">
-			    <sv:property sv:name="imageRotate" sv:type="Name">
-			        <sv:value>0</sv:value>
-			    </sv:property>
-			    <sv:property sv:name="jcr:primaryType" sv:type="Name">
-			        <sv:value>nt:unstructured</sv:value>
-			    </sv:property>
-		    </sv:node>
-		    <sv:node sv:name="content-parsys">
-			    <sv:property sv:name="jcr:primaryType" sv:type="Name">
-			        <sv:value>nt:unstructured</sv:value>
-			    </sv:property>
-			    <sv:property sv:name="sling:resourceType" sv:type="String">
-			        <sv:value>wcm/foundation/components/parsys</sv:value>
-			    </sv:property>
-			    <sv:node sv:name="section_title">
-				    <sv:property sv:name="jcr:primaryType" sv:type="Name">
-				        <sv:value>nt:unstructured</sv:value>
-				    </sv:property>
-				    <sv:property sv:name="sling:resourceType" sv:type="String">
-				        <sv:value>StaffWeb/components/section/section-title</sv:value>
-				    </sv:property>
-				    <sv:property sv:name="text" sv:type="String">
-				    	<sv:value><xsl:value-of select="$urlLabel" /></sv:value>
-				    </sv:property>
-		    	</sv:node>
-		    	<xsl:apply-templates select="wcm:root/wcm:list/wcm:row"/>
-			</sv:node>
-		</sv:node>
+	<xsl:template match="*">
+	    <xsl:element name="{name()}">
+	        <xsl:apply-templates select="@*" />
+	        <xsl:apply-templates />
+	    </xsl:element>
 	</xsl:template>
 	
+	<xsl:template match="@*">
+	    <xsl:attribute name="{name()}"><xsl:value-of select="." /></xsl:attribute>
+	</xsl:template>
+
+	<xsl:template match="sv:node[@sv:name='content-parsys']">
+		<sv:node sv:name="content-parsys">
+			<xsl:variable name="fragment" select="fn:doc(concat('give://collectorCache?key=',$fragment))"/>
+			<xsl:apply-templates select="@*" />
+			<xsl:apply-templates />
+			<xsl:for-each select="$fragment/cacheValue/wcm:root/wcm:list">
+				<xsl:apply-templates />
+			</xsl:for-each>
+		</sv:node>
+	</xsl:template>
+
 	<xsl:template match="wcm:row">
 		<xsl:variable name="plainHeadline" select="fn:doc(concat('give://escapeHTMLTags?htmlSource=', fn:encode-for-uri(wcm:element[@name='headline'])))"/>
 		<xsl:variable name="linkHeadline" select="fn:doc(concat('give://getLinkFromHTML?htmlSource=', fn:encode-for-uri(wcm:element[@name='headline'])))"/>

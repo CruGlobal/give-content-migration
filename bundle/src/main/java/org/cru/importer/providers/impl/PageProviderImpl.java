@@ -1,7 +1,8 @@
 package org.cru.importer.providers.impl;
 
-import java.io.InputStream;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.ParametersCollector;
@@ -28,7 +29,7 @@ public class PageProviderImpl implements ResourceProvider {
 	private String intermediateTemplate;
 	private List<RelativePathSection> pathSections;
 	private String pageAcceptRuleKey;
-	private String pageAcceptRuleValue;
+	private Pattern pageAcceptRuleValue;
 	
 	public PageProviderImpl(ParametersCollector parametersCollector, MetadataProvider metadataProvider) throws Exception {
 		this.pageManager = parametersCollector.getResourceResolver().adaptTo(PageManager.class);
@@ -42,14 +43,15 @@ public class PageProviderImpl implements ResourceProvider {
 		} else {
 			String[] pageAcceptRule = parametersCollector.getPageAcceptRule().split("=");
 			this.pageAcceptRuleKey = pageAcceptRule[0];
-			this.pageAcceptRuleValue = pageAcceptRule[1];
+			this.pageAcceptRuleValue =  Pattern.compile(pageAcceptRule[1]);
 		}
 	}
 
-	public ResourceInfo getResource(ResourceMetadata metadata, InputStream inputStream) throws Exception {
+	public ResourceInfo getResource(ResourceMetadata metadata, byte[] fileContent) throws Exception {
 		if (this.pageAcceptRuleKey != null && metadata.getPropertyNames().contains(this.pageAcceptRuleKey)) {
 			String val = metadata.getValue(this.pageAcceptRuleKey);
-			if (!val.equals(this.pageAcceptRuleValue)) {
+			Matcher m = pageAcceptRuleValue.matcher(val);
+			if (!m.matches()) {
 				return null;
 			}
 		}

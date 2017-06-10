@@ -1,5 +1,6 @@
 package org.cru.importer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -98,33 +99,38 @@ public class GiveDataImportMasterProcess implements Runnable {
 					proccesed.add(filename);
 					String currentFilename = "";
 					try {
-						ResourceMetadata metadata = metadataProvider.getMetadata(filename);
-						ResourceInfo resourceInfo = resourceProvider.getResource(metadata, zis);
-						currentFilename = metadata.getValue(parametersCollector.getColumnFileName());
-						if (resourceInfo != null) {
-							contentMapperProvider.mapFields(resourceInfo.getResource(), metadata, zis);
-							String pageReference = resourceInfo.getResource().getPath();
-							String message = currentFilename + " - " + pageReference;
-							if (session.hasPendingChanges()) {
-								session.save();
-								if (resourceInfo.isNewResource()) {
-									resultsCollector.addCreatedPage(message);
-									LOGGER.info("New resource created - " + message);
-								} else {
-									resultsCollector.addModifiedPage(message);
-									LOGGER.info("Existed resource modified - " + message);
-								}
-							} else {
-								resultsCollector.addNotModifiedPage(message);
-								LOGGER.info("Not modified resource - " + message);
-							}
-							for (PostProcessService service : postProcessServices) {
-							    service.process(parametersCollector, metadata, resourceInfo.getResource());
-                            }
-						} else {
-							resultsCollector.addIgnoredPages(currentFilename + " - Ignored by file name accept policy");
-							LOGGER.info("Ignored file: " + filename);
-						}
+						List<ResourceMetadata> metadataList = metadataProvider.getMetadata(filename);
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						IOUtils.copy(zis, baos);
+						byte[] fileContent = baos.toByteArray();
+						for (ResourceMetadata metadata : metadataList) {
+	                        ResourceInfo resourceInfo = resourceProvider.getResource(metadata, fileContent);
+	                        currentFilename = filename;
+	                        if (resourceInfo != null) {
+	                            contentMapperProvider.mapFields(resourceInfo.getResource(), metadata, fileContent);
+	                            String pageReference = resourceInfo.getResource().getPath();
+	                            String message = currentFilename + " - " + pageReference;
+	                            if (session.hasPendingChanges()) {
+	                                session.save();
+	                                if (resourceInfo.isNewResource()) {
+	                                    resultsCollector.addCreatedPage(message);
+	                                    LOGGER.info("New resource created - " + message);
+	                                } else {
+	                                    resultsCollector.addModifiedPage(message);
+	                                    LOGGER.info("Existed resource modified - " + message);
+	                                }
+	                            } else {
+	                                resultsCollector.addNotModifiedPage(message);
+	                                LOGGER.info("Not modified resource - " + message);
+	                            }
+	                            for (PostProcessService service : postProcessServices) {
+	                                service.process(parametersCollector, metadata, resourceInfo.getResource());
+	                            }
+	                        } else {
+	                            resultsCollector.addIgnoredPages(currentFilename + " - Ignored by file name accept policy or page acceptance rules");
+	                            LOGGER.info("Ignored file: " + filename);
+	                        }   
+                        }
                     } catch (Exception e) {
 						if (session.hasPendingChanges()) {
 							session.refresh(false);

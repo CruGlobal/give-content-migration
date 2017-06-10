@@ -1,8 +1,6 @@
 package org.cru.importer.providers.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
 import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.ParametersCollector;
@@ -24,15 +22,14 @@ public class AssetContentMapperProviderImpl extends ContentMapperProviderImpl {
 	}
 
 	@Override
-	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream imageInputStream) throws Exception {
+	public void mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		super.getSession().exportDocumentView(resource.getChild(METADATA_NODE).getPath(), out, true, true);
-		InputStream in = new ByteArrayInputStream(out.toByteArray());
-		super.mapFields(resource, metadata, in);
+		super.mapFields(resource, metadata, fileContent);
 	}
 	
 	@Override
-	protected Resource getResourceToOverride(Resource resource) {
+	public Resource getResourceToOverride(Resource resource) {
 		return resource.getChild(METADATA_NODE);
 	}
 	
