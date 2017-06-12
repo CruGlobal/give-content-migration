@@ -57,7 +57,7 @@
 				        <sv:value>StaffWeb/components/section/free-form</sv:value>
 				    </sv:property>
 				    <sv:property sv:name="htmlSource" sv:type="String">
-						<sv:value>&lt;div class=&quot;masonry__item&quot;> &lt;div class=&quot;panel  panel-default&quot; > &lt;iframe style=&quot;height:1000px&quot; src=&quot;<xsl:value-of select="wcm:root/wcm:element[@name='iframe_src']" />&quot; id=&quot;iframe_id&quot; width=&quot;100%&quot; scrolling=&quot;no&quot; frameborder=&quot;0&quot;>&lt;/iframe>&lt;/div> &lt;/div> &lt;script> $(&quot;#iframe_id&quot;).load(function(){ $(&quot;#iframe_id&quot;).height($(&quot;#iframe_id&quot;).contents().height()); }); &lt;/script> </sv:value>
+						<sv:value>&lt;div class=&quot;masonry__item&quot;> &lt;div class=&quot;panel  panel-default&quot; > &lt;iframe style=&quot;height:1000px&quot; src=&quot;<xsl:value-of select="wcm:root/wcm:element[@name='iframe_src']" />&quot; id=&quot;iframe_id&quot; width=&quot;100%&quot; scrolling=&quot;no&quot; frameborder=&quot;0&quot;>&lt;/iframe>&lt;/div> &lt;/div> &lt;script> $(&quot;#iframe_id&quot;).load(function(){ StaffWeb.global.resizeIframe(); }); &lt;/script> </sv:value>
 				    </sv:property>
 			    </sv:node>
 		    </sv:node>
