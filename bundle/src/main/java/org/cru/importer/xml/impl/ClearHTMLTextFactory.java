@@ -2,6 +2,7 @@ package org.cru.importer.xml.impl;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -39,6 +40,7 @@ public class ClearHTMLTextFactory extends GiveSourceFactoryBase {
             Document doc = Jsoup.parse(params.get(PARAM_TEXT));
             doc.outputSettings().charset("UTF-8");
             plainText = Jsoup.clean(doc.body().html(), Whitelist.simpleText());
+            plainText = StringEscapeUtils.escapeXml11(plainText);
         }
         return "<plaintext>" + plainText + "</plaintext>";
     }

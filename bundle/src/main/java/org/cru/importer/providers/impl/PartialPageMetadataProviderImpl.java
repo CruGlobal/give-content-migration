@@ -4,13 +4,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.cru.importer.bean.NotMetadataFoundException;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.util.UrlUtil;
+
+import com.google.common.base.Strings;
 
 /**
  * Extract the metadata for fragmented pages in import process (From Excel file)
@@ -25,14 +30,17 @@ public class PartialPageMetadataProviderImpl extends MetadataProviderImpl {
 
     public PartialPageMetadataProviderImpl(ParametersCollector parametersCollector) throws Exception {
         super(parametersCollector);
-        buildFragmentRowsCache();
+        buildFragmentRowsCache(parametersCollector);
     }
 
-    private void buildFragmentRowsCache() throws Exception {
-        String keyColumnName = "pageContent"; // TODO: move to configuration
+    private void buildFragmentRowsCache(ParametersCollector parametersCollector) throws Exception {
+        String keyColumnName = parametersCollector.getFragmentsColumnFileName();
         if (!colnames.containsKey(keyColumnName)) {
             throw new Exception("Metadata Excel file does not contains a column called "+ keyColumnName);
         }
+        String fragmentPattern = parametersCollector.getFragmentsAcceptanceParameterPattern();
+        fragmentPattern = (Strings.isNullOrEmpty(fragmentPattern)) ? ".*" : fragmentPattern;
+        Pattern fragmentColumnPattern = Pattern.compile(fragmentPattern);
         int keyColumnNumber = colnames.get(keyColumnName);
         fragmentRowsCache = new HashMap<String, List<XSSFRow>>();
         requiredFragments = new HashMap<String, List<String>>();
@@ -44,7 +52,7 @@ public class PartialPageMetadataProviderImpl extends MetadataProviderImpl {
                     String rowFileNames = getStringValue(currentrow, keyColumnNumber);
                     try {
                         String rowFilename = decodeFilename(getStringValue(currentrow, columnFileNames));
-                        List<String> fragments = extractFragments(rowFileNames);
+                        List<String> fragments = extractFragments(fragmentColumnPattern, rowFileNames);
                         requiredFragments.put(rowFilename, fragments);
                         for (String filename : fragments) {
                             List<XSSFRow> rows;
@@ -63,30 +71,29 @@ public class PartialPageMetadataProviderImpl extends MetadataProviderImpl {
         }
     }
 
-    private List<String> extractFragments(String rowFileNames) throws Exception {
+    private List<String> extractFragments(Pattern fragmentColumnPattern, String rowFileNames) throws Exception {
         List<String> fragments = new LinkedList<String>();
         Map<String, String> parameters = UrlUtil.splitQuery(rowFileNames);
-        for (String key : parameters.keySet()) {
-            if (isApplyParameter(key)) {
+        for (String key : new TreeSet<String>(parameters.keySet())) {
+            if (isApplyParameter(fragmentColumnPattern, key)) {
                 fragments.add(parameters.get(key).toLowerCase());
             }
         }
         return fragments;
     }
 
-    private boolean isApplyParameter(String key) {
-        // TODO Move to a regex in configuration
-        return key.startsWith("Landing_Page_Content_");
+    private boolean isApplyParameter(Pattern fragmentColumnPattern, String key) {
+        return fragmentColumnPattern.matcher(key).matches();
     }
 
     @Override
-    public List<ResourceMetadata> getMetadata(String filename) throws Exception {
+    public List<ResourceMetadata> getMetadata(String filename) throws NotMetadataFoundException {
         try {
             List<ResourceMetadata> metas = super.getMetadata(filename);
             String partialFilename = decodeFilename(filename);
             metas.get(0).setRequiredFragments(requiredFragments.get(partialFilename));
             return metas;
-        } catch (Exception e) {
+        } catch (NotMetadataFoundException e) {
             String partialFilename = decodeFilename(filename);
             if (fragmentRowsCache.containsKey(partialFilename)) {
                 List<XSSFRow> rows = fragmentRowsCache.get(partialFilename);

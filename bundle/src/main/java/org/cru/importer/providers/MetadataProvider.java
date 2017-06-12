@@ -2,6 +2,7 @@ package org.cru.importer.providers;
 
 import java.util.List;
 
+import org.cru.importer.bean.NotMetadataFoundException;
 import org.cru.importer.bean.ResourceMetadata;
 
 /**
@@ -19,7 +20,7 @@ public interface MetadataProvider {
 	 * @return
 	 * @throws Exception 
 	 */
-	public List<ResourceMetadata> getMetadata(String filename) throws Exception;
+	public List<ResourceMetadata> getMetadata(String filename) throws NotMetadataFoundException;
 	
 	/**
 	 * Decodes a property name of the metadata provider from the given name.

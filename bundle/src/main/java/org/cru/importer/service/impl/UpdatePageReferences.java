@@ -62,6 +62,10 @@ public class UpdatePageReferences implements PostProcessService {
     @Reference
     private ReferenceResolutionService referenceResolutionService;
     
+    public void process(ParametersCollector parametersCollector, List<PostProcessService> postProcessServices) throws Exception {
+        // Nothing to do here.
+    }
+    
     public void process(ParametersCollector parametersCollector, ResourceMetadata currentMetadata,
             Resource currentResource) throws Exception {
         String contentId = getCurrentContentId(currentResource);

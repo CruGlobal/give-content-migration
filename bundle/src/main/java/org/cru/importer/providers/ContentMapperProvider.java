@@ -17,8 +17,9 @@ public interface ContentMapperProvider {
 	 * @param resource
 	 * @param metadata
 	 * @param fileContent
+	 * @return 
 	 * @throws Exception
 	 */
-	public void mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception;
+	public boolean mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception;
 	
 }

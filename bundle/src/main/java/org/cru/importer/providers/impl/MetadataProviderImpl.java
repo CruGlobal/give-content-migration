@@ -2,7 +2,6 @@ package org.cru.importer.providers.impl;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +20,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.cru.importer.bean.NotMetadataFoundException;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.providers.MetadataProvider;
@@ -86,7 +86,7 @@ public class MetadataProviderImpl implements MetadataProvider {
         }
     }
 	
-	public List<ResourceMetadata> getMetadata(String filename) throws Exception {
+	public List<ResourceMetadata> getMetadata(String filename) throws NotMetadataFoundException {
 		// Step 1: Find the filename in the Excel file
 		String partialName;
 		try {
@@ -133,7 +133,7 @@ public class MetadataProviderImpl implements MetadataProvider {
 		if (metadataRow != null) {
 			return Arrays.asList(new ResourceMetadata(metadataRow, colnames, excelFormatter, partialName, false));
 		} else {
-			throw new Exception("Can not find metadata for this file in the Excel file searching for " + partialName);
+			throw new NotMetadataFoundException("Can not find metadata for this file in the Excel file searching for " + partialName);
 		}
 	}
 	

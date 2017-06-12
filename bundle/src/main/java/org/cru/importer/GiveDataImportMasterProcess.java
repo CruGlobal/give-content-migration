@@ -15,6 +15,7 @@ import javax.jcr.Session;
 
 import org.apache.commons.io.IOUtils;
 import org.cru.importer.bean.CurrentStatus;
+import org.cru.importer.bean.NotMetadataFoundException;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceInfo;
 import org.cru.importer.bean.ResourceMetadata;
@@ -107,7 +108,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 	                        ResourceInfo resourceInfo = resourceProvider.getResource(metadata, fileContent);
 	                        currentFilename = filename;
 	                        if (resourceInfo != null) {
-	                            contentMapperProvider.mapFields(resourceInfo.getResource(), metadata, fileContent);
+	                            boolean imported = contentMapperProvider.mapFields(resourceInfo.getResource(), metadata, fileContent);
 	                            String pageReference = resourceInfo.getResource().getPath();
 	                            String message = currentFilename + " - " + pageReference;
 	                            if (session.hasPendingChanges()) {
@@ -123,14 +124,20 @@ public class GiveDataImportMasterProcess implements Runnable {
 	                                resultsCollector.addNotModifiedPage(message);
 	                                LOGGER.info("Not modified resource - " + message);
 	                            }
-	                            for (PostProcessService service : postProcessServices) {
-	                                service.process(parametersCollector, metadata, resourceInfo.getResource());
+	                            if (imported) {
+    	                            for (PostProcessService service : postProcessServices) {
+    	                                service.process(parametersCollector, metadata, resourceInfo.getResource());
+    	                            }
 	                            }
 	                        } else {
 	                            resultsCollector.addIgnoredPages(currentFilename + " - Ignored by file name accept policy or page acceptance rules");
 	                            LOGGER.info("Ignored file: " + filename);
 	                        }   
                         }
+					} catch (NotMetadataFoundException nme) {
+					    String errorMessage = filename + " - " + nme.getMessage();
+                        resultsCollector.addWarning(filename);
+                        LOGGER.info("Error importing " + errorMessage);
                     } catch (Exception e) {
 						if (session.hasPendingChanges()) {
 							session.refresh(false);
@@ -144,6 +151,9 @@ public class GiveDataImportMasterProcess implements Runnable {
 					LOGGER.info("File not accepted: " + filename);
 				}
 			}
+            for (PostProcessService service : postProcessServices) {
+                service.process(parametersCollector, postProcessServices);
+            }
 			if (currentThread.isInterrupted()) {
                 LOGGER.info("Import proccess interrupted.");
 			} else {

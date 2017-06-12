@@ -87,7 +87,7 @@
 			    <sv:value>StaffWeb/components/section/tile</sv:value>
 			</sv:property>
 			<sv:property sv:name="width" sv:type="String">
-			    	<sv:value>col-md-4  col-sm-6</sv:value>
+			    	<sv:value>col-md-12</sv:value>
 			</sv:property>
 			<xsl:if test="not(wcm:element[@name='headline'] = '')">
 				<sv:property sv:name="title" sv:type="String">

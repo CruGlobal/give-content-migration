@@ -31,56 +31,56 @@
 			<xsl:variable name="fragment" select="fn:doc(concat('give://collectorCache?key=',$fragment))"/>
 			<xsl:apply-templates select="@*" />
 			<xsl:apply-templates />
-			<xsl:for-each select="$fragment/cacheValue/wcm:root/wcm:list">
-				<xsl:apply-templates />
-			</xsl:for-each>
+			<xsl:apply-templates select="$fragment/cacheValue/wcm:root/wcm:list/wcm:row"/>
 		</sv:node>
 	</xsl:template>
 
 	<xsl:template match="wcm:row">
-		<xsl:variable name="plainHeadline" select="fn:doc(concat('give://escapeHTMLTags?htmlSource=', fn:encode-for-uri(wcm:element[@name='headline'])))"/>
-		<xsl:variable name="linkHeadline" select="fn:doc(concat('give://getLinkFromHTML?htmlSource=', fn:encode-for-uri(wcm:element[@name='headline'])))"/>
-		<sv:node >
-			<xsl:attribute name="sv:name"><xsl:value-of select="concat('tile_',fn:position())"/></xsl:attribute>
-			<sv:property sv:name="jcr:primaryType" sv:type="Name">
-				<sv:value>nt:unstructured</sv:value>
-			</sv:property>
-			<sv:property sv:name="sling:resourceType" sv:type="String">
-			    <sv:value>StaffWeb/components/section/tile</sv:value>
-			</sv:property>
-			<sv:property sv:name="width" sv:type="String">
-			    	<sv:value>col-md-4  col-sm-6</sv:value>
-			</sv:property>
-			<xsl:if test="not(wcm:element[@name='headline'] = '')">
-				<sv:property sv:name="title" sv:type="String">
-			    	<sv:value><xsl:value-of select="$plainHeadline" /></sv:value>
+		<xsl:if test="fn:position() &lt; 3">
+			<xsl:variable name="plainHeadline" select="fn:doc(concat('give://escapeHTMLTags?htmlSource=', fn:encode-for-uri(wcm:element[@name='headline'])))"/>
+			<xsl:variable name="linkHeadline" select="fn:doc(concat('give://getLinkFromHTML?htmlSource=', fn:encode-for-uri(wcm:element[@name='headline'])))"/>
+			<sv:node >
+				<xsl:attribute name="sv:name"><xsl:value-of select="concat('tile_',$fragment,fn:position())"/></xsl:attribute>
+				<sv:property sv:name="jcr:primaryType" sv:type="Name">
+					<sv:value>nt:unstructured</sv:value>
 				</sv:property>
-				<xsl:if test="$linkHeadline != ''">
-					<sv:property sv:name="href" sv:type="String">
-				    	<sv:value><xsl:value-of select="$linkHeadline" /></sv:value>
+				<sv:property sv:name="sling:resourceType" sv:type="String">
+				    <sv:value>StaffWeb/components/section/tile</sv:value>
+				</sv:property>
+				<sv:property sv:name="width" sv:type="String">
+				    	<sv:value>col-md-12</sv:value>
+				</sv:property>
+				<xsl:if test="not(wcm:element[@name='headline'] = '')">
+					<sv:property sv:name="title" sv:type="String">
+				    	<sv:value><xsl:value-of select="$plainHeadline" /></sv:value>
 					</sv:property>
-					<sv:property sv:name="readMoreStyle" sv:type="String">
-				    	<sv:value>btn-subtle</sv:value>
+					<xsl:if test="$linkHeadline != ''">
+						<sv:property sv:name="href" sv:type="String">
+					    	<sv:value><xsl:value-of select="$linkHeadline" /></sv:value>
+						</sv:property>
+						<sv:property sv:name="readMoreStyle" sv:type="String">
+					    	<sv:value>btn-subtle</sv:value>
+						</sv:property>
+					</xsl:if>
+				</xsl:if>
+				<xsl:if test="not(wcm:element[@name='teaser'] = '')">
+					<sv:property sv:name="text" sv:type="String">
+				    	<sv:value><xsl:value-of select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:element[@name='teaser'])))" /></sv:value>
 					</sv:property>
 				</xsl:if>
-			</xsl:if>
-			<xsl:if test="not(wcm:element[@name='teaser'] = '')">
-				<sv:property sv:name="text" sv:type="String">
-			    	<sv:value><xsl:value-of select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:element[@name='teaser'])))" /></sv:value>
-				</sv:property>
-			</xsl:if>
-			<xsl:if test="not(wcm:element[@name='image_large'] = '')">
-				<sv:property sv:name="fileReference" sv:type="String">
-					<sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:element[@name='image_large'])))" /></sv:value>
-				</sv:property>
-				<sv:property sv:name="imageRenditionName" sv:type="String">
-			    	<sv:value>CruHalf432x243</sv:value>
-				</sv:property>
-				<sv:property sv:name="imageRotate" sv:type="String">
-			    	<sv:value>0</sv:value>
-				</sv:property>
-			</xsl:if>
-		</sv:node>	
+				<xsl:if test="not(wcm:element[@name='image_large'] = '')">
+					<sv:property sv:name="fileReference" sv:type="String">
+						<sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:element[@name='image_large'])))" /></sv:value>
+					</sv:property>
+					<sv:property sv:name="imageRenditionName" sv:type="String">
+				    	<sv:value>CruHalf432x243</sv:value>
+					</sv:property>
+					<sv:property sv:name="imageRotate" sv:type="String">
+				    	<sv:value>0</sv:value>
+					</sv:property>
+				</xsl:if>
+			</sv:node>
+		</xsl:if>
 	</xsl:template>
 
 </xsl:transform>

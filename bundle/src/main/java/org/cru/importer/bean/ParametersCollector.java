@@ -34,6 +34,8 @@ public class ParametersCollector {
     private String[] postProcessServices;
     private String[] updatePageReferencesPolicy;
     private String metadataFilePatern;
+    private String fragmentsColumnFileName;
+    private String fragmentsAcceptanceParameterPattern;
 	
 	public ParametersCollector() {
 	    cache = new HashMap<String, Object>();
@@ -233,6 +235,22 @@ public class ParametersCollector {
 
     public void setMetadataFilePatern(String metadataFilePatern) {
         this.metadataFilePatern = metadataFilePatern;
+    }
+
+    public String getFragmentsColumnFileName() {
+        return fragmentsColumnFileName;
+    }
+
+    public void setFragmentsColumnFileName(String fragmentsColumnFileName) {
+        this.fragmentsColumnFileName = fragmentsColumnFileName;
+    }
+
+    public String getFragmentsAcceptanceParameterPattern() {
+        return fragmentsAcceptanceParameterPattern;
+    }
+
+    public void setFragmentsAcceptanceParameterPattern(String fragmentsAcceptanceParameterPattern) {
+        this.fragmentsAcceptanceParameterPattern = fragmentsAcceptanceParameterPattern;
     }
 
 }

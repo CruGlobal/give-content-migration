@@ -17,7 +17,7 @@ import org.cru.importer.providers.ContentMapperProvider;
 public class PartialPageContentMapperProviderImpl implements ContentMapperProvider {
     
     private static final String CACHE_KEY_FRAGMENT_FILE = "fragment";
-    
+ 
     String columnFilename;
     
     DocumentBuilder xmlBuilder;
@@ -40,21 +40,24 @@ public class PartialPageContentMapperProviderImpl implements ContentMapperProvid
         this.fragmentContentMapper = new ContentMapperProviderImpl(parametersCollector, "/apps/cru-content-importer/transformations/staffweb/landingpage-fragment.xsl");
     }
 
-    public void mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
+    public boolean mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
         if (metadata.isFragment()) {
             fragmentsCache.put(metadata.getFilename(), fileContent);
             String baseFileName = FilenameUtils.getBaseName(metadata.getValue(columnFilename));
             if (principalCache.containsKey(baseFileName) && verifyFragments(metadata)) {
                 byte[] principalContent = principalCache.remove(baseFileName);
                 processImport(principalContent, metadata, resource);
+                return true;
             }
         } else {
             if (verifyFragments(metadata)) {
                 processImport(fileContent, metadata, resource);
+                return true;
             } else {
                 principalCache.put(metadata.getFilename(), fileContent);
             }
         }
+        return false;
     }
 
     private boolean verifyFragments(ResourceMetadata metadata) {
@@ -66,29 +69,29 @@ public class PartialPageContentMapperProviderImpl implements ContentMapperProvid
         return true;
     }
     
-    private void processImport(byte[] principalContent, ResourceMetadata metadata, Resource resource) throws Exception {
+    public void processImport(byte[] principalContent, ResourceMetadata metadata, Resource resource) throws Exception {
         byte[] content = principalContentMapper.processTransformation(resource, metadata, principalContent);
         for (String fragment : metadata.getRequiredFragments()) {
-            byte[] fragmentContent = fragmentsCache.get(fragment);
-            parametersCollector.putCache(fragment, clearXml(fragmentContent));
-            fragmentContentMapper.setTransformParameter(CACHE_KEY_FRAGMENT_FILE, fragment);
-            content = fragmentContentMapper.processTransformation(resource, metadata, content);
+            if (fragmentsCache.containsKey(fragment)) {
+                byte[] fragmentContent = fragmentsCache.get(fragment);
+                parametersCollector.putCache(fragment, clearXml(fragmentContent));
+                fragmentContentMapper.setTransformParameter(CACHE_KEY_FRAGMENT_FILE, fragment);
+                content = fragmentContentMapper.processTransformation(resource, metadata, content);
+            }
         }
         InputStream result = new ByteArrayInputStream(content);
-        try {
-            principalContentMapper.importResult(principalContentMapper.getResourceToOverride(resource), result);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        principalContentMapper.importResult(principalContentMapper.getResourceToOverride(resource), result);
     }
 
     private String clearXml(byte[] fragmentContent) {
         String fragment = new String(fragmentContent);
         fragment = fragment.replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim(); //Remove xml declaration
         fragment = fragmentContentMapper.sanitizeXml(fragment);
-        //fragment = fragment.replaceAll("\\sxmlns[^\"]+\"[^\"]+\"", ""); // Remove namespace definitions
         return fragment;
+    }
+    
+    public Map<String, byte[]> getPendingImportFiles() {
+        return principalCache;
     }
 
 }

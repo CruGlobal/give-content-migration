@@ -22,10 +22,10 @@ public class AssetContentMapperProviderImpl extends ContentMapperProviderImpl {
 	}
 
 	@Override
-	public void mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
+	public boolean mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		super.getSession().exportDocumentView(resource.getChild(METADATA_NODE).getPath(), out, true, true);
-		super.mapFields(resource, metadata, fileContent);
+		return super.mapFields(resource, metadata, out.toByteArray());
 	}
 	
 	@Override

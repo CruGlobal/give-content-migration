@@ -24,17 +24,28 @@ import org.osgi.framework.Constants;
 	@Property(name = Constants.SERVICE_RANKING, intValue = 1)
 })
 public class FragmentedPageImportFactoryImpl implements DataImportFactory {
+    
+    public static final String CACHE_KEY_METADATA_PROVIDER = "fragmentMetadataProvider";
+    public static final String CACHE_KEY_CONTENT_MAPPER_PROVIDER = "fragmentContentMapperProvider";
+    public static final String CACHE_KEY_RESOURCE_PROVIDER = "fragmentResourceProvider";
+    
 
 	public MetadataProvider createMetadataProvider(ParametersCollector parametersCollector) throws Exception {
-		return new PartialPageMetadataProviderImpl(parametersCollector);
+	    PartialPageMetadataProviderImpl provider = new PartialPageMetadataProviderImpl(parametersCollector);
+        parametersCollector.putCache(CACHE_KEY_METADATA_PROVIDER, provider);
+		return provider;
 	}
 
 	public ResourceProvider createResourceProvider(ParametersCollector parametersCollector, MetadataProvider metadataProvider) throws Exception {
-		return new PageProviderImpl(parametersCollector, metadataProvider);
+	    PageProviderImpl provider = new PageProviderImpl(parametersCollector, metadataProvider);
+        parametersCollector.putCache(CACHE_KEY_RESOURCE_PROVIDER, provider);
+        return provider;
 	}
 
 	public ContentMapperProvider createContentMapperProvider(ParametersCollector parametersCollector) throws Exception {
-		return new PartialPageContentMapperProviderImpl(parametersCollector);
+		PartialPageContentMapperProviderImpl provider = new PartialPageContentMapperProviderImpl(parametersCollector);
+        parametersCollector.putCache(CACHE_KEY_CONTENT_MAPPER_PROVIDER, provider);
+        return provider;
 	}
 
 }

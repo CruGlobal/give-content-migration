@@ -55,11 +55,13 @@
 		pathCreationStrategy="[url:(.*)(?&lt;!\\/index)(\\/index)?\\..*:/$1]"
 		pageAcceptRule="url=^(?!\\/donotmigrate)(.*)"
 		factoryType="fragmentedPage"
+		fragmentsColumnFileName="pageContent"
+		fragmentsAcceptanceParameterPattern="^Landing_Page_Content_(.*)"
 		additionalMappingFile="{Boolean}false"
 		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
-		postProcessServices="[UpdatePageReferences]"
+		postProcessServices="[UpdatePageReferences, buildUncompletedFragmentedPages]"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 		
 	<iframe

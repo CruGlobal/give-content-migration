@@ -73,11 +73,12 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
     }
 
 	//@SuppressWarnings("resource")
-	public void mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
+	public boolean mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
 		try {
 			byte[] bresult = processTransformation(resource, metadata, fileContent);
 			InputStream result = new ByteArrayInputStream(bresult);
 			importResult(getResourceToOverride(resource), result);
+			return true;
 		} catch (SaxonApiException e) {
 			if (e.getCause()!=null && e.getCause() instanceof XPathException) {
 				XPathException ex = (XPathException)e.getCause();
