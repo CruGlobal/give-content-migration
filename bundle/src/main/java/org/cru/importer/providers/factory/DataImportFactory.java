@@ -1,6 +1,7 @@
 package org.cru.importer.providers.factory;
 
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.ResourceProvider;
@@ -19,10 +20,11 @@ public interface DataImportFactory {
 	 * Creates a metadata provider
 	 * 
 	 * @param parametersCollector
+	 * @param resultsCollector 
 	 * @return
 	 * @throws Exception
 	 */
-	public MetadataProvider createMetadataProvider(ParametersCollector parametersCollector) throws Exception;
+	public MetadataProvider createMetadataProvider(ParametersCollector parametersCollector, ResultsCollector resultsCollector) throws Exception;
 	
 	/**
 	 * Cretes a resource provider

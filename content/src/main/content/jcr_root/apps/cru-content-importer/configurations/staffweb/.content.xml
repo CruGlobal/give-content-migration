@@ -44,7 +44,7 @@
 
 	<landingpage
 		jcr:primaryType="nt:unstructured"
-		title="Landingpage"
+		title="Landing Page"
 		defaultPath="/content/staffweb/us/en"
 		pageTemplate="/apps/StaffWeb/components/page/content"
 		intermediateTemplate="/apps/StaffWeb/components/page/content"
@@ -52,14 +52,16 @@
 		rowColumnNames="{Long}0"
 		columnFileName="primaryFile"
 		columnMimeType=""
-		pathCreationStrategy="[finalUrl:(.*)(?&lt;!\\/index)(\\/index)?\\..*:/$1]"
-		pageAcceptRule=""
-		factoryType="page"
+		pathCreationStrategy="[url:(.*)(?&lt;!\\/index)(\\/index)?\\..*:/$1]"
+		pageAcceptRule="url=^(?!\\/donotmigrate)(.*)"
+		factoryType="fragmentedPage"
+		fragmentsColumnFileName="pageContent"
+		fragmentsAcceptanceParameterPattern="^Landing_Page_Content_(.*)"
 		additionalMappingFile="{Boolean}false"
 		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
-		postProcessServices="[UpdatePageReferences]"
+		postProcessServices="[UpdatePageReferences, buildUncompletedFragmentedPages]"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>
 		
 	<iframe

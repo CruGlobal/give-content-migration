@@ -18,9 +18,8 @@
       Just declare in this section the required parameter using the column label,
       replacing all non alphanumeric characters by underscore
     =============================================== -->
-	<xsl:param name="dDocTitle" />
-	<xsl:param name="xDescription" />
-	<xsl:param name="dDocName" />
+	<xsl:param name="urlLabel" />
+	<xsl:param name="dDocName_6_30" />
 	
 	<xsl:template match="/">
 		<sv:node sv:name="jcr:content">
@@ -37,13 +36,10 @@
 		        <sv:value>/etc/designs/staffweb</sv:value>
 		    </sv:property>
 		    <sv:property sv:name="jcr:title" sv:type="String">
-		        <sv:value><xsl:value-of select="$dDocTitle" /></sv:value>
-		    </sv:property>
-		    <sv:property sv:name="jcr:description" sv:type="String">
-		        <sv:value><xsl:value-of select="$xDescription" /></sv:value>
+		        <sv:value><xsl:value-of select="$urlLabel" /></sv:value>
 		    </sv:property>
 		    <sv:property sv:name="contentId" sv:type="String">
-		        <sv:value><xsl:value-of select="$dDocName" /></sv:value>
+		        <sv:value><xsl:value-of select="$dDocName_6_30" /></sv:value>
 		    </sv:property>
  			<sv:property sv:name="hideInNav" sv:type="Boolean">
 		        <sv:value>true</sv:value>
@@ -71,7 +67,7 @@
 				        <sv:value>StaffWeb/components/section/section-title</sv:value>
 				    </sv:property>
 				    <sv:property sv:name="text" sv:type="String">
-				    	<sv:value><xsl:value-of select="wcm:root/wcm:element[@name='section_text_heading']" /></sv:value>
+				    	<sv:value><xsl:value-of select="$urlLabel" /></sv:value>
 				    </sv:property>
 		    	</sv:node>
 		    	<xsl:apply-templates select="wcm:root/wcm:list/wcm:row"/>
@@ -91,7 +87,7 @@
 			    <sv:value>StaffWeb/components/section/tile</sv:value>
 			</sv:property>
 			<sv:property sv:name="width" sv:type="String">
-			    	<sv:value>col-md-4  col-sm-6</sv:value>
+			    	<sv:value>col-md-12</sv:value>
 			</sv:property>
 			<xsl:if test="not(wcm:element[@name='headline'] = '')">
 				<sv:property sv:name="title" sv:type="String">

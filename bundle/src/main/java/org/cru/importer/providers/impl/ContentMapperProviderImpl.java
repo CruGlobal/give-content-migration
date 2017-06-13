@@ -14,7 +14,6 @@ import javax.jcr.Node;
 import javax.jcr.Session;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.commons.JcrUtils;
 import org.apache.sling.api.resource.Resource;
 import org.cru.importer.bean.ParametersCollector;
@@ -50,62 +49,36 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	private List<String> transformerParameters;
 	private GiveURIResolver resolver;
 	
-	public ContentMapperProviderImpl(ParametersCollector parametersCollector) throws Exception {
-		this.transformedKeys = null;
-		this.session = parametersCollector.getResourceResolver().adaptTo(Session.class);
-		this.sanitizationMap = parametersCollector.getSanitizationMap();
+    public ContentMapperProviderImpl(ParametersCollector parametersCollector) throws Exception {
+        this(parametersCollector, parametersCollector.getXsltPath());
+    }
 
-		Node xsltNode = this.session.getNode(parametersCollector.getXsltPath());
-		processor = new Processor(false);
+    public ContentMapperProviderImpl(ParametersCollector parametersCollector, String xsltPath) throws Exception {
+        this.transformedKeys = null;
+        this.session = parametersCollector.getResourceResolver().adaptTo(Session.class);
+        this.sanitizationMap = parametersCollector.getSanitizationMap();
+
+        Node xsltNode = this.session.getNode(xsltPath);
+        processor = new Processor(false);
         XsltCompiler comp = processor.newXsltCompiler();
         resolver = new GiveURIResolver(parametersCollector);
         comp.setURIResolver(resolver);
         XsltExecutable exp = comp.compile(new StreamSource(JcrUtils.readFile(xsltNode)));
         transformerParameters = new LinkedList<String>();
         for (QName key : exp.getGlobalParameters().keySet()) {
-        	transformerParameters.add(key.getLocalName());
+            transformerParameters.add(key.getLocalName());
         }
         transformer = exp.load();
         transformer.setURIResolver(resolver);
-	}
+    }
 
 	//@SuppressWarnings("resource")
-	public void mapFields(Resource resource, ResourceMetadata metadata, InputStream xmlInputStream) throws Exception {
+	public boolean mapFields(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
 		try {
-			initTransformedKeys(metadata.getPropertyNames());
-			
-			// Copy the stream to be sure is not closed prematurely
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			IOUtils.copy(xmlInputStream, baos);
-
-			InputStream isArrBaos = new ByteArrayInputStream(baos.toByteArray());
-			CharsetDetector detector = new CharsetDetector();
-	        detector.setText(isArrBaos);
-	        CharsetMatch match = detector.detect();
-	        String orig = new String(baos.toByteArray(), match.getName());
-        	for (String key : sanitizationMap.keySet()) {
-        	    orig = orig.replaceAll(key, sanitizationMap.get(key));
-        	}
-        	isArrBaos = new ByteArrayInputStream(orig.getBytes("UTF-8"));
-
-			transformer.setParameter(new QName("path"), new XdmAtomicValue(resource.getPath()));
-			for (String key : transformerParameters) {
-				if (transformedKeys.containsKey(key)) {
-					String colname = transformedKeys.get(key);
-					transformer.setParameter(new QName(key), new XdmAtomicValue(metadata.getValue(colname)));
-				}
-			}
-			
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			resolver.setCurrentMetadata(metadata);
-			transformer.setSource(new StreamSource(isArrBaos));
-			transformer.setDestination(processor.newSerializer(output));
-			transformer.transform();
-
-			byte[] bresult = output.toByteArray();
+			byte[] bresult = processTransformation(resource, metadata, fileContent);
 			InputStream result = new ByteArrayInputStream(bresult);
-
 			importResult(getResourceToOverride(resource), result);
+			return true;
 		} catch (SaxonApiException e) {
 			if (e.getCause()!=null && e.getCause() instanceof XPathException) {
 				XPathException ex = (XPathException)e.getCause();
@@ -117,6 +90,39 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 			}
 			throw e;
 		}
+	}
+	
+	protected byte[] processTransformation(Resource resource, ResourceMetadata metadata, byte[] fileContent) throws Exception {
+        initTransformedKeys(metadata.getPropertyNames());
+        InputStream isArrBaos = new ByteArrayInputStream(fileContent);
+        CharsetDetector detector = new CharsetDetector();
+        detector.setText(isArrBaos);
+        CharsetMatch match = detector.detect();
+        String orig = sanitizeXml(new String(fileContent, match.getName()));
+        isArrBaos = new ByteArrayInputStream(orig.getBytes("UTF-8"));
+
+        transformer.setParameter(new QName("path"), new XdmAtomicValue(resource.getPath()));
+        for (String key : transformerParameters) {
+            if (transformedKeys.containsKey(key)) {
+                String colname = transformedKeys.get(key);
+                transformer.setParameter(new QName(key), new XdmAtomicValue(metadata.getValue(colname)));
+            }
+        }
+        
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        resolver.setCurrentMetadata(metadata);
+        transformer.setSource(new StreamSource(isArrBaos));
+        transformer.setDestination(processor.newSerializer(output));
+        transformer.transform();
+
+        return output.toByteArray();
+	}
+	
+	public String sanitizeXml(String orig) {
+        for (String key : sanitizationMap.keySet()) {
+            orig = orig.replaceAll(key, sanitizationMap.get(key));
+        }
+        return orig;
 	}
 
 	private void initTransformedKeys(Set<String> colnames) {
@@ -135,7 +141,7 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	 * @param result
 	 * @throws Exception
 	 */
-	private void importResult(Resource resource, InputStream result) throws Exception {
+	public void importResult(Resource resource, InputStream result) throws Exception {
 		// Get the parent path
 		String path = resource.getParent().getPath();
 		// Remove the previous content to avoid xml import error
@@ -149,12 +155,16 @@ public class ContentMapperProviderImpl implements ContentMapperProvider {
 	 * @param resource
 	 * @return
 	 */
-	protected Resource getResourceToOverride(Resource resource) {
+	public Resource getResourceToOverride(Resource resource) {
 		return resource.getChild("jcr:content");
 	}
 
 	protected Session getSession() {
 		return session;
 	}
+
+    public void setTransformParameter(String name, String value) {
+        transformer.setParameter(new QName(name), new XdmAtomicValue(value));
+    }
 	
 }
