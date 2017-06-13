@@ -13,7 +13,10 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.cru.importer.bean.NotMetadataFoundException;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
+import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.util.UrlUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
@@ -25,15 +28,17 @@ import com.google.common.base.Strings;
  */
 public class PartialPageMetadataProviderImpl extends MetadataProviderImpl {
     
+    private final static Logger LOGGER = LoggerFactory.getLogger(PartialPageMetadataProviderImpl.class);
+    
     Map<String, List<XSSFRow>> fragmentRowsCache;
     Map<String, List<String>> requiredFragments;
 
-    public PartialPageMetadataProviderImpl(ParametersCollector parametersCollector) throws Exception {
+    public PartialPageMetadataProviderImpl(ParametersCollector parametersCollector, ResultsCollector resultsCollector) throws Exception {
         super(parametersCollector);
-        buildFragmentRowsCache(parametersCollector);
+        buildFragmentRowsCache(parametersCollector, resultsCollector);
     }
 
-    private void buildFragmentRowsCache(ParametersCollector parametersCollector) throws Exception {
+    private void buildFragmentRowsCache(ParametersCollector parametersCollector, ResultsCollector resultsCollector) throws Exception {
         String keyColumnName = parametersCollector.getFragmentsColumnFileName();
         if (!colnames.containsKey(keyColumnName)) {
             throw new Exception("Metadata Excel file does not contains a column called "+ keyColumnName);
@@ -50,8 +55,8 @@ public class PartialPageMetadataProviderImpl extends MetadataProviderImpl {
                 XSSFRow currentrow = currentsheet.getRow(j);
                 if (currentrow != null) {
                     String rowFileNames = getStringValue(currentrow, keyColumnNumber);
+                    String rowFilename = decodeFilename(getStringValue(currentrow, columnFileNames));
                     try {
-                        String rowFilename = decodeFilename(getStringValue(currentrow, columnFileNames));
                         List<String> fragments = extractFragments(fragmentColumnPattern, rowFileNames);
                         requiredFragments.put(rowFilename, fragments);
                         for (String filename : fragments) {
@@ -65,6 +70,8 @@ public class PartialPageMetadataProviderImpl extends MetadataProviderImpl {
                             rows.add(currentrow);
                         }
                     } catch (Exception e) {
+                        resultsCollector.addWarning("Building metadata from Excel file: " + rowFilename + " - " + e.getMessage());
+                        LOGGER.error(e.getMessage(), e);
                     }
                 }
             }
@@ -73,10 +80,12 @@ public class PartialPageMetadataProviderImpl extends MetadataProviderImpl {
 
     private List<String> extractFragments(Pattern fragmentColumnPattern, String rowFileNames) throws Exception {
         List<String> fragments = new LinkedList<String>();
-        Map<String, String> parameters = UrlUtil.splitQuery(rowFileNames);
-        for (String key : new TreeSet<String>(parameters.keySet())) {
-            if (isApplyParameter(fragmentColumnPattern, key)) {
-                fragments.add(parameters.get(key).toLowerCase());
+        if (!Strings.isNullOrEmpty(rowFileNames)) {
+            Map<String, String> parameters = UrlUtil.splitQuery(rowFileNames);
+            for (String key : new TreeSet<String>(parameters.keySet())) {
+                if (isApplyParameter(fragmentColumnPattern, key)) {
+                    fragments.add(parameters.get(key).toLowerCase());
+                }
             }
         }
         return fragments;

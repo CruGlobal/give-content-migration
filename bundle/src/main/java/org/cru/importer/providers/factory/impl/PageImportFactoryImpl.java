@@ -5,6 +5,7 @@ import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.ResourceProvider;
@@ -25,7 +26,7 @@ import org.osgi.framework.Constants;
 })
 public class PageImportFactoryImpl implements DataImportFactory {
 
-	public MetadataProvider createMetadataProvider(ParametersCollector parametersCollector) throws Exception {
+	public MetadataProvider createMetadataProvider(ParametersCollector parametersCollector, ResultsCollector resultsCollector) throws Exception {
 		return new MetadataProviderImpl(parametersCollector);
 	}
 

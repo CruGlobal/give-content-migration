@@ -5,6 +5,7 @@ import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
+import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.providers.ContentMapperProvider;
 import org.cru.importer.providers.MetadataProvider;
 import org.cru.importer.providers.ResourceProvider;
@@ -30,8 +31,8 @@ public class FragmentedPageImportFactoryImpl implements DataImportFactory {
     public static final String CACHE_KEY_RESOURCE_PROVIDER = "fragmentResourceProvider";
     
 
-	public MetadataProvider createMetadataProvider(ParametersCollector parametersCollector) throws Exception {
-	    PartialPageMetadataProviderImpl provider = new PartialPageMetadataProviderImpl(parametersCollector);
+	public MetadataProvider createMetadataProvider(ParametersCollector parametersCollector, ResultsCollector resultsCollector) throws Exception {
+	    PartialPageMetadataProviderImpl provider = new PartialPageMetadataProviderImpl(parametersCollector, resultsCollector);
         parametersCollector.putCache(CACHE_KEY_METADATA_PROVIDER, provider);
 		return provider;
 	}

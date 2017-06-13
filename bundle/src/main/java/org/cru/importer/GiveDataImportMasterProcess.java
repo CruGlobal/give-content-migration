@@ -77,7 +77,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 		InputStream in = null;
 		try {
 			DataImportFactory dataImportFactory = getDataImporFactory(parametersCollector);
-			MetadataProvider metadataProvider = dataImportFactory.createMetadataProvider(parametersCollector);
+			MetadataProvider metadataProvider = dataImportFactory.createMetadataProvider(parametersCollector, resultsCollector);
 			ResourceProvider resourceProvider = dataImportFactory.createResourceProvider(parametersCollector, metadataProvider);
 			ContentMapperProvider contentMapperProvider = dataImportFactory.createContentMapperProvider(parametersCollector);
 			List<PostProcessService> postProcessServices = getPostProcessServices(parametersCollector);
