@@ -84,6 +84,26 @@
 		postProcessServices="[UpdatePageReferences]"
 		globalConfigs="/apps/cru-content-importer/configurations/global"/>	
 
+	<email
+		jcr:primaryType="nt:unstructured"
+		title="Email Pages"
+		defaultPath="/content/staffweb/us/en"
+		pageTemplate="/apps/StaffWeb/components/page/article"
+		intermediateTemplate="/apps/StaffWeb/components/page/content"
+		transformation="/apps/cru-content-importer/transformations/staffweb/email.xsl"
+		rowColumnNames="{Long}0"
+		columnFileName="primaryFile"
+		columnMimeType=""
+		pathCreationStrategy="[url:(.*)(?&lt;!\\/index)(\\/index)?\\..*:/$1]"
+		pageAcceptRule=""
+		factoryType="page"
+		additionalMappingFile="{Boolean}false"
+		acceptFilesPattern="^(?!__MACOSX)(.*).xml"
+		referenceResolutionBasePathPages="/content/staffweb/us/en"
+		referenceResolutionBasePathAssets="/content/dam"
+		postProcessServices="[UpdatePageReferences]"
+		globalConfigs="/apps/cru-content-importer/configurations/global"/>
+
     <assets
         jcr:primaryType="nt:unstructured"
         title="Assets"
