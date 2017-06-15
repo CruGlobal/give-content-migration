@@ -18,7 +18,9 @@
 		'Published' MMMM dd\, yyyy hh:mm,
 		'Published' MMMM dd\, yyyy,
 		'Published' MMMM. dd\, yyyy,
+		'Posted:' dd.MMM.yyyydd.MMM.yyyy,
 		'Posted:' dd.MMMM.yyyy,
+		'yyyydd-MMM-ddT',
 		MMMM dd\, yyyy HH:mm,
 		MMM. dd\, yyyy,
 		MMMM dd\, yyyy,
@@ -29,6 +31,9 @@
 		dd MMMM yyyy,
 		dd-MMMM-yy,
 		M/d/yyyy]"
+	dateSanitizationMap="[
+		Sept\\.=Sep.
+	]"
 	sanitizationMap="[
 		&amp;ntilde;=&amp;amp;ntilde;,
 		&amp;ccedil;=&amp;amp;ccedil;,

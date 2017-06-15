@@ -36,8 +36,9 @@ public class ParametersCollector {
     private String metadataFilePatern;
     private String fragmentsColumnFileName;
     private String fragmentsAcceptanceParameterPattern;
+    private Map<String, String> dateSanitizationMap;
 	
-	public ParametersCollector() {
+    public ParametersCollector() {
 	    cache = new HashMap<String, Object>();
 	}
 	
@@ -251,6 +252,14 @@ public class ParametersCollector {
 
     public void setFragmentsAcceptanceParameterPattern(String fragmentsAcceptanceParameterPattern) {
         this.fragmentsAcceptanceParameterPattern = fragmentsAcceptanceParameterPattern;
+    }
+    
+    public Map<String, String> getDateSanitizationMap() {
+        return dateSanitizationMap;
+    }
+
+    public void setDateSanitizationMap(Map<String, String> dateSanitizationMap) {
+        this.dateSanitizationMap = dateSanitizationMap;
     }
 
 }

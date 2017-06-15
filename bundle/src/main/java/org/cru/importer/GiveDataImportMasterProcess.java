@@ -136,7 +136,7 @@ public class GiveDataImportMasterProcess implements Runnable {
                         }
 					} catch (NotMetadataFoundException nme) {
 					    String errorMessage = filename + " - " + nme.getMessage();
-                        resultsCollector.addWarning(filename);
+                        resultsCollector.addWarning(errorMessage);
                         LOGGER.info("Error importing " + errorMessage);
                     } catch (Exception e) {
 						if (session.hasPendingChanges()) {

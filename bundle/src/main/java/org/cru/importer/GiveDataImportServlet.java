@@ -236,9 +236,10 @@ public class GiveDataImportServlet extends HttpServlet {
 	                isValid = false;
 	            } else {
 	                ValueMap globalProperties = globalConfigs.adaptTo(ValueMap.class);
-	                parametersCollector.setSanitizationMap(PropertiesUtil.toMap(globalProperties.get("sanitizationMap",String[].class), new String[]{}));
+                    parametersCollector.setSanitizationMap(PropertiesUtil.toMap(globalProperties.get("sanitizationMap",String[].class), new String[]{}));
                     String[] acceptedDateFormats = PropertiesUtil.toStringArray(globalProperties.get("acceptedDateFormats",String[].class), new String[]{});
                     parametersCollector.setAcceptedDateFormats(StringUtils.stripAll(acceptedDateFormats));
+                    parametersCollector.setDateSanitizationMap(PropertiesUtil.toMap(globalProperties.get("dateSanitizationMap",String[].class), new String[]{}));
                     String[] referenceResolutionIgnoredPrefixes = PropertiesUtil.toStringArray(globalProperties.get("referenceResolutionIgnoredPrefixes",String[].class), new String[]{});
                     parametersCollector.setReferenceResolutionIgnoredPrefixes(StringUtils.stripAll(referenceResolutionIgnoredPrefixes));
                     String[] referenceResolutionReplacements = PropertiesUtil.toStringArray(globalProperties.get("referenceResolutionReplacements",String[].class), new String[]{});

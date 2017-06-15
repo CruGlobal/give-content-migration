@@ -4,9 +4,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
@@ -24,12 +26,13 @@ import net.sf.saxon.trans.XPathException;
 public class DateParserServiceImpl implements DateParserService {
 
     private static final String CACHE_DATE_FORMATS_KEY = "dateFormats";
+    private static final String CACHE_DATE_SANITIZATION_MAP_KEY = "dateSanitizationMap";
     
     public Date parseDate(ParametersCollector parametersCollector, String origDate) throws XPathException {
+        String sanitizedDate = sanitizeDate(parametersCollector, origDate);
         for (DateFormat formatter : getIncomingDateFormatters(parametersCollector)) {
             try {
-                Date extractedDate = formatter.parse(origDate);
-                return extractedDate;
+                return formatter.parse(sanitizedDate);
             } catch (ParseException e) {
             }
         }
@@ -49,4 +52,20 @@ public class DateParserServiceImpl implements DateParserService {
         return (List<DateFormat>) parametersCollector.getCached(CACHE_DATE_FORMATS_KEY);
     }
 
+    public String sanitizeDate(ParametersCollector parametersCollector, String date) {
+        String result = date;
+        Map<String, String> dateSanitizationMap = getDateSanitizationMap(parametersCollector);
+        for (String key : dateSanitizationMap.keySet()) {
+            result = result.replaceAll(key, dateSanitizationMap.get(key));
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, String> getDateSanitizationMap(ParametersCollector parametersCollector) {
+        if (!parametersCollector.isCached(CACHE_DATE_SANITIZATION_MAP_KEY)) {
+            parametersCollector.putCache(CACHE_DATE_SANITIZATION_MAP_KEY, parametersCollector.getDateSanitizationMap());
+        }  
+        return (Map<String, String>) parametersCollector.getCached(CACHE_DATE_SANITIZATION_MAP_KEY);
+    }
 }
