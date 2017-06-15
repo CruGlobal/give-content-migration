@@ -1,5 +1,6 @@
 package org.cru.importer.service.impl;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
     private static final String TYPE_NODELINK = "nodelink";
     private static final String TYPE_RESOURCE = "resource";
     private static final String TYPE_RENDITION = "rendition";
+    private static final String TYPE_WEBLAYOUT = "weblayout";
 
     private static final String PROPERTY_PAGE = "cq:Page";
     private static final String PROPERTY_ASSET = "dam:Asset";
@@ -54,7 +56,10 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
 
     private static final String STELLENT_EXRACTOR_REGEX = "wcmUrl\\(\\s*?'(.*?)'\\s*?,\\s*?'(.*?)'";
     private static Pattern pattern = Pattern.compile(STELLENT_EXRACTOR_REGEX);
-    
+
+    private static final String STELLENT_EXRACTOR_REGEX_WEBLAYOUT = "ssWeblayoutUrl\\('(.*?)'\\)";
+    private static Pattern patternWeblayout = Pattern.compile(STELLENT_EXRACTOR_REGEX_WEBLAYOUT);
+
     @Reference
     private ResultsCollector resultsCollector;
     
@@ -90,26 +95,58 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
         String message = "";
         String currentFilename = currentMetadata.getValue(parametersCollector.getColumnFileName());
         try {
-            Matcher matcher = pattern.matcher(originalReference);
-            if (matcher.find()) {
-                String type = matcher.group(1);
-                String dDocName = matcher.group(2);
-                String reference = resolveContentReference(parametersCollector, type, dDocName);
+            String reference = extractReference(parametersCollector, originalReference);
+            if (reference != null) {
+                return reference;
+            } else {
+                reference = extractReferenceWeblayout(parametersCollector, originalReference);
                 if (reference != null) {
                     return reference;
                 } else {
-                    message = currentFilename + " - Cannot find content - type: " + type + " - dDocName: " + dDocName;
+                    message = currentFilename + " - Cannot extract content ID from string: " + originalReference;
                 }
-            } else {
-                message = currentFilename + " - Cannot extract content ID from string: " + originalReference;
             }
             LOGGER.warn(message);
+        } catch (FileNotFoundException e) {
+            message = currentFilename + " - " + e.getMessage();
+            LOGGER.warn(message, e);
         } catch (Exception e) {
             message = currentFilename + " - Error resolving reference for: " + originalReference;
             LOGGER.error(message, e);
         }
         resultsCollector.addWarning(message);
         return originalReference;
+    }
+
+    private String extractReference(ParametersCollector parametersCollector, String originalReference) throws Exception {
+        Matcher matcher = pattern.matcher(originalReference);
+        if (matcher.find()) {
+            String type = matcher.group(1);
+            String dDocName = matcher.group(2);
+            String reference = resolveContentReference(parametersCollector, type, dDocName);
+            if (reference != null) {
+                return reference;
+            } else {
+                throw new FileNotFoundException(" - Cannot find content - type: " + type + " - dDocName: " + dDocName);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private String extractReferenceWeblayout(ParametersCollector parametersCollector, String originalReference) throws Exception {
+        Matcher matcher = patternWeblayout.matcher(originalReference);
+        if (matcher.find()) {
+            String dDocName = matcher.group(1);
+            String reference = resolveContentReference(parametersCollector, TYPE_WEBLAYOUT, dDocName);
+            if (reference != null) {
+                return reference;
+            } else {
+                throw new FileNotFoundException(" - Cannot find content - type: " + TYPE_WEBLAYOUT + " - dDocName: " + dDocName);
+            }
+        } else {
+            return null;
+        }
     }
 
     private boolean isIgnoredPrefix(ParametersCollector parametersCollector, String originalReference) {
@@ -130,6 +167,8 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
         } else if (TYPE_RESOURCE.equalsIgnoreCase(type)) {
             return searchContent(parametersCollector, PROPERTY_ASSET, parametersCollector.getReferenceResolutionBasePathAssets(), PROPERTY_ASSET_CONTENTID, dDocName);
         } else if (TYPE_RENDITION.equalsIgnoreCase(type)) {
+            return searchContent(parametersCollector, PROPERTY_ASSET, parametersCollector.getReferenceResolutionBasePathAssets(), PROPERTY_ASSET_CONTENTID, dDocName);
+        } else if (TYPE_WEBLAYOUT.equalsIgnoreCase(type)) {
             return searchContent(parametersCollector, PROPERTY_ASSET, parametersCollector.getReferenceResolutionBasePathAssets(), PROPERTY_ASSET_CONTENTID, dDocName);
         } else {
             return null;
