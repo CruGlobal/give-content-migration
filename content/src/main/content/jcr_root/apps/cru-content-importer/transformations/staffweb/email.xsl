@@ -27,7 +27,6 @@
 		<xsl:variable name="dateText" select="fn:doc(concat('give://formatDate?outputformat=dd MMMM yyyy&amp;date=', fn:encode-for-uri(wcm:root/wcm:element[@name='email_date'])))"/>
 		<xsl:variable name="image" select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='email_header_image'])))"/>
 		<xsl:variable name="text" select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:root/wcm:element[@name='email_body'])))"/>
-	
 		<sv:node sv:name="jcr:content">
 		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
 		        <sv:value>cq:PageContent</sv:value>
@@ -38,11 +37,24 @@
 		    <sv:property sv:name="cq:template" sv:type="String">
 		        <sv:value>/apps/StaffWeb/components/page/article</sv:value>
 		    </sv:property>
+		    <sv:property sv:name="showCommentsAtBottom" sv:type="Boolean">
+				<sv:value>true</sv:value>
+			</sv:property>
 		    <sv:property sv:name="cq:designPath" sv:type="String">
 		        <sv:value>/etc/designs/staffweb</sv:value>
 		    </sv:property>
 		    <sv:property sv:name="jcr:title" sv:type="String">
-		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='email_heading']" /></sv:value>
+		    	<xsl:choose>
+         			<xsl:when test="wcm:root/wcm:element[@name='email_heading']">
+           				<sv:value><xsl:value-of select="wcm:root/wcm:element[@name='email_heading']" /></sv:value>
+         			</xsl:when>
+         			<xsl:when test="wcm:root/wcm:element[@name='heading']">
+           				<sv:value><xsl:value-of select="wcm:root/wcm:element[@name='heading']" /></sv:value>
+         			</xsl:when>
+         			<xsl:otherwise>
+          				<sv:value>All Staff Email</sv:value>
+         			</xsl:otherwise>
+       			</xsl:choose>
 		    </sv:property>
 		    <sv:property sv:name="jcr:description" sv:type="String">
 		        <sv:value><xsl:value-of select="$xDescription_6_2000" /></sv:value>
