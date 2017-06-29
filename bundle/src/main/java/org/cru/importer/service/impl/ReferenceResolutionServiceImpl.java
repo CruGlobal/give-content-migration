@@ -181,7 +181,9 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
         map.put("type", contentType);
         map.put("path", path);
         map.put("1_property", property);
-        map.put("1_property.value", dDocName);
+        map.put("1_property.1_value", dDocName);
+        map.put("1_property.2_value", dDocName.toLowerCase());
+        map.put("1_property.3_value", dDocName.toUpperCase());
         Query query = resourceResolver.adaptTo(QueryBuilder.class).createQuery(PredicateGroup.create(map), resourceResolver.adaptTo(Session.class));
         SearchResult result = query.getResult();
         List<Hit> hits = result.getHits();

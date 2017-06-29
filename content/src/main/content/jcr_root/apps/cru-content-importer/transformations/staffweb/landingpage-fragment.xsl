@@ -39,6 +39,7 @@
 		<xsl:if test="fn:position() &lt; 3">
 			<xsl:variable name="plainHeadline" select="fn:doc(concat('give://escapeHTMLTags?htmlSource=', fn:encode-for-uri(wcm:element[@name='headline'])))"/>
 			<xsl:variable name="linkHeadline" select="fn:doc(concat('give://getLinkFromHTML?htmlSource=', fn:encode-for-uri(wcm:element[@name='headline'])))"/>
+			<xsl:variable name="plainReadMore" select="fn:doc(concat('give://escapeHTMLTags?htmlSource=', fn:encode-for-uri(wcm:element[@name='more_link'])))"/>
 			<sv:node >
 				<xsl:attribute name="sv:name"><xsl:value-of select="concat('tile_',$fragment,fn:position())"/></xsl:attribute>
 				<sv:property sv:name="jcr:primaryType" sv:type="Name">
@@ -63,6 +64,11 @@
 						</sv:property>
 					</xsl:if>
 				</xsl:if>
+				<xsl:if test="not(wcm:element[@name='more_link'] = '')">
+					<sv:property sv:name="readMore" sv:type="String">
+				    	<sv:value><xsl:value-of select="$plainReadMore" /></sv:value>
+					</sv:property>
+				</xsl:if>
 				<xsl:if test="not(wcm:element[@name='teaser'] = '')">
 					<sv:property sv:name="text" sv:type="String">
 				    	<sv:value><xsl:value-of select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:element[@name='teaser'])))" /></sv:value>
@@ -73,7 +79,7 @@
 						<sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:element[@name='image_large'])))" /></sv:value>
 					</sv:property>
 					<sv:property sv:name="imageRenditionName" sv:type="String">
-				    	<sv:value>CruHalf432x243</sv:value>
+				    	<sv:value>CruWhole848x477</sv:value>
 					</sv:property>
 					<sv:property sv:name="imageRotate" sv:type="String">
 				    	<sv:value>0</sv:value>
