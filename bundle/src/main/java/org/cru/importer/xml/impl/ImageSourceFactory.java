@@ -51,12 +51,7 @@ public class ImageSourceFactory extends GiveSourceFactoryBase {
     private String extractImage(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, String htmlSource) {
         Document doc = Jsoup.parse(htmlSource);
         String image = doc.select(TAG_IMG).attr(ATTRIB_SRC);
-        String imageResolved = referenceResolutionService.resolveReference(parametersCollector, currentMetadata, image);
-        if (image.equals(imageResolved)) {
-            return ""; // Leave image empty if not present (we don't want to be displayed as a broken image)
-        } else {
-            return imageResolved;
-        }
+        return referenceResolutionService.resolveReference(parametersCollector, currentMetadata, image);
     }
 
 }

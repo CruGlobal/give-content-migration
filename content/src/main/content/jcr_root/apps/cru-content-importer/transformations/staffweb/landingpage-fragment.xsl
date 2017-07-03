@@ -79,10 +79,13 @@
 						<sv:value><xsl:value-of select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:element[@name='image_large'])))" /></sv:value>
 					</sv:property>
 					<sv:property sv:name="imageRenditionName" sv:type="String">
-				    	<sv:value>CruWhole848x477</sv:value>
+				    	<sv:value>StaffwebInternalImage</sv:value>
 					</sv:property>
 					<sv:property sv:name="imageRotate" sv:type="String">
 				    	<sv:value>0</sv:value>
+					</sv:property>
+					<sv:property sv:name="imagePosition" sv:type="String">
+				    	<sv:value>tile-image-left</sv:value>
 					</sv:property>
 				</xsl:if>
 			</sv:node>
