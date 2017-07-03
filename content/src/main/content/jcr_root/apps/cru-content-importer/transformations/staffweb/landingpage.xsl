@@ -42,7 +42,7 @@
 		        <sv:value><xsl:value-of select="$dDocName_6_30" /></sv:value>
 		    </sv:property>
  			<sv:property sv:name="hideInNav" sv:type="Boolean">
-		        <sv:value>true</sv:value>
+		        <sv:value>false</sv:value>
 		    </sv:property>
 		    <sv:node sv:name="image">
 			    <sv:property sv:name="imageRotate" sv:type="Name">
