@@ -100,15 +100,7 @@
 				        <sv:value><xsl:value-of select="$text" /></sv:value>
 				    </sv:property>
 			    </sv:node>
-		    </sv:node>
-		    <xsl:if test="wcm:root/wcm:element[@name='video_link'] != ''">
-		        <sv:node sv:name="post-body-parsys">
-			        <sv:property sv:name="jcr:primaryType" sv:type="Name">
-			            <sv:value>nt:unstructured</sv:value>
-			        </sv:property>
-			        <sv:property sv:name="sling:resourceType" sv:type="String">
-			            <sv:value>wcm/foundation/components/parsys</sv:value>
-			        </sv:property>
+		        <xsl:if test="wcm:root/wcm:element[@name='video_link'] != ''">
 			        <sv:node sv:name="media_embed">
 				        <sv:property sv:name="jcr:primaryType" sv:type="Name">
 				            <sv:value>nt:unstructured</sv:value>
@@ -120,8 +112,8 @@
 						    <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='video_link']" /></sv:value>				    
 				        </sv:property>
 			        </sv:node>
-		        </sv:node>
-		    </xsl:if>
+		        </xsl:if>
+		    </sv:node>
 		</sv:node>
 	</xsl:template>
 </xsl:transform>
