@@ -42,7 +42,8 @@
 	    	/apps/cru-content-importer/configurations/staffweb/landingpage,
 	    	/apps/cru-content-importer/configurations/staffweb/iframe,
 	    	/apps/cru-content-importer/configurations/staffweb/email,
-            /apps/cru-content-importer/configurations/staffweb/assets
+            /apps/cru-content-importer/configurations/staffweb/assets,
+            /apps/cru-content-importer/configurations/staffweb/video-home-article,
 	    ]"
 	    tempStorePath="/var/cru-content-importer"
 	    />
