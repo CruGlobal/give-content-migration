@@ -18,6 +18,7 @@ import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ReferenceReplacement;
 import org.cru.importer.bean.ResourceMetadata;
 import org.cru.importer.bean.ResultsCollector;
+import org.cru.importer.service.AdditionalMappingService;
 import org.cru.importer.service.ReferenceResolutionService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,6 +31,8 @@ import com.day.cq.search.Query;
 import com.day.cq.search.QueryBuilder;
 import com.day.cq.search.result.Hit;
 import com.day.cq.search.result.SearchResult;
+
+import net.sf.saxon.trans.XPathException;
 
 @Component(
     metatype = true,
@@ -60,8 +63,14 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
     private static final String STELLENT_EXRACTOR_REGEX_WEBLAYOUT = "ssWeblayoutUrl\\('(.*?)'\\)";
     private static Pattern patternWeblayout = Pattern.compile(STELLENT_EXRACTOR_REGEX_WEBLAYOUT);
 
+    private static final String ADDITIONAL_MAPPING_KEY = "dDocName";
+    private static final String ADDITIONAL_MAPPING_URL = "URL";
+
     @Reference
     private ResultsCollector resultsCollector;
+    
+    @Reference
+    private AdditionalMappingService additionalMappingService;
     
     public String resolveAllReferences(ParametersCollector parametersCollector, ResourceMetadata currentMetadata, String htmlSourceParameter) {
         Document doc = Jsoup.parse(htmlSourceParameter);
@@ -163,7 +172,7 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
         if (TYPE_LINK.equalsIgnoreCase(type)) {
             return searchContent(parametersCollector, PROPERTY_PAGE, parametersCollector.getReferenceResolutionBasePathPages(), PROPERTY_PAGE_CONTENTID, dDocName);
         } else if (TYPE_NODELINK.equalsIgnoreCase(type)) {
-            return null; // TODO: Verify how to search this type
+            return searchNodeLink(parametersCollector, dDocName);
         } else if (TYPE_RESOURCE.equalsIgnoreCase(type)) {
             return searchContent(parametersCollector, PROPERTY_ASSET, parametersCollector.getReferenceResolutionBasePathAssets(), PROPERTY_ASSET_CONTENTID, dDocName);
         } else if (TYPE_RENDITION.equalsIgnoreCase(type)) {
@@ -174,7 +183,7 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
             return null;
         }
     }
-    
+
     private String searchContent(ParametersCollector parametersCollector, String contentType, String path, String property, String dDocName) throws Exception {
         ResourceResolver resourceResolver = parametersCollector.getResourceResolver();
         Map<String, String> map = new HashMap<String, String>();
@@ -192,6 +201,18 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
         } else {
             return null;
         }
+    }
+    
+    private String searchNodeLink(ParametersCollector parametersCollector, String dDocName) throws XPathException {
+        Map<String, String> mapping = additionalMappingService.getAdditionalMapping(parametersCollector, null, ADDITIONAL_MAPPING_KEY, dDocName);
+        String path = mapping.get(ADDITIONAL_MAPPING_URL);
+        if (path != null) {
+            path = parametersCollector.getReferenceResolutionBasePathPages() + path;
+            if (path.endsWith("/index.htm")) {
+                path = path.substring(0, path.length() - 10);
+            }
+        }
+        return path;
     }
     
 }

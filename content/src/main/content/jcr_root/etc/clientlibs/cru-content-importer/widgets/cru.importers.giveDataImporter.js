@@ -9,6 +9,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
         
         var processOptions = [];
         var defaultPaths = {};
+        var additionalMappingLabels = {};
         var requireAdditionalMappingFile = [];
         config.options.forEach(function(item,index){
             var path = item.trim();
@@ -18,6 +19,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
             defaultPaths[path] = option.defaultPath;
             if (option.additionalMappingFile) {
                 requireAdditionalMappingFile.push(path);
+                additionalMappingLabels[path] = option.additionalMappingLabel;
             }
         });
 
@@ -62,6 +64,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                                 CQ.Ext.getCmp("additional-mapping-file").show();
                                 CQ.Ext.getCmp("additional-mapping-file").allowBlank = false;
                                 CQ.Ext.getCmp("form-parameters").doLayout();
+                                $('label[for=additional-mapping-file]').text(additionalMappingLabels[value]);
                             } else {
                                 CQ.Ext.getCmp("additional-mapping-file").hide();
                                 CQ.Ext.getCmp("additional-mapping-file").allowBlank = true;
@@ -89,7 +92,7 @@ cru.importers.giveDataImporter = CQ.Ext.extend(CQ.wcm.Viewport, {
                     "hidden":true,
                     "name": "additionalMappingFile",
                     "fieldLabel":"Additional Mapping File",
-                    "fieldDescription":"Select CSV file containing the aditional mapping information (required for fund). If the file to process is not uploaded yet, please upload it using webDav " +
+                    "fieldDescription":"Select a CSV file containing the aditional mapping information. If the file to process is not uploaded yet, please upload it using webDav " +
                                        "(In MAC: go to Finder -> Go -> Connect to server and enter the URL " + window.location.origin + "/crx/repository/crx.default/var/cru-content-importer)",
                     "rootPath": config.tempStorePath
                 }
