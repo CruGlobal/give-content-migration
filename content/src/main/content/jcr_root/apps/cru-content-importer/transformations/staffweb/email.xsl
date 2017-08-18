@@ -27,6 +27,20 @@
 		<xsl:variable name="dateText" select="fn:doc(concat('give://formatDate?outputformat=dd MMMM yyyy&amp;date=', fn:encode-for-uri(wcm:root/wcm:element[@name='email_date'])))"/>
 		<xsl:variable name="image" select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='email_header_image'])))"/>
 		<xsl:variable name="text" select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:root/wcm:element[@name='email_body'])))"/>
+		<xsl:variable name="title">
+			<xsl:choose>
+     			<xsl:when test="wcm:root/wcm:element[@name='email_heading']">
+       				<sv:value><xsl:value-of select="wcm:root/wcm:element[@name='email_heading']" /></sv:value>
+     			</xsl:when>
+     			<xsl:when test="wcm:root/wcm:element[@name='heading']">
+       				<sv:value><xsl:value-of select="wcm:root/wcm:element[@name='heading']" /></sv:value>
+     			</xsl:when>
+     			<xsl:otherwise>
+      				<sv:value>All Staff Email</sv:value>
+     			</xsl:otherwise>
+   			</xsl:choose>
+		</xsl:variable> 
+		
 		<sv:node sv:name="jcr:content">
 		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
 		        <sv:value>cq:PageContent</sv:value>
@@ -44,17 +58,7 @@
 		        <sv:value>/etc/designs/staffweb</sv:value>
 		    </sv:property>
 		    <sv:property sv:name="jcr:title" sv:type="String">
-		    	<xsl:choose>
-         			<xsl:when test="wcm:root/wcm:element[@name='email_heading']">
-           				<sv:value><xsl:value-of select="wcm:root/wcm:element[@name='email_heading']" /></sv:value>
-         			</xsl:when>
-         			<xsl:when test="wcm:root/wcm:element[@name='heading']">
-           				<sv:value><xsl:value-of select="wcm:root/wcm:element[@name='heading']" /></sv:value>
-         			</xsl:when>
-         			<xsl:otherwise>
-          				<sv:value>All Staff Email</sv:value>
-         			</xsl:otherwise>
-       			</xsl:choose>
+		    	<sv:value><xsl:value-of select="$title" /></sv:value>
 		    </sv:property>
 		    <sv:property sv:name="jcr:description" sv:type="String">
 		        <sv:value><xsl:value-of select="$xDescription_6_2000" /></sv:value>
@@ -62,11 +66,13 @@
 		    <sv:property sv:name="contentId" sv:type="String">
 		        <sv:value><xsl:value-of select="$dDocName_6_30" /></sv:value>
 		    </sv:property>
+		    <xsl:if test="$text = ''">
+		    	<sv:property sv:name="hideArticleDetails" sv:type="Boolean">
+		        	<sv:value>true</sv:value>
+		    	</sv:property>
+		    </xsl:if>
 		    <sv:property sv:name="author" sv:type="String">
 		        <sv:value><xsl:value-of select="wcm:root/wcm:element[@name='email_byline']" /></sv:value>
-		    </sv:property>
-		    <sv:property sv:name="hideFacebookCommentsFeed" sv:type="String">
-		        <sv:value>true</sv:value>
 		    </sv:property>
 		    <xsl:if test="$dateText != ''">
 		    	<sv:property sv:name="dateText" sv:type="String">
@@ -119,6 +125,19 @@
 			    <sv:property sv:name="sling:resourceType" sv:type="String">
 			        <sv:value>wcm/foundation/components/parsys</sv:value>
 			    </sv:property>
+			    <xsl:if test="$text = ''">
+				    <sv:node sv:name="section_title">
+					    <sv:property sv:name="jcr:primaryType" sv:type="Name">
+					        <sv:value>nt:unstructured</sv:value>
+					    </sv:property>
+					    <sv:property sv:name="sling:resourceType" sv:type="String">
+					        <sv:value>StaffWeb/components/section/section-title</sv:value>
+					    </sv:property>
+					    <sv:property sv:name="text" sv:type="String">
+					        <sv:value><xsl:value-of select="$title" /> - <xsl:value-of select="$dateText" /></sv:value>
+					    </sv:property>
+				    </sv:node>
+			    </xsl:if>
 			    <xsl:apply-templates select="wcm:root/wcm:list[@name='email_headlines_list']/wcm:row">
 			    	<xsl:with-param name="fragment">headlines</xsl:with-param> 
 			    </xsl:apply-templates>
@@ -143,6 +162,12 @@
 			</sv:property>
 			<sv:property sv:name="width" sv:type="String">
 			    	<sv:value>col-md-12</sv:value>
+			</sv:property>
+		    <sv:property sv:name="hideLeftPadding" sv:type="Boolean">
+				<sv:value>true</sv:value>
+			</sv:property>
+		    <sv:property sv:name="hideRightPadding" sv:type="Boolean">
+				<sv:value>true</sv:value>
 			</sv:property>
 			<sv:property sv:name="title" sv:type="String">
 		    	<sv:value><xsl:value-of select="$plainHeadline" /></sv:value>
