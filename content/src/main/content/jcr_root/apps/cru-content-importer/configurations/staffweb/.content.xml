@@ -122,7 +122,7 @@
         pathCreationStrategy="[dDocType 6 30:.*:/$0,dDocAccount 6 30:.*:/$0,dCreateDate 5 20:(.{5})(\\d{4})-(\\d{2})(.*):/$2/$3,dDocName 6 30:.*:/$0,dWebExtension 6 255:.*:\\.$0]"
         pageAcceptRule=""
         factoryType="asset"
-        additionalMappingFile="{Boolean}true"
+        additionalMappingFile="{Boolean}false"
         additionalMappingLabel="Nodelink Mapping File"
         acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(.*))$"
         globalConfigs="/apps/cru-content-importer/configurations/global"
