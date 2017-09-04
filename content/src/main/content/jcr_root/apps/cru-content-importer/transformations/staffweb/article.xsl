@@ -21,14 +21,14 @@
 	<xsl:param name="dDocTitle" />
 	<xsl:param name="xDescription" />
 	<xsl:param name="dDocName" />
+	<xsl:param name="xWebsiteSection"/>
+	<xsl:param name="xWebsiteSection_6_200"/>
 
 	<xsl:template match="/">
-	
 		<xsl:variable name="date" select="fn:doc(concat('give://formatDate?date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
 		<xsl:variable name="dateText" select="fn:doc(concat('give://formatDate?outputformat=dd MMMM yyyy&amp;date=', fn:encode-for-uri(wcm:root/wcm:element[@name='by_line_date'])))"/>
 		<xsl:variable name="image" select="fn:doc(concat('give://searchImage?image=', fn:encode-for-uri(wcm:root/wcm:element[@name='article_image'])))"/>
 		<xsl:variable name="text" select="fn:doc(concat('give://transformUrls?htmlSource=', fn:encode-for-uri(wcm:root/wcm:element[@name='body'])))"/>
-	
 		<sv:node sv:name="jcr:content">
 		    <sv:property sv:name="jcr:primaryType" sv:type="Name">
 		        <sv:value>cq:PageContent</sv:value>
@@ -48,6 +48,7 @@
 		    <sv:property sv:name="jcr:description" sv:type="String">
 		        <sv:value><xsl:value-of select="$xDescription" /></sv:value>
 		    </sv:property>
+			<xsl:call-template name="cqtags"/>
 		    <sv:property sv:name="contentId" sv:type="String">
 		        <sv:value><xsl:value-of select="$dDocName" /></sv:value>
 		    </sv:property>
@@ -115,5 +116,42 @@
 		        </xsl:if>
 		    </sv:node>
 		</sv:node>
+	</xsl:template>
+	
+	<xsl:template name="cqtags">
+		<xsl:variable name="tag">   
+     		<xsl:choose> 
+        		<xsl:when test="$xWebsiteSection_6_200 != ''"> 
+        	    	<xsl:value-of select="$xWebsiteSection_6_200"/> 
+        		</xsl:when> 
+        		<xsl:when test="$xWebsiteSection != ''"> 
+            		<xsl:value-of select="$xWebsiteSection"/> 
+        		</xsl:when> 
+		    </xsl:choose> 
+		</xsl:variable>   
+		<xsl:if test="$tag != ''">
+			<sv:property sv:name="cq:tags" sv:type="String">
+				<sv:value>
+				<xsl:choose>
+					<xsl:when test="$tag = 'StaffWeb:mpd-email-tips'">Staffweb:MPD_Tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:mpd-tips'">Staffweb:MPD_Tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:timeless-tips'">Staffweb:MPD_Tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:AllStaffEmail'">Staffweb:All_Hands_Email</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-archives'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:day-of-prayer'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:ibs'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-events'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:connection-newsletter'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:leadership'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:legacy-archives-hidden'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:legacy-project'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:branding-naming'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:new-staff-training'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:travel'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-events-video'">Staffweb:News_Events</xsl:when>
+				</xsl:choose>
+				</sv:value>
+			</sv:property>
+		</xsl:if>
 	</xsl:template>
 </xsl:transform>

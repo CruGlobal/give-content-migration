@@ -21,6 +21,8 @@
 	<xsl:param name="dDocTitle" />
 	<xsl:param name="xDescription" />
 	<xsl:param name="dDocName" />
+	<xsl:param name="xWebsiteSection"/>
+	<xsl:param name="xWebsiteSection_6_200"/>
 
 	<xsl:template match="/">
 	
@@ -48,6 +50,7 @@
 		    <sv:property sv:name="jcr:description" sv:type="String">
 		        <sv:value><xsl:value-of select="$xDescription" /></sv:value>
 		    </sv:property>
+		    <xsl:call-template name="cqtags"/>
 		    <sv:property sv:name="contentId" sv:type="String">
 		        <sv:value><xsl:value-of select="$dDocName" /></sv:value>
 		    </sv:property>
@@ -120,5 +123,42 @@
 			    </sv:node>
 		    </sv:node>
 		</sv:node>
+	</xsl:template>
+	
+	<xsl:template name="cqtags">
+		<xsl:variable name="tag">   
+     		<xsl:choose> 
+        		<xsl:when test="$xWebsiteSection_6_200 != ''"> 
+        	    	<xsl:value-of select="$xWebsiteSection_6_200"/> 
+        		</xsl:when> 
+        		<xsl:when test="$xWebsiteSection != ''"> 
+            		<xsl:value-of select="$xWebsiteSection"/> 
+        		</xsl:when> 
+		    </xsl:choose> 
+		</xsl:variable>   
+		<xsl:if test="$tag != ''">
+			<sv:property sv:name="cq:tags" sv:type="String">
+				<sv:value>
+				<xsl:choose>
+					<xsl:when test="$tag = 'StaffWeb:mpd-email-tips'">Staffweb:MPD_Tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:mpd-tips'">Staffweb:MPD_Tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:timeless-tips'">Staffweb:MPD_Tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:AllStaffEmail'">Staffweb:All_Hands_Email</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-archives'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:day-of-prayer'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:ibs'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-events'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:connection-newsletter'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:leadership'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:legacy-archives-hidden'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:legacy-project'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:branding-naming'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:new-staff-training'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:travel'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-events-video'">Staffweb:News_Events</xsl:when>
+				</xsl:choose>
+				</sv:value>
+			</sv:property>
+		</xsl:if>
 	</xsl:template>
 </xsl:transform>
