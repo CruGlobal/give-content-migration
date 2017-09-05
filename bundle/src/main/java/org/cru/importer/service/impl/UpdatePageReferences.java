@@ -78,7 +78,8 @@ public class UpdatePageReferences implements PostProcessService {
                 String currentFilename = currentMetadata.getValue(parametersCollector.getColumnFileName());
                 while (pages.hasNext()) {
                     Resource pageResource = pages.next();
-                    updateResource(referenceReplacements, updatePageReferencesPolicies, contentId, currentResource.getPath(), pageResource);
+                    Page page = pageResource.adaptTo(Page.class);
+                    updateResource(referenceReplacements, updatePageReferencesPolicies, contentId, currentResource.getPath(), page.getContentResource());
                     if (session.hasPendingChanges()) {
                         session.save();
                         String message = currentFilename + " - Related page - " + pageResource.getPath();

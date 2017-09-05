@@ -2,6 +2,7 @@ package org.cru.importer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +32,8 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 import net.sf.saxon.trans.XPathException;
 
@@ -78,6 +81,7 @@ public class GiveDataImportMasterProcess implements Runnable {
 		try {
 			DataImportFactory dataImportFactory = getDataImporFactory(parametersCollector);
 			MetadataProvider metadataProvider = dataImportFactory.createMetadataProvider(parametersCollector, resultsCollector);
+			verifyRequiredColumns(metadataProvider, parametersCollector);
 			ResourceProvider resourceProvider = dataImportFactory.createResourceProvider(parametersCollector, metadataProvider);
 			ContentMapperProvider contentMapperProvider = dataImportFactory.createContentMapperProvider(parametersCollector);
 			List<PostProcessService> postProcessServices = getPostProcessServices(parametersCollector);
@@ -168,6 +172,20 @@ public class GiveDataImportMasterProcess implements Runnable {
 			IOUtils.closeQuietly(in);
 		}
 	}
+
+    private void verifyRequiredColumns(MetadataProvider metadataProvider, ParametersCollector parametersCollector) throws Exception {
+        List<String> requiredColumns = new LinkedList<String>();
+        for (String requiredColumnName : parametersCollector.getRequiredColumnNames()) {
+            try {
+                metadataProvider.decodePropertyName(requiredColumnName + "$");
+            } catch (Exception e) {
+                requiredColumns.add(requiredColumnName);
+            }
+        }
+        if (requiredColumns.size() > 0) {
+            throw new Exception("Excel file must contain the columns: " + String.join(", ", requiredColumns));
+        }
+    }
 
     private boolean acceptsFile(Pattern acceptFilesPattern, String filename) {
 		if (acceptFilesPattern != null) {

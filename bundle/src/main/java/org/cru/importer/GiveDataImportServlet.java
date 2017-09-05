@@ -208,6 +208,7 @@ public class GiveDataImportServlet extends HttpServlet {
                 parametersCollector.setReferenceResolutionBasePathAssets(properties.get("referenceResolutionBasePathAssets",String.class));
                 parametersCollector.setFragmentsColumnFileName(properties.get("fragmentsColumnFileName",String.class));
                 parametersCollector.setFragmentsAcceptanceParameterPattern(properties.get("fragmentsAcceptanceParameterPattern",String.class));
+                parametersCollector.setRequiredColumnNames(properties.get("requiredColumnNames",String[].class));
 				if (properties.get("additionalMappingFile",Boolean.class)) {
 				    Resource additionalMappingFileResource = parametersCollector.getResourceResolver().getResource(request.getParameter("additionalMappingFile"));
 				    if (additionalMappingFileResource == null) {

@@ -37,6 +37,7 @@ public class ParametersCollector {
     private String fragmentsColumnFileName;
     private String fragmentsAcceptanceParameterPattern;
     private Map<String, String> dateSanitizationMap;
+    private String[] requiredColumnNames;
 	
     public ParametersCollector() {
 	    cache = new HashMap<String, Object>();
@@ -260,6 +261,14 @@ public class ParametersCollector {
 
     public void setDateSanitizationMap(Map<String, String> dateSanitizationMap) {
         this.dateSanitizationMap = dateSanitizationMap;
+    }
+
+    public String[] getRequiredColumnNames() {
+        return requiredColumnNames;
+    }
+
+    public void setRequiredColumnNames(String[] requiredColumnNames) {
+        this.requiredColumnNames = requiredColumnNames;
     }
 
 }

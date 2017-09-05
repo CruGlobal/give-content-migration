@@ -21,7 +21,8 @@
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
 		postProcessServices="[UpdatePageReferences]"
-		globalConfigs="/apps/cru-content-importer/configurations/global"/>
+		globalConfigs="/apps/cru-content-importer/configurations/global"
+		requiredColumnNames="[dDocTitle,xDescription,dDocName,xWebsiteSection,finalUrl]"/>
 	
 	<handbook
 		jcr:primaryType="nt:unstructured"
@@ -42,7 +43,8 @@
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
 		postProcessServices="[UpdatePageReferences]"
-		globalConfigs="/apps/cru-content-importer/configurations/global"/>
+		globalConfigs="/apps/cru-content-importer/configurations/global"
+		requiredColumnNames="[dDocTitle,xDescription,dDocName,finalUrl]"/>
 
 	<landingpage
 		jcr:primaryType="nt:unstructured"
@@ -65,7 +67,8 @@
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
 		postProcessServices="[UpdatePageReferences, buildUncompletedFragmentedPages]"
-		globalConfigs="/apps/cru-content-importer/configurations/global"/>
+		globalConfigs="/apps/cru-content-importer/configurations/global"
+		requiredColumnNames="[urlLabel,dDocName 6 30,url]"/>
 		
 	<iframe
 		jcr:primaryType="nt:unstructured"
@@ -86,7 +89,8 @@
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
 		postProcessServices="[UpdatePageReferences]"
-		globalConfigs="/apps/cru-content-importer/configurations/global"/>	
+		globalConfigs="/apps/cru-content-importer/configurations/global"
+		requiredColumnNames="[dDocTitle,dDocName,finalUrl]"/>	
 
 	<email
 		jcr:primaryType="nt:unstructured"
@@ -107,7 +111,8 @@
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
 		postProcessServices="[UpdatePageReferences]"
-		globalConfigs="/apps/cru-content-importer/configurations/global"/>
+		globalConfigs="/apps/cru-content-importer/configurations/global"
+		requiredColumnNames="[xDescription 6 2000,dDocName_6 30,xWebsiteSection 6 200,url]"/>
 
     <assets
         jcr:primaryType="nt:unstructured"
@@ -126,7 +131,8 @@
         additionalMappingLabel="Nodelink Mapping File"
         acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(.*))$"
         globalConfigs="/apps/cru-content-importer/configurations/global"
-        metadataFilePatern="(.*)(/staffweb-)(.*)"/>
+        metadataFilePatern="(.*)(/staffweb-)(.*)"
+        requiredColumnNames="[dDocTitle 6 255,dDocAuthor 6 50,dDocName_6_30,dDocType 6 30,dDocAccount 6 30,dCreateDate 5 20,dDocName 6 30,dWebExtension 6 255]"/>
         
 	<video-home-article
 		jcr:primaryType="nt:unstructured"
@@ -147,6 +153,7 @@
 		referenceResolutionBasePathPages="/content/staffweb/us/en"
 		referenceResolutionBasePathAssets="/content/dam"
 		postProcessServices="[UpdatePageReferences]"
-		globalConfigs="/apps/cru-content-importer/configurations/global"/>
+		globalConfigs="/apps/cru-content-importer/configurations/global"
+		requiredColumnNames="[dDocTitle,xDescription,dDocName,xWebsiteSection,finalUrl]"/>
 
 </jcr:root>
