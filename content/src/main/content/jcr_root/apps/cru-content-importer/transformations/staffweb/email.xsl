@@ -65,6 +65,9 @@
 		    <sv:property sv:name="jcr:description" sv:type="String">
 		        <sv:value><xsl:value-of select="$xDescription_6_2000" /></sv:value>
 		    </sv:property>
+		    <sv:property sv:name="hideInNav" sv:type="String">
+				<sv:value>true</sv:value>
+		    </sv:property>
 		    <xsl:call-template name="cqtags"/>
 		    <sv:property sv:name="contentId" sv:type="String">
 		        <sv:value><xsl:value-of select="$dDocName_6_30" /></sv:value>
@@ -120,6 +123,7 @@
 					    </sv:property>
 				    </sv:node>
 			    </xsl:if>
+			    <xsl:call-template name="recent_headlines"/>
 		    </sv:node>
  			<sv:node sv:name="content-parsys-postArticle">
 			    <sv:property sv:name="jcr:primaryType" sv:type="Name">
@@ -202,6 +206,7 @@
 		</sv:node>
 	</xsl:template>
 	
+	<!-- Searches the equivalent tag in StaffWeb and includes it in the content -->
 	<xsl:template name="cqtags">
 		<xsl:variable name="tag">   
      		<xsl:choose> 
@@ -236,6 +241,122 @@
 				</xsl:choose>
 				</sv:value>
 			</sv:property>
+		</xsl:if>
+	</xsl:template>
+	
+	<!-- Includes 'recent headlines' component and configures it -->
+	<xsl:template name="recent_headlines">
+		<xsl:variable name="xWebsiteSectionValue">   
+     		<xsl:choose> 
+        		<xsl:when test="$xWebsiteSection_6_200 != ''"> 
+        	    	<xsl:value-of select="$xWebsiteSection_6_200"/> 
+        		</xsl:when> 
+        		<xsl:when test="$xWebsiteSection != ''"> 
+            		<xsl:value-of select="$xWebsiteSection"/> 
+        		</xsl:when> 
+		    </xsl:choose> 
+		</xsl:variable>   
+		<xsl:variable name="tags" as="element()*">   
+     		<xsl:choose>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:mpd-email-tips'">
+					<Item>Staffweb:MPD_Tips</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:mpd-tips'">
+					<Item>Staffweb:MPD_Tips</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:timeless-tips'">
+					<Item>Staffweb:MPD_Tips</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:AllStaffEmail'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:news-archives'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:day-of-prayer'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:ibs'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:news-events'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:connection-newsletter'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:leadership'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:legacy-archives-hidden'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:legacy-project'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:branding-naming'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:new-staff-training'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:travel'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>
+				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:news-events-video'">
+					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:All_Hands_Email</Item>
+					<Item>Staffweb:News_Events</Item>
+				</xsl:when>						
+				<xsl:otherwise></xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>   
+		<xsl:if test="$tags != ''">
+			<sv:node sv:name="recent_headlines">
+				<sv:property sv:name="jcr:primaryType" sv:type="Name">
+					<sv:value>nt:unstructured</sv:value>
+				</sv:property>
+				    <sv:property sv:name="sling:resourceType" sv:type="String">
+				        <sv:value>StaffWeb/components/section/recent-headlines</sv:value>
+				    </sv:property>
+				    <sv:property sv:name="itemQuantity" sv:type="String">
+				        <sv:value> 4 </sv:value>
+				    </sv:property>
+				    <sv:property sv:name="pathRef" sv:type="String">
+				        <sv:value> /content/staffweb/us/en </sv:value>
+				    </sv:property>
+				    <sv:property sv:name="tags" sv:type="String">
+						<xsl:for-each select="$tags">
+    						<sv:value>
+    							<xsl:value-of select="."/>
+    						</sv:value>
+						</xsl:for-each>
+					</sv:property>
+			  </sv:node>
 		</xsl:if>
 	</xsl:template>
 </xsl:transform>
