@@ -105,17 +105,17 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
         String currentFilename = currentMetadata.getValue(parametersCollector.getColumnFileName());
         try {
             String reference = extractReference(parametersCollector, originalReference);
+            if (reference == null) {
+                reference = extractReferenceWeblayout(parametersCollector, originalReference);
+            }
             if (reference != null) {
+                if (reference.startsWith(parametersCollector.getReferenceResolutionBasePathPages())){
+                    reference = reference + ".html";
+                }
                 return reference;
             } else {
-                reference = extractReferenceWeblayout(parametersCollector, originalReference);
-                if (reference != null) {
-                    return reference;
-                } else {
-                    message = currentFilename + " - Cannot extract content ID from string: " + originalReference;
-                }
+                LOGGER.warn(currentFilename + " - Cannot extract content ID from string: " + originalReference);
             }
-            LOGGER.warn(message);
         } catch (FileNotFoundException e) {
             message = currentFilename + " - " + e.getMessage();
             LOGGER.warn(message, e);
@@ -210,6 +210,8 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
             path = parametersCollector.getReferenceResolutionBasePathPages() + path;
             if (path.endsWith("/index.htm")) {
                 path = path.substring(0, path.length() - 10);
+            } else if (path.endsWith(".htm")) {
+                path = path.substring(0, path.length() - 4);
             }
         }
         return path;
