@@ -112,7 +112,7 @@
 		referenceResolutionBasePathAssets="/content/dam"
 		postProcessServices="[UpdatePageReferences]"
 		globalConfigs="/apps/cru-content-importer/configurations/global"
-		requiredColumnNames="[xDescription 6 2000,dDocName_6 30,xWebsiteSection 6 200,url]"/>
+		requiredColumnNames="[xDescription 6 2000,dDocName 6 30,xWebsiteSection 6 200,url]"/>
 
     <assets
         jcr:primaryType="nt:unstructured"
@@ -132,7 +132,7 @@
         acceptFilesPattern="^(?!__MACOSX)(.*)(\.(?i)(.*))$"
         globalConfigs="/apps/cru-content-importer/configurations/global"
         metadataFilePatern="(.*)(/staffweb-)(.*)"
-        requiredColumnNames="[dDocTitle 6 255,dDocAuthor 6 50,dDocName_6_30,dDocType 6 30,dDocAccount 6 30,dCreateDate 5 20,dDocName 6 30,dWebExtension 6 255]"/>
+        requiredColumnNames="[dDocTitle 6 255,dDocAuthor 6 50,dDocName 6 30,dDocType 6 30,dDocAccount 6 30,dCreateDate 5 20,dDocName 6 30,dWebExtension 6 255]"/>
         
 	<video-home-article
 		jcr:primaryType="nt:unstructured"
