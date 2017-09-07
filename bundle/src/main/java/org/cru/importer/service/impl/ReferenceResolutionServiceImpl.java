@@ -170,7 +170,11 @@ public class ReferenceResolutionServiceImpl implements ReferenceResolutionServic
 
     private String resolveContentReference(ParametersCollector parametersCollector, String type, String dDocName) throws Exception {
         if (TYPE_LINK.equalsIgnoreCase(type)) {
-            return searchContent(parametersCollector, PROPERTY_PAGE, parametersCollector.getReferenceResolutionBasePathPages(), PROPERTY_PAGE_CONTENTID, dDocName);
+            String reference = searchContent(parametersCollector, PROPERTY_PAGE, parametersCollector.getReferenceResolutionBasePathPages(), PROPERTY_PAGE_CONTENTID, dDocName);
+            if (reference == null) {
+                reference = searchContent(parametersCollector, PROPERTY_ASSET, parametersCollector.getReferenceResolutionBasePathAssets(), PROPERTY_ASSET_CONTENTID, dDocName);
+            }
+            return reference;
         } else if (TYPE_NODELINK.equalsIgnoreCase(type)) {
             return searchNodeLink(parametersCollector, dDocName);
         } else if (TYPE_RESOURCE.equalsIgnoreCase(type)) {
