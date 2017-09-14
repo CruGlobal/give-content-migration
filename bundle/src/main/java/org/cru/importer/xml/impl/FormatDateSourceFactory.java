@@ -13,6 +13,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.cru.importer.bean.ParametersCollector;
 import org.cru.importer.bean.ResourceMetadata;
+import org.cru.importer.bean.ResultsCollector;
 import org.cru.importer.service.DateParserService;
 import org.cru.importer.xml.GiveSourceFactory;
 import org.cru.importer.xml.GiveSourceFactoryBase;
@@ -35,6 +36,9 @@ public class FormatDateSourceFactory extends GiveSourceFactoryBase {
     @Reference
     private DateParserService dateFormatter;
     
+    @Reference
+    private ResultsCollector resultsCollector;
+    
 	private static final String AEM_FORMAT = "yyyy-MM-dd'T'hh:mm:ss.'000+00:00'";
     private static final DateFormat AEM_DATE_FORMATTER = new SimpleDateFormat(AEM_FORMAT, Locale.US);
 
@@ -46,12 +50,16 @@ public class FormatDateSourceFactory extends GiveSourceFactoryBase {
             throws XPathException {
         String date = "";
         if (params.containsKey(PARAM_DATE) && !params.get(PARAM_DATE).equals("")) {
-            Date extractedDate = dateFormatter.parseDate(parametersCollector, params.get(PARAM_DATE));
-            String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
-            if (outputFormat!=null && !"".equals(outputFormat)){
-                date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);
-            } else {
-                date = AEM_DATE_FORMATTER.format(extractedDate);
+            try {
+                Date extractedDate = dateFormatter.parseDate(parametersCollector, params.get(PARAM_DATE));
+                String outputFormat = params.get(PARAM_OUTPUT_FORMAT);
+                if (outputFormat!=null && !"".equals(outputFormat)){
+                    date = new SimpleDateFormat(outputFormat, Locale.US).format(extractedDate);
+                } else {
+                    date = AEM_DATE_FORMATTER.format(extractedDate);
+                }
+            } catch (Exception e) {
+                resultsCollector.addWarning(e.getMessage());
             }
         }
         return "<date>" + date + "</date>";
