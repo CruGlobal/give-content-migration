@@ -154,22 +154,22 @@
 			<sv:property sv:name="cq:tags" sv:type="String">
 				<sv:value>
 				<xsl:choose>
-					<xsl:when test="$tag = 'StaffWeb:mpd-email-tips'">Staffweb:MPD_Tips</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:mpd-tips'">Staffweb:MPD_Tips</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:timeless-tips'">Staffweb:MPD_Tips</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:AllStaffEmail'">Staffweb:All_Hands_Email</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:news-archives'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:day-of-prayer'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:ibs'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:news-events'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:connection-newsletter'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:leadership'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:legacy-archives-hidden'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:legacy-project'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:branding-naming'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:new-staff-training'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:travel'">Staffweb:News_Events</xsl:when>
-					<xsl:when test="$tag = 'StaffWeb:news-events-video'">Staffweb:News_Events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:mpd-email-tips'">Staffweb:mpd-tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:mpd-tips'">Staffweb:mpd-tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:timeless-tips'">Staffweb:mpd-tips</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:AllStaffEmail'">Staffweb:all-hands-email</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-archives'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:day-of-prayer'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:ibs'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-events'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:connection-newsletter'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:leadership'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:legacy-archives-hidden'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:legacy-project'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:branding-naming'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:new-staff-training'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:travel'">Staffweb:news-events</xsl:when>
+					<xsl:when test="$tag = 'StaffWeb:news-events-video'">Staffweb:news-events</xsl:when>
 				</xsl:choose>
 				</sv:value>
 			</sv:property>
@@ -191,78 +191,78 @@
 		<xsl:variable name="tags" as="element()*">   
      		<xsl:choose>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:mpd-email-tips'">
-					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:mpd-tips</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:mpd-tips'">
-					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:mpd-tips</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:timeless-tips'">
-					<Item>Staffweb:MPD_Tips</Item>
+					<Item>Staffweb:mpd-tips</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:AllStaffEmail'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:news-archives'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:day-of-prayer'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:ibs'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:news-events'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:connection-newsletter'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:leadership'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:legacy-archives-hidden'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:legacy-project'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:branding-naming'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:new-staff-training'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:travel'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>
 				<xsl:when test="$xWebsiteSectionValue = 'StaffWeb:news-events-video'">
-					<Item>Staffweb:MPD_Tips</Item>
-					<Item>Staffweb:All_Hands_Email</Item>
-					<Item>Staffweb:News_Events</Item>
+					<Item>Staffweb:mpd-tips</Item>
+					<Item>Staffweb:all-hands-email</Item>
+					<Item>Staffweb:news-events</Item>
 				</xsl:when>						
 				<xsl:otherwise></xsl:otherwise>
 			</xsl:choose>
