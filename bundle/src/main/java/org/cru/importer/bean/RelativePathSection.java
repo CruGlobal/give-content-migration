@@ -47,7 +47,7 @@ public class RelativePathSection {
 				finalPathBuilder.append(m.replaceFirst(relativePathSection.replacement));
 			}
 		}
-		return finalPathBuilder.toString().replace(' ', '-');
+		return finalPathBuilder.toString().replace(' ', '-').replace('.', '-');
 	}
 	
 }
